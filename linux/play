@@ -1,0 +1,12 @@
+#!/bin/bash -xe
+
+cd /home/jack/durden/Quake-2/linux
+
+cd debugi386
+cd baseq2
+
+ln -sf ../gamei386.so gamei386.so
+
+cd ..
+export DISPLAY=:0 
+./quake2  +set vid_ref softx

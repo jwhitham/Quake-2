@@ -206,7 +206,7 @@ void R_TransformFrustum (void)
 }
 
 
-#if !(defined __linux__ && defined __i386__)
+#if 1
 #if !id386
 
 /*
