@@ -226,24 +226,17 @@ void *Sys_GetGameAPI (void *parms)
 		if (!path)
 			return NULL;		// couldn't find one anywhere
 		sprintf (name, "%s/%s/%s", curpath, path, gamename);
-        Com_Printf("attempt %s\n", name);
-        Com_Printf("before %s\n", dlerror ());
-
 		game_library = dlopen (name, RTLD_LAZY );
-
 		if (game_library)
 		{
 			Com_DPrintf ("LoadLibrary (%s)\n",name);
 			break;
-		} else {
-            Com_Printf("bad %s\n", dlerror ());
-        }
+		}
 	}
 
 	GetGameAPI = (void *)dlsym (game_library, "GetGameAPI");
 	if (!GetGameAPI)
 	{
-        perror ("huh");
 		Sys_UnloadGame ();		
 		return NULL;
 	}

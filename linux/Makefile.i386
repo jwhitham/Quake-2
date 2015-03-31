@@ -27,7 +27,7 @@ CTF_DIR=$(MOUNT_DIR)/ctf
 XATRIX_DIR=$(MOUNT_DIR)/xatrix
 
 CC=gcc
-BASE_CFLAGS=-Dstricmp=strcasecmp -DC_ONLY
+BASE_CFLAGS=-Dstricmp=strcasecmp
 
 ifeq ($(ARCH),axp)
 RELEASE_CFLAGS=$(BASE_CFLAGS) -ffast-math -funroll-loops \
