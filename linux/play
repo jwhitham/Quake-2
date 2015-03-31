@@ -9,4 +9,8 @@ ln -sf ../gamei386.so gamei386.so
 
 cd ..
 export DISPLAY=:0 
-./quake2  +set vid_ref softx
+rm -f q2dq2/config.cfg   
+rm -rf q2dq2/save
+
+./quake2  +game q2dq2 +set vid_ref softx 
+

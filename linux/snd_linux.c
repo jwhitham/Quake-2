@@ -34,6 +34,9 @@ qboolean SNDDMA_Init(void)
 	int caps;
 	extern uid_t saved_euid;
 
+	audio_fd = -1;
+	return 0;
+
 	if (snd_inited)
 		return;
 

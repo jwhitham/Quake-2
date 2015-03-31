@@ -844,11 +844,12 @@ static qboolean SWimp_InitGraphics( qboolean fullscreen )
 		displayname = (char *) getenv("DISPLAY");
 		if (displayname)
 		{
-			char *d = displayname;
+			char *d = strdup (displayname);
 			while (*d && (*d != ':')) d++;
 			if (*d) *d = 0;
 			if (!(!strcasecmp(displayname, "unix") || !*displayname))
 				doShm = false;
+            free (d);
 		}
 	}
 
