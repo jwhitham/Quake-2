@@ -22,7 +22,7 @@
 #include <signal.h>
 #include <sys/mman.h>
 
-#include <asm/io.h>
+#include <sys/io.h>
 
 #include "vga.h"
 #include "vgakeyboard.h"

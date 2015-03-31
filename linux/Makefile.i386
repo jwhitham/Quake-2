@@ -12,7 +12,7 @@ else
 ARCH=i386
 endif
 
-MOUNT_DIR=/grog/NewWork/Quake2/code
+MOUNT_DIR=/home/jack/durden/Quake-2
 
 BUILD_DEBUG_DIR=debug$(ARCH)
 BUILD_RELEASE_DIR=release$(ARCH)
@@ -27,7 +27,7 @@ CTF_DIR=$(MOUNT_DIR)/ctf
 XATRIX_DIR=$(MOUNT_DIR)/xatrix
 
 CC=gcc
-BASE_CFLAGS=-Dstricmp=strcasecmp
+BASE_CFLAGS=-Dstricmp=strcasecmp -DC_ONLY
 
 ifeq ($(ARCH),axp)
 RELEASE_CFLAGS=$(BASE_CFLAGS) -ffast-math -funroll-loops \
@@ -73,10 +73,10 @@ TARGETS=$(BUILDDIR)/quake2 \
 	$(BUILDDIR)/game$(ARCH).$(SHLIBEXT) \
 	$(BUILDDIR)/ref_soft.$(SHLIBEXT) \
 	$(BUILDDIR)/ref_softx.$(SHLIBEXT) \
-	$(BUILDDIR)/ref_gl.$(SHLIBEXT) \
-	$(BUILDDIR)/ctf/game$(ARCH).$(SHLIBEXT) \
-	$(BUILDDIR)/xatrix/game$(ARCH).$(SHLIBEXT)
+	$(BUILDDIR)/ctf/game$(ARCH).$(SHLIBEXT)
 endif
+	# $(BUILDDIR)/xatrix/game$(ARCH).$(SHLIBEXT)
+	# $(BUILDDIR)/ref_gl.$(SHLIBEXT) \
 
 build_debug:
 	@-mkdir $(BUILD_DEBUG_DIR) \
@@ -109,6 +109,7 @@ targets: $(TARGETS)
 QUAKE2_OBJS = \
 	$(BUILDDIR)/client/cl_cin.o \
 	$(BUILDDIR)/client/cl_ents.o \
+	$(BUILDDIR)/client/cl_newfx.o \
 	$(BUILDDIR)/client/cl_fx.o \
 	$(BUILDDIR)/client/cl_input.o \
 	$(BUILDDIR)/client/cl_inv.o \
@@ -171,6 +172,9 @@ $(BUILDDIR)/client/cl_cin.o :     $(CLIENT_DIR)/cl_cin.c
 	$(DO_CC)
 
 $(BUILDDIR)/client/cl_ents.o :    $(CLIENT_DIR)/cl_ents.c
+	$(DO_CC)
+
+$(BUILDDIR)/client/cl_newfx.o :    $(CLIENT_DIR)/cl_newfx.c
 	$(DO_CC)
 
 $(BUILDDIR)/client/cl_fx.o :      $(CLIENT_DIR)/cl_fx.c

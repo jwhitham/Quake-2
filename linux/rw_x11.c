@@ -74,7 +74,7 @@ int config_notify=0;
 int config_notify_width;
 int config_notify_height;
 						      
-typedef unsigned short PIXEL;
+typedef unsigned PIXEL;
 
 // Console variables that we need to access from this module
 

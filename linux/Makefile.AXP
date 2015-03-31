@@ -8,7 +8,7 @@
 
 ARCH=axp
 
-MOUNT_DIR=/chest/Quake2/code
+MOUNT_DIR=/home/jack/durden/Quake-2
 
 BUILD_DEBUG_DIR=debug$(ARCH)
 BUILD_RELEASE_DIR=release$(ARCH)
