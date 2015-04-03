@@ -37,11 +37,13 @@
 
 #define WIDTH 400
 #define HEIGHT 300
-#define INTERVAL 125
-#define H_MAX_FRAMES 110000
-/*#define H_MAX_FRAMES 2000*/
+#define INTERVAL 12
+#define PERIOD 40
+/*#define H_MAX_FRAMES 110000*/
+#define H_MAX_FRAMES (PERIOD * 2000)
 
 extern int curframe;
+int drawframe = 0;
 static FILE * outfile;
 
 void RW_IN_Init(in_state_t *in_state_p)
@@ -88,12 +90,19 @@ void RW_IN_Activate(void)
 */
 int SWimp_Init( void *hInstance, void *wndProc )
 {
-    if (!curframe) {
-        curframe = 1;
+    if (!outfile) {
+        int x;
+
+        curframe++;
         outfile = fopen ("video.bin", "wb");
         if (!outfile) {
     		Sys_Error("video.bin not created\n");
         }
+        fwrite ("S", 1, 1, outfile);
+        x = WIDTH;
+        fwrite (&x, 4, 1, outfile);
+        x = HEIGHT;
+        fwrite (&x, 4, 1, outfile);
     }
 	return true;
 }
@@ -108,13 +117,15 @@ int SWimp_Init( void *hInstance, void *wndProc )
 */
 void SWimp_EndFrame (void)
 {
-    curframe ++;
+    curframe += PERIOD;
 
-    if ((curframe % INTERVAL) == (INTERVAL / 2)) {
+    if ((curframe >= drawframe) && outfile) {
         fwrite ("F", 1, 1, outfile);
+        fwrite (&curframe, 4, 1, outfile);
         fwrite (vid.buffer, WIDTH * HEIGHT, 1, outfile);
         printf ("frame %u -> %u bytes\n",
                 curframe, (unsigned) ftell (outfile));
+        drawframe += INTERVAL * PERIOD;
     }
     if (curframe >= H_MAX_FRAMES) {
         Sys_Error ("SWimp_EndFrame - quit\n");
@@ -147,8 +158,10 @@ rserr_t SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 */
 void SWimp_SetPalette( const unsigned char *palette )
 {
-    fwrite ("P", 1, 1, outfile);
-    fwrite (palette, 4 * 256, 1, outfile);
+    if (outfile) {
+        fwrite ("P", 1, 1, outfile);
+        fwrite (palette, 4 * 256, 1, outfile);
+    }
 }
 
 /*

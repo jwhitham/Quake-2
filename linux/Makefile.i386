@@ -33,9 +33,8 @@ ifeq ($(ARCH),axp)
 RELEASE_CFLAGS=$(BASE_CFLAGS) -ffast-math -funroll-loops \
 	-fomit-frame-pointer -fexpensive-optimizations
 else
-RELEASE_CFLAGS=$(BASE_CFLAGS) -m486 -O6 -ffast-math -funroll-loops \
-	-fomit-frame-pointer -fexpensive-optimizations -malign-loops=2 \
-	-malign-jumps=2 -malign-functions=2
+RELEASE_CFLAGS=$(BASE_CFLAGS) -O6 -ffast-math -funroll-loops \
+	-fomit-frame-pointer -fexpensive-optimizations 
 endif
 
 DEBUG_CFLAGS=$(BASE_CFLAGS) -g
@@ -68,6 +67,8 @@ TARGETS=$(BUILDDIR)/quake2 \
 	$(BUILDDIR)/ref_headless.$(SHLIBEXT) \
 	$(BUILDDIR)/ref_softx.$(SHLIBEXT)
 
+all: build_debug build_release
+
 build_debug:
 	@-mkdir $(BUILD_DEBUG_DIR) \
 		$(BUILD_DEBUG_DIR)/client \
@@ -87,8 +88,6 @@ build_release:
 		$(BUILD_RELEASE_DIR)/ctf \
 		$(BUILD_RELEASE_DIR)/xatrix
 	$(MAKE) targets BUILDDIR=$(BUILD_RELEASE_DIR) CFLAGS="$(RELEASE_CFLAGS)"
-
-all: build_debug build_release
 
 targets: $(TARGETS)
 

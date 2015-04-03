@@ -658,8 +658,11 @@ void GetEvent(void)
 ** This routine is responsible for initializing the implementation
 ** specific stuff in a software rendering subsystem.
 */
+extern int curframe;
 int SWimp_Init( void *hInstance, void *wndProc )
 {
+    curframe = 0;
+
 // open the display
 	x_disp = XOpenDisplay(0);
 	if (!x_disp)

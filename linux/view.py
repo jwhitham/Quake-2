@@ -1,5 +1,5 @@
 
-import pygame, sys
+import pygame, sys, struct
 
 
 pygame.init()
@@ -16,43 +16,43 @@ while True:
     if ch == "P":
         palette = infile.read(256 * 4)
 
+    elif ch == "S":
+        width = struct.unpack("<I", infile.read(4))[0]
+        height = struct.unpack("<I", infile.read(4))[0]
+
     elif ch == "F":
+        frame = struct.unpack("<I", infile.read(4))[0]
 
-        if frame > 50000:
-            pal = []
-            for idx in xrange(256):
-                r = ord(palette[idx * 4 + 0])
-                g = ord(palette[idx * 4 + 1])
-                b = ord(palette[idx * 4 + 2])
-                pal.append((r, g, b))
+        pal = []
+        for idx in xrange(256):
+            r = ord(palette[idx * 4 + 0])
+            g = ord(palette[idx * 4 + 1])
+            b = ord(palette[idx * 4 + 2])
+            pal.append((r, g, b))
 
-            image = infile.read(WIDTH * HEIGHT)
-            scopy.fill((0, 0, 0))
+        image = infile.read(WIDTH * HEIGHT)
+        scopy.fill((0, 0, 0))
 
-            idx2 = 0
-            for y in xrange(HEIGHT):
-                for x in xrange(WIDTH):
-                    idx = ord(image[idx2])
-                    scopy.set_at((x, y), pal[idx])
-                    idx2 += 1
+        idx2 = 0
+        for y in xrange(HEIGHT):
+            for x in xrange(WIDTH):
+                idx = ord(image[idx2])
+                scopy.set_at((x, y), pal[idx])
+                idx2 += 1
 
-            print 'frame update', frame
-            screen.blit(scopy, (0, 0))
-            #pygame.image.save(scopy, "%05u.png" % frame)
-            pygame.display.flip()
+        print 'frame update', frame
+        screen.blit(scopy, (0, 0))
+        #pygame.image.save(scopy, "%05u.png" % frame)
+        pygame.display.flip()
+
+        e = pygame.event.poll() 
+        while e.type != pygame.NOEVENT:
+            if e.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit(0)
 
             e = pygame.event.poll() 
-            while e.type != pygame.NOEVENT:
-                if e.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit(0)
 
-                e = pygame.event.poll() 
-
-        else:
-            infile.seek(WIDTH * HEIGHT, 1)
-
-        frame += 125
     else:
         break
 

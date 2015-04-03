@@ -77,11 +77,12 @@ Sys_Milliseconds
 ================
 */
 int curtime = 0;
-int curframe = 0;
+int curframe = 1;
 int Sys_Milliseconds (void)
 {
-    if (curframe) {
-        return 1000 + (curframe * 40);
+    if (curframe > 0) {
+        curframe ++;
+        return curframe;
     } else {
         struct timeval tp;
         struct timezone tzp;
