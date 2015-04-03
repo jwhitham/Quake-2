@@ -35,7 +35,12 @@
 #include "../client/keys.h"
 #include "../linux/rw_linux.h"
 
+#define WIDTH 320
+#define HEIGHT 240
+#define INTERVAL 1
+
 extern int curframe;
+static FILE * outfile;
 
 void RW_IN_Init(in_state_t *in_state_p)
 {
@@ -83,6 +88,10 @@ int SWimp_Init( void *hInstance, void *wndProc )
 {
     if (!curframe) {
         curframe = 1;
+        outfile = fopen ("video.bin", "wb");
+        if (!outfile) {
+    		Sys_Error("video.bin not created\n");
+        }
     }
 	return true;
 }
@@ -97,8 +106,14 @@ int SWimp_Init( void *hInstance, void *wndProc )
 */
 void SWimp_EndFrame (void)
 {
-    printf ("frame %u\n", curframe);
     curframe ++;
+
+    if ((curframe % INTERVAL) == (INTERVAL - 1)) {
+        fwrite ("F", 1, 1, outfile);
+        fwrite (vid.buffer, WIDTH * HEIGHT, 1, outfile);
+        printf ("frame %u -> %u bytes\n",
+                curframe, (unsigned) ftell (outfile));
+    }
 }
 
 /*
@@ -108,9 +123,9 @@ rserr_t SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 {
 	rserr_t retval = rserr_ok;
 
-    vid.width = 320;
-    vid.height = 240;
-	vid.rowbytes = 320;
+    vid.width = WIDTH;
+    vid.height = HEIGHT;
+	vid.rowbytes = WIDTH;
 	vid.buffer = malloc(vid.rowbytes * vid.height);
 	ri.Vid_NewWindow (vid.width, vid.height);
 	R_GammaCorrectAndSetPalette( ( const unsigned char * ) d_8to24table );
@@ -127,6 +142,8 @@ rserr_t SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 */
 void SWimp_SetPalette( const unsigned char *palette )
 {
+    fwrite ("P", 1, 1, outfile);
+    fwrite (palette, 4 * 256, 1, outfile);
 }
 
 /*
@@ -137,6 +154,10 @@ void SWimp_SetPalette( const unsigned char *palette )
 */
 void SWimp_Shutdown( void )
 {
+    if (outfile) {
+        fclose (outfile);
+        outfile = NULL;
+    }
 }
 
 /*
