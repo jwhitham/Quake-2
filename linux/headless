@@ -2,33 +2,27 @@
 
 cd /home/jack/durden/Quake-2/linux
 
-cd debugi386
-
-
-cd baseq2
-ln -sf ../gamei386.so gamei386.so
-
-cd ..
 export DISPLAY=:0 
-rm -f q2dq2/config.cfg   
-rm -rf q2dq2/save
-
-./quake2  +game q2dq2 +set vid_ref headless
-cd ..
-
-
-cd releasei386
+pushd debugi386/baseq2
+ln -sf ../gamei386.so gamei386.so
+popd
+pushd releasei386
 ln -sf ../debugi386/baseq2
 ln -sf ../debugi386/q2dq2
 ln -sf ../debugi386/quake2.conf
+popd
 
-cd baseq2
-ln -sf ../gamei386.so gamei386.so
-
-cd ..
-export DISPLAY=:0 
+pushd debugi386
 rm -f q2dq2/config.cfg   
 rm -rf q2dq2/save
+rm -f video.bin
+./quake2  +game q2dq2 +set vid_ref headless || true
+popd
 
-./quake2  +game q2dq2 +set vid_ref headless
+pushd releasei386
+rm -f q2dq2/config.cfg   
+rm -rf q2dq2/save
+rm -f video.bin
+./quake2  +game q2dq2 +set vid_ref headless || true
+popd
 

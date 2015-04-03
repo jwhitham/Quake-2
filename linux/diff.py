@@ -51,24 +51,29 @@ while True:
             scopy.fill((0, 0, 0))
 
             idx2 = 0
+            count = 0
             for y in xrange(HEIGHT):
                 for x in xrange(WIDTH):
                     idx = ord(image[idx2])
                     scopy.set_at((x + WIDTH * 2, y), pal[idx])
+
+                    idx = ord(image[idx2])
+                    scopy.set_at((x + WIDTH, y), pal[idx])
 
                     idx = ord(ref_data[idx2])
                     scopy.set_at((x, y), pal[idx])
 
                     if image[idx2] != ref_data[idx2]:
                         scopy.set_at((x + WIDTH, y), (255, 255, 255))
+                        count += 1
 
                     idx2 += 1
 
-            print 'DIFFERENCE', frame
+            print 'DIFFERENCE', frame, count
             screen.blit(scopy, (0, 0))
             #pygame.image.save(scopy, "%05u.png" % frame)
             pygame.display.flip()
-            break
+            #break
         else:
             print 'OK', frame
 
