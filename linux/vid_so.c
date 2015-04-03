@@ -2,7 +2,7 @@
 // is used for both the software and OpenGL rendering versions of the
 // Quake refresh engine.
 
-#define SO_FILE "/etc/quake2.conf"
+#define SO_FILE "quake2.conf"
 
 #include <assert.h>
 #include <dlfcn.h> // ELF dl loader
@@ -219,6 +219,7 @@ qboolean VID_LoadRefresh( char *name )
 	strcat(fn, name);
 
 	// permission checking
+#if 0
 	if (strstr(fn, "softx") == NULL) { // softx doesn't require root
 		if (stat(fn, &st) == -1) {
 			Com_Printf( "LoadLibrary(\"%s\") failed: %s\n", name, strerror(errno));
@@ -239,6 +240,7 @@ qboolean VID_LoadRefresh( char *name )
 		setreuid(getuid(), getuid());
 		setegid(getgid());
 	}
+#endif
 
 	if ( ( reflib_library = dlopen( fn, RTLD_NOW ) ) == 0 )
 	{

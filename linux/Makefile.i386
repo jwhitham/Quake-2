@@ -63,20 +63,10 @@ DO_SHLIB_AS=$(CC) $(CFLAGS) $(SHLIBCFLAGS) -DELF -x assembler-with-cpp -o $@ -c 
 # SETUP AND BUILD
 #############################################################################
 
-ifeq ($(ARCH),axp)
 TARGETS=$(BUILDDIR)/quake2 \
 	$(BUILDDIR)/game$(ARCH).$(SHLIBEXT) \
-	$(BUILDDIR)/ctf/game$(ARCH).$(SHLIBEXT) \
-	$(BUILDDIR)/xatrix/game$(ARCH).$(SHLIBEXT)
-else
-TARGETS=$(BUILDDIR)/quake2 \
-	$(BUILDDIR)/game$(ARCH).$(SHLIBEXT) \
-	$(BUILDDIR)/ref_soft.$(SHLIBEXT) \
-	$(BUILDDIR)/ref_softx.$(SHLIBEXT) \
-	$(BUILDDIR)/ctf/game$(ARCH).$(SHLIBEXT)
-endif
-	# $(BUILDDIR)/xatrix/game$(ARCH).$(SHLIBEXT)
-	# $(BUILDDIR)/ref_gl.$(SHLIBEXT) \
+	$(BUILDDIR)/ref_headless.$(SHLIBEXT) \
+	$(BUILDDIR)/ref_softx.$(SHLIBEXT)
 
 build_debug:
 	@-mkdir $(BUILD_DEBUG_DIR) \
@@ -866,6 +856,9 @@ REF_SOFT_SVGA_OBJS = \
 REF_SOFT_X11_OBJS = \
 	$(BUILDDIR)/ref_soft/rw_x11.o
 
+REF_SOFT_HEADLESS_OBJS = \
+	$(BUILDDIR)/ref_soft/rw_headless.o
+
 $(BUILDDIR)/ref_soft.$(SHLIBEXT) : $(REF_SOFT_OBJS) $(REF_SOFT_SVGA_OBJS)
 	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(REF_SOFT_OBJS) \
 		$(REF_SOFT_SVGA_OBJS) $(SVGALDFLAGS)
@@ -873,6 +866,10 @@ $(BUILDDIR)/ref_soft.$(SHLIBEXT) : $(REF_SOFT_OBJS) $(REF_SOFT_SVGA_OBJS)
 $(BUILDDIR)/ref_softx.$(SHLIBEXT) : $(REF_SOFT_OBJS) $(REF_SOFT_X11_OBJS)
 	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(REF_SOFT_OBJS) \
 		$(REF_SOFT_X11_OBJS) $(XLDFLAGS)
+
+$(BUILDDIR)/ref_headless.$(SHLIBEXT) : $(REF_SOFT_OBJS) $(REF_SOFT_HEADLESS_OBJS)
+	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(REF_SOFT_OBJS) \
+		$(REF_SOFT_HEADLESS_OBJS) $(LDFLAGS)
 
 $(BUILDDIR)/ref_soft/r_aclip.o :      $(REF_SOFT_DIR)/r_aclip.c
 	$(DO_SHLIB_CC)
@@ -979,6 +976,9 @@ $(BUILDDIR)/ref_soft/rw_in_svgalib.o : $(LINUX_DIR)/rw_in_svgalib.c
 $(BUILDDIR)/ref_soft/rw_x11.o :       $(LINUX_DIR)/rw_x11.c
 	$(DO_SHLIB_CC)
 
+$(BUILDDIR)/ref_soft/rw_headless.o :  $(LINUX_DIR)/rw_headless.c
+	$(DO_SHLIB_CC)
+
 #############################################################################
 # REF_GL
 #############################################################################
@@ -1071,5 +1071,6 @@ clean2:
 	$(REF_SOFT_OBJS) \
 	$(REF_SOFT_SVGA_OBJS) \
 	$(REF_SOFT_X11_OBJS) \
+	$(REF_SOFT_HEADLESS_OBJS) \
 	$(REF_GL_OBJS)
 
