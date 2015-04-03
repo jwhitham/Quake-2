@@ -35,9 +35,11 @@
 #include "../client/keys.h"
 #include "../linux/rw_linux.h"
 
-#define WIDTH 320
-#define HEIGHT 240
-#define INTERVAL 1
+#define WIDTH 400
+#define HEIGHT 300
+#define INTERVAL 125
+#define H_MAX_FRAMES 110000
+/*#define H_MAX_FRAMES 2000*/
 
 extern int curframe;
 static FILE * outfile;
@@ -108,11 +110,14 @@ void SWimp_EndFrame (void)
 {
     curframe ++;
 
-    if ((curframe % INTERVAL) == (INTERVAL - 1)) {
+    if ((curframe % INTERVAL) == (INTERVAL / 2)) {
         fwrite ("F", 1, 1, outfile);
         fwrite (vid.buffer, WIDTH * HEIGHT, 1, outfile);
         printf ("frame %u -> %u bytes\n",
                 curframe, (unsigned) ftell (outfile));
+    }
+    if (curframe >= H_MAX_FRAMES) {
+        Sys_Error ("SWimp_EndFrame - quit\n");
     }
 }
 
