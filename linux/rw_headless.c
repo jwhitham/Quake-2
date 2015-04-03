@@ -35,6 +35,8 @@
 #include "../client/keys.h"
 #include "../linux/rw_linux.h"
 
+extern int curframe;
+
 void RW_IN_Init(in_state_t *in_state_p)
 {
 }
@@ -79,6 +81,9 @@ void RW_IN_Activate(void)
 */
 int SWimp_Init( void *hInstance, void *wndProc )
 {
+    if (!curframe) {
+        curframe = 1;
+    }
 	return true;
 }
 
@@ -92,9 +97,8 @@ int SWimp_Init( void *hInstance, void *wndProc )
 */
 void SWimp_EndFrame (void)
 {
-    static unsigned counter = 0;
-    printf ("frame %u\n", counter);
-    counter ++;
+    printf ("frame %u\n", curframe);
+    curframe ++;
 }
 
 /*

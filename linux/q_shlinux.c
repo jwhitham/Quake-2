@@ -76,24 +76,29 @@ void Hunk_Free (void *base)
 Sys_Milliseconds
 ================
 */
-int curtime;
+int curtime = 0;
+int curframe = 0;
 int Sys_Milliseconds (void)
 {
-	struct timeval tp;
-	struct timezone tzp;
-	static int		secbase;
+    if (curframe) {
+        return 1000 + (curframe * 40);
+    } else {
+        struct timeval tp;
+        struct timezone tzp;
+        static int		secbase;
 
-	gettimeofday(&tp, &tzp);
-	
-	if (!secbase)
-	{
-		secbase = tp.tv_sec;
-		return tp.tv_usec/1000;
-	}
+        gettimeofday(&tp, &tzp);
+        
+        if (!secbase)
+        {
+            secbase = tp.tv_sec;
+            return tp.tv_usec/1000;
+        }
 
-	curtime = (tp.tv_sec - secbase)*1000 + tp.tv_usec/1000;
-	
-	return curtime;
+        curtime = (tp.tv_sec - secbase)*1000 + tp.tv_usec/1000;
+        
+        return curtime;
+    }
 }
 
 void Sys_Mkdir (char *path)
