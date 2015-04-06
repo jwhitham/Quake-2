@@ -37,14 +37,15 @@
 
 #define WIDTH 400
 #define HEIGHT 300
-#define INTERVAL 12
+#define INTERVAL 1
 #define PERIOD 40
 /*#define H_MAX_FRAMES 110000*/
-#define H_MAX_FRAMES (PERIOD * 2000)
+#define H_MAX_FRAMES (PERIOD * 1000)
 
 extern int curframe;
 int drawframe = 0;
 static FILE * outfile;
+static FILE * infile;
 
 void RW_IN_Init(in_state_t *in_state_p)
 {
@@ -94,6 +95,12 @@ int SWimp_Init( void *hInstance, void *wndProc )
         int x;
 
         curframe++;
+#ifdef RELEASEMODE
+        infile = fopen ("../debugi386/video.bin", "rb");
+        if (!infile) {
+    		Sys_Error("video.bin not created\n");
+        }
+#endif
         outfile = fopen ("video.bin", "wb");
         if (!outfile) {
     		Sys_Error("video.bin not created\n");
@@ -120,11 +127,40 @@ void SWimp_EndFrame (void)
     curframe += PERIOD;
 
     if ((curframe >= drawframe) && outfile) {
+        long begin;
+
         fwrite ("F", 1, 1, outfile);
         fwrite (&curframe, 4, 1, outfile);
+        begin = ftell (outfile);
         fwrite (vid.buffer, WIDTH * HEIGHT, 1, outfile);
-        printf ("frame %u -> %u bytes\n",
+        printf ("frame %d -> %d bytes\n",
                 curframe, (unsigned) ftell (outfile));
+
+#ifdef RELEASEMODE
+        {
+            char secondary[WIDTH * HEIGHT];
+            volatile int i, error = 0;
+
+            if (fseek (infile, begin, SEEK_SET) < 0) {
+                Sys_Error ("Unable to seek reference frame\n");
+            }
+            if (fread (secondary, WIDTH * HEIGHT, 1, infile) != 1) {
+                Sys_Error ("Unable to read reference frame\n");
+            }
+            for (i = 0; i < (WIDTH * HEIGHT); i++) {
+                volatile char ref = secondary[i];
+                volatile char cmp = vid.buffer[i];
+                if (ref != cmp) {
+                    error ++;
+                }
+            }
+            printf ("frame %d -> error count %d\n",
+                    curframe, error);
+            if (error) {
+                Sys_Error ("errors detected\n");
+            }
+        }
+#endif
         drawframe += INTERVAL * PERIOD;
     }
     if (curframe >= H_MAX_FRAMES) {

@@ -9,7 +9,6 @@ popd
 pushd releasei386
 ln -sf ../debugi386/baseq2
 ln -sf ../debugi386/q2dq2
-ln -sf ../debugi386/quake2.conf
 popd
 
 pushd debugi386
