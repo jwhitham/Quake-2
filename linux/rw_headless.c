@@ -34,18 +34,15 @@
 #include "../ref_soft/r_local.h"
 #include "../client/keys.h"
 #include "../linux/rw_linux.h"
+#include "../linux/crc.h"
 
 #define WIDTH 400
 #define HEIGHT 300
-#define INTERVAL 1
 #define PERIOD 40
-/*#define H_MAX_FRAMES 110000*/
-#define H_MAX_FRAMES (PERIOD * 1000)
+#define H_MAX_FRAMES (PERIOD * 20000)
 
 extern int curframe;
-int drawframe = 0;
-static FILE * outfile;
-static FILE * infile;
+static FILE * crc_file;
 
 void RW_IN_Init(in_state_t *in_state_p)
 {
@@ -91,25 +88,12 @@ void RW_IN_Activate(void)
 */
 int SWimp_Init( void *hInstance, void *wndProc )
 {
-    if (!outfile) {
-        int x;
-
+    if (!crc_file) {
         curframe++;
-#ifdef RELEASEMODE
-        infile = fopen ("../debugi386/video.bin", "rb");
-        if (!infile) {
-    		Sys_Error("video.bin not created\n");
+        crc_file = fopen ("crc.dat", "wt");
+        if (!crc_file) {
+    		Sys_Error("crc.dat not created\n");
         }
-#endif
-        outfile = fopen ("video.bin", "wb");
-        if (!outfile) {
-    		Sys_Error("video.bin not created\n");
-        }
-        fwrite ("S", 1, 1, outfile);
-        x = WIDTH;
-        fwrite (&x, 4, 1, outfile);
-        x = HEIGHT;
-        fwrite (&x, 4, 1, outfile);
     }
 	return true;
 }
@@ -124,46 +108,14 @@ int SWimp_Init( void *hInstance, void *wndProc )
 */
 void SWimp_EndFrame (void)
 {
+    unsigned crc;
+
+    crc = crc32_8bytes (vid.buffer, WIDTH * HEIGHT, 0);
+    fprintf (crc_file, "%08x %u\n", crc, curframe);
     curframe += PERIOD;
 
-    if ((curframe >= drawframe) && outfile) {
-        long begin;
-
-        fwrite ("F", 1, 1, outfile);
-        fwrite (&curframe, 4, 1, outfile);
-        begin = ftell (outfile);
-        fwrite (vid.buffer, WIDTH * HEIGHT, 1, outfile);
-        printf ("frame %d -> %d bytes\n",
-                curframe, (unsigned) ftell (outfile));
-
-#ifdef RELEASEMODE
-        {
-            char secondary[WIDTH * HEIGHT];
-            volatile int i, error = 0;
-
-            if (fseek (infile, begin, SEEK_SET) < 0) {
-                Sys_Error ("Unable to seek reference frame\n");
-            }
-            if (fread (secondary, WIDTH * HEIGHT, 1, infile) != 1) {
-                Sys_Error ("Unable to read reference frame\n");
-            }
-            for (i = 0; i < (WIDTH * HEIGHT); i++) {
-                volatile char ref = secondary[i];
-                volatile char cmp = vid.buffer[i];
-                if (ref != cmp) {
-                    error ++;
-                }
-            }
-            printf ("frame %d -> error count %d\n",
-                    curframe, error);
-            if (error) {
-                Sys_Error ("errors detected\n");
-            }
-        }
-#endif
-        drawframe += INTERVAL * PERIOD;
-    }
     if (curframe >= H_MAX_FRAMES) {
+        fflush (crc_file);
         Sys_Error ("SWimp_EndFrame - quit\n");
     }
 }
@@ -194,10 +146,6 @@ rserr_t SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 */
 void SWimp_SetPalette( const unsigned char *palette )
 {
-    if (outfile) {
-        fwrite ("P", 1, 1, outfile);
-        fwrite (palette, 4 * 256, 1, outfile);
-    }
 }
 
 /*
@@ -208,9 +156,9 @@ void SWimp_SetPalette( const unsigned char *palette )
 */
 void SWimp_Shutdown( void )
 {
-    if (outfile) {
-        fclose (outfile);
-        outfile = NULL;
+    if (crc_file) {
+        fclose (crc_file);
+        crc_file = NULL;
     }
 }
 
