@@ -1,12 +1,14 @@
-#include "xh.h"
+#include "opt.h"
 
 
 extern cl_t cl;
-void test (void);
+void test0 (void);
+void test1 (void);
+void test2 (void);
+void testf (void);
 
-int main (void)
+void setup (void)
 {
-    uint32_t * x;
     cl.lerpfrac = 0.479999989;
     cl.predicted_origin[0] = -29.625;
     cl.predicted_origin[1] = -168.375;
@@ -22,10 +24,28 @@ int main (void)
     cl.prediction_error[2] = 0;
     cl.flag = 1;
     cl.n = 0;
-    test ();
-    printf ("%1.7f\n", (double) cl.vieworg[0]);
+}
+
+int main (void)
+{
+    uint32_t * x;
+
     x = (uint32_t *) (&cl.vieworg[0]);
-    printf ("0x%08x\n", x[0]);
+    setup ();
+    test0 ();
+    printf ("test0: %1.9f %08x\n", (double) cl.vieworg[0], (* x));
+
+    setup ();
+    test1 ();
+    printf ("test1: %1.9f %08x\n", (double) cl.vieworg[0], (* x));
+
+    setup ();
+    test2 ();
+    printf ("test2: %1.9f %08x\n", (double) cl.vieworg[0], (* x));
+
+    setup ();
+    testf ();
+    printf ("testf: %1.9f %08x\n", (double) cl.vieworg[0], (* x));
     return 0;
 }
 
