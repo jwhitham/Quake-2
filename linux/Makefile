@@ -8,17 +8,22 @@
 
 ifneq (,$(findstring alpha,$(shell uname -m)))
 ARCH=axp
+ARCH_CFLAGS=
 else
     ifneq (,$(findstring x86_64,$(shell uname -m)))
 ARCH=amd64
+ARCH_CFLAGS=
     else
         ifneq (,$(findstring arm,$(shell uname -m)))
 ARCH=arm
+ARCH_CFLAGS=
         else
             ifneq (,$(findstring 86,$(shell uname -m)))
 ARCH=i386
+ARCH_CFLAGS=-mfpmath=sse -msse2
             else
 ARCH=unknown
+ARCH_CFLAGS=
             endif
         endif
     endif
@@ -39,17 +44,8 @@ CTF_DIR=$(MOUNT_DIR)/ctf
 XATRIX_DIR=$(MOUNT_DIR)/xatrix
 
 CC=gcc
-BASE_CFLAGS=-Dstricmp=strcasecmp -mfpmath=sse -msse2
-
-ifeq ($(ARCH),axp)
-RELEASE_CFLAGS=$(BASE_CFLAGS) -ffast-math -funroll-loops \
-	-fomit-frame-pointer -fexpensive-optimizations
-else
-RELEASE_CFLAGS=$(BASE_CFLAGS) -O2 -g -DRELEASEMODE
-endif
-# -fexcess-precision=standard -ffloat-store
-# -mfpmath=sse -msse 
-
+BASE_CFLAGS=-Dstricmp=strcasecmp $(ARCH_CFLAGS)
+RELEASE_CFLAGS=$(BASE_CFLAGS) -O2 -g
 DEBUG_CFLAGS=$(BASE_CFLAGS) -g
 LDFLAGS=-ldl -lm
 SVGALDFLAGS=-lvga

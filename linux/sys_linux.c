@@ -220,7 +220,7 @@ void *Sys_GetGameAPI (void *parms)
 
 	getcwd(curpath, sizeof(curpath));
 
-	Com_Printf("------- Loading %s -------", gamename);
+	Com_Printf("------- Loading gameXXXX.so -------", gamename);
 
 	// now run through the search paths
 	path = NULL;

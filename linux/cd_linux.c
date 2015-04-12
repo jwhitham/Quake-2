@@ -356,9 +356,12 @@ void CDAudio_Update(void)
 
 int CDAudio_Init(void)
 {
+    return -1; /* no CD audio */
+#if 0
 	int i;
 	cvar_t			*cv;
 	extern uid_t saved_euid;
+
 
 	cv = Cvar_Get ("nocdaudio", "0", CVAR_NOSET);
 	if (cv->value)
@@ -400,6 +403,7 @@ int CDAudio_Init(void)
 	Com_Printf("CD Audio Initialized\n");
 
 	return 0;
+#endif
 }
 
 void CDAudio_Activate (qboolean active)
