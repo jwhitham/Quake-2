@@ -1,0 +1,539 @@
+                            Quake2 done Quick2
+                            ------------------  
+		       <http://PlanetQuake.com/QdQ/>
+
+(0) Index
+
+(1) Introduction
+ (1.1) What's Quake2 done Quick2?
+
+(2) The run
+ (2.1) Installation
+ (2.2) Running and viewing
+
+(3) More details about the run
+ (3.1) Timing
+ (3.2) How the run was recorded
+ (3.3) The bunny-hop restriction
+ (3.4) Project history
+
+(4) Statistics
+
+(5) Credits and contact info
+ (5.1) Credits
+ (5.2) Utilities used
+ (5.3) Contact info
+
+----------------------------------------------------------------------------
+
+
+(1) Introduction
+
+(1.1) What's Quake2 done Quick2?
+
+Quake2 done Quick2 (known as Q2dQ2 for short) is the first speed-run
+by the Quake done Quick team through id Software's Quake2. It is a run
+all the way through Quake2 on Hard skill, going through the levels as
+fast as possible.
+
+We do not worry about secrets and kills, only about completing the
+primary game goals as specified in the manual and completing the game.
+
+We didn't use bunny-hops (strafe-jumping) except to perform tricks
+that couldn't be done in any other way.
+
+The run is continuous, so that we begin each new level with the same
+statistics with which we ended the previous level. In cases where we
+return to a level we have already visited, the level starts in the
+same state as when we left it previously. The run should therefore be
+just like a single continuous run through the game, although like all
+QdQ runs, it was actually recorded one level at a time.
+
+We do not expect every demo to be completely optimised, some maps
+certainly still have some room for improvements - the only certainty
+in speed-running is that you can always do it faster somehow. (-:
+If you think you can beat any of the demos in Q2dQ2, please get in
+touch and we'll supply you with the technology needed to record a demo
+that will fit into the existing run.
+
+
+(2) The run
+
+(2.1) Installation
+
+(At the time of release, Q2dQ2 works for WinXX platforms only. Check the
+download page for extra information on Linux and Mac versions.)
+
+First you need to find your main Quake2 directory. This probably has
+the name "Quake2" and will contain such items as your Quake2 executable
+program (quake2.exe) and your baseq2 game subdirectory.
+
+You should make a subdirectory of this main directory. Give it
+whatever name you like; for the purposes of these instructions we will
+assume you have called it "Q2dQ2". You can e.g. do this in a DOS shell
+by changing to your main Quake2 directory and then typing "md Q2dQ2" at
+the prompt.
+
+You should unzip the contents of q2dq2.zip into your Q2dQ2 directory.
+
+
+(2.2) Running and viewing
+
+First, you will need the "official" version of Quake2, v3.20, in order
+to watch the demos. If you aren't up-to-date, you can download what you
+need from many places, including <http://planetquake.com/files/>
+
+Now to watch the run, start Quake2 with the command-line option "+game
+q2dq2". Alternatively, you can start Quake2 as normal and then enter
+"game q2dq2" in the console.
+
+The run is played from a menu interface, so that you can choose to
+play the whole speed-run, or individual units, or individual runs.
+Use the same keys that you use to access the Quake2 inventory menu
+to move around and make selections in the menu. By default, these
+will be the "[" and "]" keys to move up and down, and the "ENTER"
+key to select a menu item.
+
+If you have them available, you can toggle the inclusion of the
+original id cinematics as part of playback with a menu option.
+
+Whilst playing a demo, you can press F10 to stop and return
+to the menu.
+
+Note that if you press non-function keys in Quake2 whilst a
+demo is playing, this will take you to the console. To return
+to the main Q2dQ2 menu, you can press F10, or enter "menu" as
+a console command.
+
+If you are a keen player who has optimised their DeathMatch framerate
+at the expense of viewing quality, you may wish to choose some
+different configuration options to play back this run so that it looks
+as pretty as possible. A good way to do this is to edit the
+q2dq2/autoexec.cfg file. 
+
+Is there anything else you need to know? Sorry, we'll have to blank
+you - there are no Easter Egg demos in the Q2dQ2 speed-run. There
+will be plenty of eggs when we make a proper movie, though.
+
+We don't know about any playback problems in Q2dQ2, but since this
+is the first time we have released something for Quake2, it is
+possible that some exist. Please write and tell us if you find any
+problems, so that we can fix them, and do things better next time.
+
+As time goes on, FAQs about this release will no doubt arise.
+We will try to publish answers to the common ones on our website.
+When we do this, these will be available via the download page at
+<http://PlanetQuake.com/QdQ/Q2dQ2.html>.
+
+
+(3) More details about the run
+
+(3.1) Timing
+
+Just a quick explanation of why we say we completed Quake2 in 21:06.
+
+We recorded every demo separately and then connected them together,
+adding up the times for each level.
+
+The times for individual levels are rounded down to a whole number
+of seconds, ignoring any fractions of a second. This convention is
+inherited from Quake1 speed-running; consistency was our main
+concern. The total time for our run if the excess fractions of a
+second are taken into account is 21:38.3.
+
+
+(3.2) How the run was recorded
+
+We recorded each demo separately, on skill 2 (Hard), of course without
+any cheating. To time the demos, and to start with the correct stats
+and entity positions that we ended the previous levels with, we used
+some specially written recording options in a game modification by
+Nolan Pflug called q2timer.
+
+We recorded Quake2 as one big run because Quake2 was made to be played
+all the way through, and not as separate levels. We did it by
+connecting single demos together because the final product is a lot
+more interesting and entertaining that way, and we could include some
+very cool tricks that we couldn't do had we recorded it in one sitting.
+
+However we wanted to be sure that the finished run worked just like a
+single continuous playing session, and have worked hard on our recording
+technology in order to do this. The "hub" system of levels that allows
+the player to carry items between levels and re-enter levels that they
+have already visited meant this was much harder to do in Quake2 than in
+Quake1. If you find any continuity problems, please let us know about
+them.
+
+The details of the recording procedure are too complicated to explain
+here, but in time we intend to publish them on our website.
+When we do this, these will be available via the download page at
+<http://PlanetQuake.com/QdQ/Q2dQ2.html>.
+
+(3.3) The bunny-hop restriction
+
+In Quake2, a player can increase their speed with various techniques
+that are based on swiftly changing direction in combination with
+jumping. The main trick is commonly known as turbo-running, although
+QdQ tend to refer to it as bunny-hopping because of the similarity to
+the Quake1 technique of the same name. It basically reduces to
+repeatedly jumping whilst strafing and turning a little.
+
+To proceed through Quake2 as quickly as possible, a player needs
+to bunny-hop non-stop. Some people, including several of the Q2dQ2
+team members, find the results unattractive. There was also a concern
+that the effectiveness of the technique is frame-rate dependent, which
+would have meant that in order to get the best times, a player had to
+have as fast a computer system as possible. This would have introduced
+undesirable unfairness to speed-running.
+
+For this first Q2dQ2 run, we decided to restrict the use of bunny-hopping.
+We bunny-hop only when it is necessary for us to do so in order to perform
+some trick (more precisely, to follow a particular route through the
+Quake2 environment at a certain cost of damage.) This is an arbitrary
+restriction that results in slower than optimum times, but we thought
+it was appropriate for this first attempt at a Quake2 speed-run.
+
+Perhaps future QdQ runs through Quake2 will feature unrestricted
+bunny-hops. This development would echo that of Quake1 speed-running,
+where bunny-hops became more important as time progressed and running
+techniques were refined.
+
+
+(3.4) Project overview
+
+Quake done Quick started making these sort of runs using Quake1 a couple
+of years ago. There are plenty of downloads waiting for you at
+<http://planetquake.com/qdq/> if you haven't seen them already.
+
+This was our first project for Quake2, and it took a very long time to
+complete - sorry to the people who have been waiting impatiently! The
+details of speed-running Quake2 turn out to be much more complicated than
+they were in Quake1.
+
+A lot of new recording technology had to be written, and tuning the details
+so that everything worked right took us a long time. I'd like especially to
+thank Nolan Pflug and Will Marsh for their efforts in making everything work
+as it should. Respect also to all the runners for putting up with all the
+patches, fixes and work-arounds that we had to use whilst trying to get
+things working, and to Gerald Tangent for assembling and motivating the team.
+
+Quake2 underwent many changes relevant to gameplay post-release. We waited
+for the game to stabilise (and for the baseq2 source to be released) before
+starting recording on this project, since we wanted to run a single, stable
+version of the game.
+
+In both the above cases, we could have cut our losses, accepted that the
+finished product wouldn't really represent a continuous run through the game,
+and released something that wasn't quite right. It would probably have been
+just as enjoyable to watch a run where the details don't quite work, but we
+didn't want to compromise the integrity of our speed-runs, so we accepted the
+delay resulting from getting the details right.
+
+But although there are devils in those details, there is lots new to enjoy
+about running this game as well.
+
+Quake2 adds many jumping tricks to the ammunition available to runners.
+Double-jumping and other varieties of ledge pull-ups were probably as
+important as grenade and rocket-jumping in this run, but there are others too,
+including the occasional "permitted" bunnies and circle-jumps.
+
+The ability to carry items between maps (especially with skill 2's "only
+one of any power-up at a time" restriction) adds a lot to the strategy
+involved in route planning. There was a lot of discussion about which
+Quads and Invulnerabilities would yield a profit over all.
+
+The hub/unit-system makes keys and triggers interesting too. There are
+actually a few places where one can carry keys between units; for example,
+one could avoid using the blue key in waste3 and take it through to use in
+lab.
+
+However that minor saving was abandonned when we found a forgotten
+floating trigger that let us avoid most of the Power unit altogether;
+this is probably my favourite hack in the run. Other neat tricks are the
+corpse and bullet door-stops in ware1 and ware2, the 10fps laser bug in
+jail3, the supertank launch in jail4, the rocket+grenade in mine1, the
+adrenaline grab in mine3iii, the Quad from water in hangar2, the
+well-known window in the black hole generator's security in command,
+and the icarus and beserker assists in city1 and city2ii.
+
+Enjoy the run! Especially, ah, hangar1ii...
+
+- Anthony, 1999.06.28
+
+
+(4) Statistics
+
+============================================
+Map       (Level Name)        Time  Player
+============================================
+base1     (Outer Base)        0:12  Toxy    
+base2     (Installation)      0:18  Fredrik
+base3     (Comm Center)       0:44  Fredrik
+base2ii   (Installation)      0:20  Fredrik
+--------------------------------------------
+ unit1     (Base)             1:34
+--------------------------------------------
+bunk1     (Ammo Depot)        0:25  Fredrik
+ware1     (Supply Station)    0:33  Toxy
+bunk1ii   (Ammo Depot)        0:26  NancyBoy
+ware2     (Warehouse)         0:48  Fredrik
+--------------------------------------------
+ unit2     (Warehouse)        2:12
+--------------------------------------------
+jail1     (Main Gate)         0:31  NancyBoy
+jail2     (Detention Center)  0:28  Optic
+jail3     (Security Complex)  0:11  NancyBoy
+jail5     (Guard House)       0:58  Toxy
+jail3ii   (Security Complex)  0:12  NancyBoy
+jail4     (Torture Chambers)  0:24  MrJ
+jail3iii  (Security Complex)  0:19  Fredrik
+security  (Grid Control)      0:41  NancyBoy
+--------------------------------------------
+ unit3     (Jail)             3:44
+--------------------------------------------
+mintro    (Mine Entrance)     0:25  MrJ
+mine1     (Upper Mines)       0:26  Toxy
+mine2     (Bore Hole)         0:04  Ajare
+mine3     (Drilling Area)     0:28  NancyBoy
+mine2ii   (Bore Hole)         0:03  Mattias
+mine3ii   (Drilling Area)     0:22  Mattias
+mine4     (Lower Mines)       0:25  MrJ
+mine3iii  (Drilling Area)     0:06  Fredrik
+--------------------------------------------
+ unit4     (Mines)            2:19
+--------------------------------------------
+fact1     (Receiving Center)  0:08  Ajare
+fact2     (Processing Plant)  0:58  Toxy
+fact1ii   (Receiving Center)  0:09  Fredrik
+--------------------------------------------
+ unit5     (Factory)          1:15
+--------------------------------------------
+power1    (Power Plant)       0:15  Fredrik
+power2    (The Reactor)       0:40  Hatti
+--------------------------------------------
+ unit6     (Power)            0:55
+--------------------------------------------
+biggun    (Big Gun)           0:30  Fredrik
+--------------------------------------------
+ unit7     (Big Gun)          0:30
+--------------------------------------------
+hangar1   (Outer Hangar)      0:08  Ajare
+lab       (Research Lab)      1:46  Toxy
+hangar1ii (Outer Hangar)      0:06  Anthony
+hangar2   (Inner Hangar)      1:00  Ajare
+command   (Launch Command)    0:23  Fredrik
+strike    (Outlands)          0:56  Ajare
+--------------------------------------------
+ unit8     (Hangar)           4:19
+--------------------------------------------
+city1     (Outer Courts)      0:59  Fredrik
+city2     (Lower Palace)      0:44  Optic
+city3     (Upper Palace)      0:23  Ajare
+city2ii   (Lower Palace)      0:39  Ajare
+city3ii   (Upper Palace)      0:30  Ajare
+--------------------------------------------
+ unit9     (City)             3:15
+--------------------------------------------
+boss1     (Inner Chamber)     0:36  Ajare
+boss2     (Final Showdown)    0:27  Fredrik
+--------------------------------------------
+ unit10    (Boss)             1:03 
+============================================
+  Quake2 done Quick2         21:06 
+============================================
+
+
+(5) Credits and contact info
+
+(5.1) Credits
+
+Q2dQ2 features demos recorded by the following people:
+
+Fredrik "[+]RZA" Arvidsson
+Anthony "They let me do a very easy one, bless them" Bailey
+Mattias Berggren
+Sean "NancyBoy" Crooks
+Robert "Toxy" Duncan
+David "Mr-J[!!]" Eva 
+Justin "Optic" Fleck
+Will "Ajare" Marsh
+Simon "Hatti" Nordberg
+
+Other people also recorded demos that did not feature in the final run,
+invented tricks and routes, wrote tools that made this release possible,
+took care of admin matters, and so forth:
+
+Vincent "ColdFusion" Aber
+MacKenzie "Chino" Anderson
+"BlacK_OuT"
+Simon Broadhead
+"BurninSun"
+Dugan Chen
+Yonatan "Zem" Donner
+Ben "Slayer" Douglass
+Kaj "s8n" Haffenden
+Thomas Lim
+Chris Longden
+Jesper "Avalanche" Lund
+Kyle Monson
+Anthony "Airon" Oetzmann
+Nolan "Radix" Pflug
+Roman "WarKosign" Priborkin
+Aivars R
+Stefan Schwoon
+Andrew Smith
+Gerald "Tangent" Tan
+Zoltan "Predator4" Torok
+
+Thanks also to David "crt" Wright for the menu mod and to mad dasher Colin
+Moore for the cue to grab that city3 Quad.
+
+
+(5.2) Utilities used
+
+The utilities we used included:
+
+Q2timer by Nolan Pflug <http://PlanetQuake.com/QdQ/q2timer.html> for
+timing runs, allowing recordings to follow-on from previous runs,
+and logging information needed for other demo processing.
+
+D2relise by Will Marsh (unreleased) in order to maintain continuity
+of the later demos when improvements were made to earlier demos in
+the run.
+
+LMPC by Uwe Girlich <http://PlanetQuake.com/demospecs/> for
+decompiling & recompiling demos so we could use the convenient LS format.
+Also Uwe's DM2 specs were very useful for us in creating our own tools.
+
+Dm2Tool by Stefan Schwoon <http://PlanetQuake.com/QdQ/Dm2Tool.html>.
+A variety of other tools also made use of his skeleton code for
+parsing demos.
+
+MenuMod by David Wright <http://PlanetQuake.com/Arena/> for the code
+used to implement the menus from which demos are accessed.
+
+
+(5.3) Contact info
+
+For QdQ news and future projects check our page at
+<http://PlanetQuake.com/QdQ/>
+At the time of writing, the next should be:
+"The Rabbit Run" (tRR), a movie of the quickest ever Skill 0 Quake1 run.
+
+For questions and comments (even if you just want to say you liked the
+demo), email <qdq-q2dq2@list.gamespy.com>. For general comments to
+QdQ, email <QdQ@PlanetQuake.com>
+
+If a FAQ, patches or extensions are developed for this release, they will
+be available via the download page at <http://PlanetQuake.com/QdQ/Q2dQ2.html>.
+
+To contact individual members of the team:
+
+Vincent "ColdFusion" Aber
+mailto:vaber@peaks.teton.com
+
+MacKenzie "Chino" Anderson
+mailto:chino@nildram.co.uk
+
+Fredrik "[+]RZA" Arvidsson
+mailto:fredrik.arvidsson@swipnet.se
+
+Anthony Bailey
+mailto:anthony@planetquake.com
+
+Mattias Berggren
+mailto:mattias.berggren@mail.bktv.se
+
+"BlacK_OuT"
+mailto:nwise@megsinet.net
+
+Simon Broadhead
+mailto:simonb@kwic.com
+
+"BurninSun"
+mailto:burninsun@aol.com
+
+Dugan Chen
+mailto:wingman@infoserve.net
+
+Sean "NancyBoy" Crooks
+mailto:sean@prcn.org
+
+Yonatan "Zem" Donner
+mailto:zem@planetquake.com
+http://www.geocities.com/Hollywood/4704/
+
+Ben "Slayer" Douglass
+mailto:bendoug@yahoo.com
+
+Robert "Toxy" Duncan
+mailto:toxy@planetquake.com
+
+David "Mr-J[!!]" Eva 
+mailto:moksha@dial.pipex.com
+
+Justin "Optic" Fleck
+mailto:rjfleck@earthlink.net
+
+Kaj "s8n" Haffenden
+mailto:s8n@tsunamitech.com
+http://www.g-a-m-e.org/rtr/
+
+Thomas Lim
+mailto:tom@connect.ab.ca
+http://www.ualberta.ca/~tmlim
+
+Chris Longden
+mailto:chrisl@gamespy.com
+
+Jesper "Avalanche" Lund
+mailto:jeppelund@hotmail.com
+
+Will "Ajare" Marsh
+mailto:w.t.marsh@sms.ed.ac.uk
+http://www.geocities.com/Yosemite/Geyser/2599/
+
+Kyle Monson
+mailto:elm@televar.com
+
+Simon "Hatti" Nordberg
+mailto:simon@planetquake.com
+
+Anthony "Airon" Oetzmann
+mailto:aronchce@sp.zrz.tu-berlin.de
+http://www.scene.org/phd/
+
+Nolan "Radix" Pflug
+mailto:radix@planetquake.com
+http://www.planetquake.com/sda/
+
+Roman "WarKosign" Priborkin
+mailto:warkosign@intertaxi.co.il
+http://www.planetquake.com/remaic/
+
+Aivars R
+mailto:aar@shiznat.com
+
+Stefan Schwoon
+mailto:schwoon@informatik.uni-hildesheim.de
+
+Andrew Smith
+mailto:andrew@amorph.demon.co.uk
+http://www.amorph.demon.co.uk/
+
+Gerald "Tangent" Tan
+mailto:tangent@cyberway.com.sg
+http://www.planetquake.com/sda/
+
+Zoltan "Predator4" Torok
+mailto:pred4@freemail.c3.hu
+
+
+DISCLAIMER: NO MARINES WERE HURT DURING THE MAKING OF THIS MOVIE...
+            WELL OK...
+            MAYBE A COUPLE.. :)
+
+
+Enjoy Quake2 done Quick2!
+
+

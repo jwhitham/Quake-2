@@ -204,8 +204,12 @@ void *Sys_GetGameAPI (void *parms)
 	const char *gamename = "gamei386.so";
 #elif defined __alpha__
 	const char *gamename = "gameaxp.so";
+#elif defined __arm__
+	const char *gamename = "gamearm.so";
+#elif defined __amd64__
+	const char *gamename = "gamex64.so";
 #else
-	const char *gamename = "gamei386.so";
+#error "Unsupported architecture"
 #endif
 
 	setreuid(getuid(), getuid());

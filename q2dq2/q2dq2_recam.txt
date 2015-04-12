@@ -1,0 +1,178 @@
+                            Quake2 done Quick2
+                            ------------------  
+		       <http://PlanetQuake.com/QdQ/>
+
+		       A recam by Zarathustra Studios
+                       ------------------------------
+			<http://PlanetQuake.com/ZS/>
+
+(0) Index
+
+(1) Introduction
+ (1.1) What's Quake2 done Quick2?
+ (1.2) About the recam
+
+(2) The recam
+ (2.1) Download choices
+ (2.2) Installation
+ (2.3) Running and viewing
+
+(3) Credits and contact info
+ (3.1) Credits
+ (3.2) Utilities used
+ (3.3) Contact info
+
+----------------------------------------------------------------------------
+
+(1) Introduction
+
+(1.1) What's Quake2 done Quick2?
+
+Quake2 done Quick2 (known as Q2dQ2 for short) is the first speed-run
+by the Quake done Quick team through id Software's Quake2. It is a run
+all the way through Quake2 on Hard skill, going through the game as
+fast as possible.
+
+More details about Q2dQ2 can be found in the file q2dq2.txt which you
+should have gotten together with this file.
+
+(1.2) About the recam
+
+When we were finished with running, we asked Zarathustra Studios whether
+they would like to make a recam of the demos. A "recammed" demo is one 
+where the action is not watched from the player's eyes as usual but from
+a newly inserted "camera" entity that lets you watch the player and her
+surroundings from a new perspective, making the whole affair more "movie-
+like" to watch. All of the recams in Qd2Q2 were done by Phil "Overman" Rice.
+
+Note that the refilming alone does not make this a full-blown movie like
+some of our previous releases, e.g. Scourge done Slick. We may still work
+on such a proper movie yet but it will take a lot of time. In the meantime,
+enjoy these demos - the first recammed speedrun for Quake2!
+
+
+(2) The recam
+
+(2.1) Download choices
+
+There are two versions of the Q2dQ2 demos: The original runs as seen from
+the player's perspective and their refilmed counterparts. You can download
+both sets of demos separately, or both them at once. Also, we offer a Linux
+version.
+
+The following downloads are available. You can find all of these files, and
+possibly more recent versions at <http://www.planetquake.com/qdq/q2dq2.html>.
+
+q2dq2_full.zip	- These are both the original runs and their recams in one
+ (3.5M)		  large package, complete with a menu interface for Win32
+		  operating systems to select the demos (Linux version of 
+		  said interface is available in a separate download). 
+		  Downloading this file is equivalent to downloading
+		  q2dq2.zip and q2dq2_recam.zip separately.		
+q2dq2.zip	- These are the original player-perspective runs. If you
+ (1.7M)		  downloaded this file previously you can add the recammed
+		  versions by downloading q2dq2_recam.zip.
+q2dq2_recam.zip	- These are the recams made by Zarathustra Studios. If you
+ (2.0M)		  download this file first and want to add the original runs
+		  later you can do so by downloading q2dq2.zip.
+q2dq2_linux.zip	- Linux versions of menu interface dll compiled for both
+ (324K)		  libc5 and glibc.
+
+(2.2) Installation
+
+First you need to find your main Quake2 directory. This probably has
+the name "Quake2" and will contain such items as your Quake2 executable
+program (quake2.exe or quake2) and your baseq2 game subdirectory.
+
+You should make a subdirectory of this main directory. Give it the name
+"q2dq2". After that should unzip the contents of the files you downloaded 
+into this Q2dQ2 directory. For playing the Linux version, you should rename
+one of gamei386.libc5 or gamei386.glibc into gamei386.so, depending on the
+type of your Linux installation.
+
+(2.3) Running and viewing
+
+First, you will need the "official" version of Quake2, v3.20, in order
+to watch the demos. If you aren't up-to-date, you can download what you
+need from many places, including <http://planetquake.com/files/>
+
+Now to watch the run, start Quake2 with the command-line option "+game
+q2dq2". Alternatively, you can start Quake2 as normal and then enter
+"game q2dq2" in the console.
+
+The run is played from a menu interface, so that you can choose to play 
+either the player-perspective runs or the recams if you have both.
+
+Also, you can choose to play the whole speed-run, or individual units, 
+or individual runs. Use the arrow keys to move around and make selections 
+in the menu. The "ENTER" key will select a menu item.
+
+If you have them available, you can toggle the inclusion of the original 
+id cinematics as part of playback with a menu option.
+
+If you are playing the recams, you can toggle slow-motion effects on and
+off (default is on). Some scenes in the recam are played at slow-motion
+to highlight some of the more spectacular scenes and to make them easier
+to understand for the viewer. Note: The demos were originally recorded
+at normal speed. No slow-motion cheats were used in the recording of these
+demos! The slow-motion effects used in the recams are merely a special
+playback effect included for your convenience.
+
+Whilst playing a demo, you can press F10 to stop and return to the menu.
+
+Note that if you press non-function keys in Quake2 whilst a demo is 
+playing, this will take you to the console. To return to the main Q2dQ2 
+menu, you can press F10, or enter "menu" as a console command.
+
+If you are a keen player who has optimised their DeathMatch framerate
+at the expense of viewing quality, you may wish to choose some different 
+configuration options to play back this run so that it looks as pretty 
+as possible. A good way to do this is to edit the q2dq2/autoexec.cfg file. 
+
+Is there anything else you need to know? Sorry, we'll have to blank
+you - there are no Easter Egg demos in the Q2dQ2 speed-run. There
+will be plenty of eggs when we make a proper movie, though.
+
+We don't know about any playback problems in Q2dQ2, but since this
+is the first time we have released something for Quake2, it is
+possible that some exist. Please write and tell us if you find any
+problems, so that we can fix them, and do things better next time.
+
+As time goes on, FAQs about this release will no doubt arise.
+We will try to publish answers to the common ones on our website.
+When we do this, these will be available via the download page at
+<http://PlanetQuake.com/QdQ/Q2dQ2.html>.
+
+
+(3) Credits and contact info
+
+(3.1) Credits
+
+The player-perspective demos were recorded by a whole bunch of people,
+and an even larger crowd paved the way by planning routes, building
+tools and organising everything. Full credit to the members of the
+Q2dQ2 team is given in the q2dq2.txt file.
+
+The recams were done by Phil "Overman" Rice of Zarathustra Studios
+<http://www.planetquake.com/zs>.
+
+(3.2) Utilities used
+
+The utilities used for creating the player-perspective runs are listed
+in q2dq2.txt. The recams were created in David "crt" Wright´s Keygrip2
+<http://www.planetquake.com/keygrip2>.
+
+(3.3) Contact info
+
+For QdQ news and future projects check our page at
+<http://www.planetquake.com/qdq>.
+
+To contact the Q2dQ2 team as a whole, email <qdq-q2dq2@list.gamespy.com>.
+For general comments to QdQ, email <qdq@planetquake.com>. To contact
+Phil Rice personally, write to <overman@planetquake.com>. The individual 
+emails of the other project members are listed in q2dq2.txt.
+
+If an FAQ, patches or extensions are developed for this release, they will
+be available via the download page at <http://PlanetQuake.com/QdQ/Q2dQ2.html>.
+
+Enjoy Quake2 done Quick2!
