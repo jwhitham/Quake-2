@@ -1,3 +1,4 @@
+#define _GNU_SOURCE // for mremap
 #include <sys/types.h>
 #include <errno.h>
 #include <stdio.h>

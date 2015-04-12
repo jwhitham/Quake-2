@@ -4,6 +4,7 @@
 // Include file for asm drawing routines.
 //
 
+#if 0
 //
 // !!! note that this file must match the corresponding C structures at all
 // times !!!
@@ -119,3 +120,5 @@
 								// !!! d_polysa.s must be changed to match !!!
 #define mtri_shift			4
 
+
+#endif

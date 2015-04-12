@@ -1,3 +1,4 @@
+#if 0
 //
 // d_ifacea.h
 //
@@ -74,3 +75,4 @@
 #define atd_seamfixupX16	32
 #define atd_size			36
 
+#endif

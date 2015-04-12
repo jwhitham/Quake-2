@@ -12,5 +12,5 @@ export DISPLAY=:0
 rm -f q2dq2/config.cfg   
 rm -rf q2dq2/save
 
-./quake2  +game q2dq2 +set vid_ref softx
+gdb --args ./quake2  +game q2dq2 +set vid_ref softx
 
