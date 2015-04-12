@@ -85,11 +85,8 @@ int i;
 ** This routine is responsible for initializing the implementation
 ** specific stuff in a software rendering subsystem.
 */
-extern int curframe;
 int SWimp_Init( void *hInstance, void *wndProc )
 {
-    curframe = 0;
-
 	vga_init();
 
 	VID_InitModes();

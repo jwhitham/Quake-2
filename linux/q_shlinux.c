@@ -78,12 +78,17 @@ Sys_Milliseconds
 ================
 */
 int curtime = 0;
-int curframe = 1;
+int headless_mode = 1;
 int Sys_Milliseconds (void)
 {
-    if (curframe > 0) {
-        curframe ++;
-        return curframe;
+    if (headless_mode) {
+        // initially 1ms per call (1000 fps) - during startup
+        // Later, 40ms per call (25 fps) - during normal play
+        curtime ++;
+        if (curtime > 20) {
+            curtime += 39;
+        }
+        return curtime;
     } else {
         struct timeval tp;
         struct timezone tzp;

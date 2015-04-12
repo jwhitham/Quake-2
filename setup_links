@@ -3,9 +3,11 @@
 export DEBUG_OR_RELEASE=$1
 export ARCH=$2
 
-if test -z "$ARCH"
+if test -z "$ARCH" -o -z "$DEBUG_OR_RELEASE"
 then
-    echo "Usage: setup_links <debug|release> <arch>"
+    echo "Usage: <mode> <arch>"
+    echo "  mode is one of: debug, release"
+    echo "  arch is one of: i386, arm, amd64"
     exit 1
 fi
 

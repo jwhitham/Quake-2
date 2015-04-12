@@ -1,23 +1,5 @@
 /*
-** RW_X11.C
-**
-** This file contains ALL Linux specific stuff having to do with the
-** software refresh.  When a port is being made the following functions
-** must be implemented by the port:
-**
-** SWimp_EndFrame
-** SWimp_Init
-** SWimp_InitGraphics
-** SWimp_SetPalette
-** SWimp_Shutdown
-** SWimp_SwitchFullscreen
-**
-** void RW_IN_Init(in_state_t *in_state_p)
-** void RW_IN_Shutdown(void)
-** void RW_IN_Commands (void)
-** void RW_IN_Move (usercmd_t *cmd)
-** void RW_IN_Frame (void)
-** void RW_IN_Activate(void)
+** Headless mode output driver
 */
 
 #include <ctype.h>
@@ -38,11 +20,12 @@
 
 #define WIDTH 400
 #define HEIGHT 300
-#define PERIOD 40
-#define H_MAX_FRAMES (PERIOD * 20000)
 
-extern int curframe;
+static int curframe;
+static int endframe;
 static FILE * crc_file;
+static FILE * frames_file;
+static unsigned char frames_palette[4 * 256];
 
 void RW_IN_Init(in_state_t *in_state_p)
 {
@@ -92,10 +75,15 @@ int SWimp_Init( void *hInstance, void *wndProc )
         curframe++;
         crc_file = fopen ("crc.dat", "wt");
         if (!crc_file) {
-    		Sys_Error("crc.dat not created\n");
+            Sys_Error("crc.dat not created\n");
         }
+        frames_file = fopen ("frames.dat", "wb");
+        if (!frames_file) {
+            Sys_Error("frames.dat not created\n");
+        }
+        endframe = atoi (getenv ("ENDFRAME"));
     }
-	return true;
+    return true;
 }
 
 
@@ -111,11 +99,25 @@ void SWimp_EndFrame (void)
     unsigned crc;
 
     crc = crc32_8bytes (vid.buffer, WIDTH * HEIGHT, 0);
-    fprintf (crc_file, "%08x %u\n", crc, curframe);
-    curframe += PERIOD;
 
-    if (curframe >= H_MAX_FRAMES) {
+    if (frames_file) {
+        fprintf (crc_file, "%08x %08x\n", crc, (unsigned) ftell (frames_file));
+        fwrite (frames_palette, sizeof (frames_palette), 1, frames_file);
+        fwrite (vid.buffer, WIDTH * HEIGHT, 1, frames_file);
+    } else {
+        fprintf (crc_file, "%08x\n", crc);
+    }
+    if ((curframe & 127) == 0) {
+        printf ("headless: %u frames\n", curframe);
         fflush (crc_file);
+    }
+    curframe ++;
+
+    if (curframe >= endframe) {
+        fflush (crc_file);
+        if (frames_file) {
+            fflush (frames_file);
+        }
         Sys_Error ("SWimp_EndFrame - quit\n");
     }
 }
@@ -125,16 +127,16 @@ void SWimp_EndFrame (void)
 */
 rserr_t SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
 {
-	rserr_t retval = rserr_ok;
+    rserr_t retval = rserr_ok;
 
     vid.width = WIDTH;
     vid.height = HEIGHT;
-	vid.rowbytes = WIDTH;
-	vid.buffer = malloc(vid.rowbytes * vid.height);
-	ri.Vid_NewWindow (vid.width, vid.height);
-	R_GammaCorrectAndSetPalette( ( const unsigned char * ) d_8to24table );
+    vid.rowbytes = WIDTH;
+    vid.buffer = malloc(vid.rowbytes * vid.height);
+    ri.Vid_NewWindow (vid.width, vid.height);
+    R_GammaCorrectAndSetPalette( ( const unsigned char * ) d_8to24table );
 
-	return retval;
+    return retval;
 }
 
 /*
@@ -146,6 +148,7 @@ rserr_t SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 */
 void SWimp_SetPalette( const unsigned char *palette )
 {
+    memcpy (frames_palette, palette, sizeof (frames_palette));
 }
 
 /*
@@ -159,6 +162,10 @@ void SWimp_Shutdown( void )
     if (crc_file) {
         fclose (crc_file);
         crc_file = NULL;
+    }
+    if (frames_file) {
+        fclose (frames_file);
+        frames_file = NULL;
     }
 }
 
@@ -187,7 +194,7 @@ Key_Event_fp_t Key_Event_fp;
 
 void KBD_Init(Key_Event_fp_t fp)
 {
-	Key_Event_fp = fp;
+    Key_Event_fp = fp;
 }
 
 void KBD_Update(void)

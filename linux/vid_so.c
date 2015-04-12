@@ -14,6 +14,8 @@
 
 #include "../linux/rw_linux.h"
 
+extern int headless_mode;
+
 // Structure containing functions exported from refresh DLL
 refexport_t	re;
 
@@ -218,29 +220,9 @@ qboolean VID_LoadRefresh( char *name )
 	strcat(fn, "/");
 	strcat(fn, name);
 
-	// permission checking
-#if 0
-	if (strstr(fn, "softx") == NULL) { // softx doesn't require root
-		if (stat(fn, &st) == -1) {
-			Com_Printf( "LoadLibrary(\"%s\") failed: %s\n", name, strerror(errno));
-			return false;
-		}
-		if (st.st_uid != 0) {
-			Com_Printf( "LoadLibrary(\"%s\") failed: ref is not owned by root\n", name);
-			return false;
-		}
-#if 0
-		if ((st.st_mode & 0777) & ~0700) {
-			Com_Printf( "LoadLibrary(\"%s\") failed: invalid permissions, must be 700 for security considerations\n", name);
-			return false;
-		}
-#endif
-	} else {
-		// softx requires we give up root now
-		setreuid(getuid(), getuid());
-		setegid(getgid());
+	if (strstr(fn, "headless") == NULL) {
+		headless_mode = 0;
 	}
-#endif
 
 	if ( ( reflib_library = dlopen( fn, RTLD_NOW ) ) == 0 )
 	{

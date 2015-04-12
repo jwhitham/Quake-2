@@ -1,14 +1,15 @@
 #!/bin/bash -xe
 
-export ARCH=i386
+export DEBUG_OR_RELEASE=$1
+export ARCH=$2
+export ENDFRAME=1000
 
-./setup_links debug $ARCH
+./setup_links $DEBUG_OR_RELEASE $ARCH
 ./quake2  +game q2dq2 +set vid_ref headless  || true
-mv crc.dat crc.debug.dat
 
-./setup_links release $ARCH
-./quake2  +game q2dq2 +set vid_ref headless  || true
-mv crc.dat crc.release.dat
+
+mv frames.dat frames.$DEBUG_OR_RELEASE.$ARCH.dat || true
+mv crc.dat crc.$DEBUG_OR_RELEASE.$ARCH.dat
 
 
 
