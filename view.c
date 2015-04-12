@@ -44,7 +44,8 @@ int main (int argc, char ** argv)
     int                 playing = 0;
     int                 searching = 0;
     off_t               pos = 0;
-    unsigned            i;
+    off_t               limit = 0;
+    unsigned            i, count;
 
     memset (old_palette, 0, sizeof (old_palette));
     if (argc != 3) {
@@ -57,6 +58,13 @@ int main (int argc, char ** argv)
 
     fd_bottom = fopen(argv[2], "rb");
     assert(fd_bottom);
+
+    fseek (fd_top, 0, SEEK_END);
+    fseek (fd_bottom, 0, SEEK_END);
+    limit = ftell (fd_top);
+    if (ftell (fd_bottom) > limit) {
+        limit = ftell (fd_bottom);
+    }
 
     fprintf (stderr, "top frame:    %s\n"
                      "bottom frame: %s\n"
@@ -81,12 +89,16 @@ int main (int argc, char ** argv)
 
     while (running) {
         // winding 
+        if (pos > limit) {
+            pos = limit;
+            playing = 0;
+            searching = 0;
+        }
         if (pos < 0) {
             pos = 0;
         }
         fseek (fd_top, pos, SEEK_SET);
         fseek (fd_bottom, pos, SEEK_SET);
-        printf ("%08x\n", (unsigned) pos);
 
         // read top data
         if ((fread (&palette, sizeof (palette), 1, fd_top) == 1)
@@ -103,6 +115,7 @@ int main (int argc, char ** argv)
         } else {
             memset (top_buffer, NULL_COLOUR, sizeof (top_buffer));
             playing = 0;
+            searching = 0;
         }
 
         // read bottom data
@@ -111,15 +124,21 @@ int main (int argc, char ** argv)
         } else {
             memset (bottom_buffer, NULL_COLOUR, sizeof (bottom_buffer));
             playing = 0;
+            searching = 0;
         }
 
         memset (diff_buffer, 0, sizeof (diff_buffer));
+        count = 0;
         for (i = 0; i < sizeof (diff_buffer); i++) {
             if (top_buffer[i] != bottom_buffer[i]) {
                 diff_buffer[i] = NULL_COLOUR;
                 searching = 0;
+                count ++;
             }
         }
+        printf ("%08x of %08x - %u different\n",
+            (unsigned) pos, (unsigned) limit, (unsigned) count);
+        fflush (stdout);
 
         // blit 
         SDL_LockSurface (window);
@@ -137,6 +156,7 @@ int main (int argc, char ** argv)
         while (waiting) {
             if (searching) {
                 if (!SDL_PollEvent (&ev)) {
+                    waiting = 0;
                     break;
                 }
             } else {
@@ -184,7 +204,7 @@ int main (int argc, char ** argv)
                     break;
             }
         }
-        if (playing) {
+        if (playing || searching) {
             pos += FRAME_SIZE;
         }
     }
