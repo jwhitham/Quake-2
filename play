@@ -1,16 +1,7 @@
 #!/bin/bash -xe
 
-cd /home/jack/durden/Quake-2/linux
-
-cd debugi386
-cd baseq2
-
-ln -sf ../gamei386.so gamei386.so
-
-cd ..
+./setup_links debug i386
 export DISPLAY=:0 
-rm -f q2dq2/config.cfg   
-rm -rf q2dq2/save
 
 gdb --args ./quake2  +game q2dq2 +set vid_ref softx
 

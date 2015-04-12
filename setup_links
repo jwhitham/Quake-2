@@ -1,0 +1,28 @@
+#!/bin/bash -e
+
+export DEBUG_OR_RELEASE=$1
+export ARCH=$2
+
+if test -z "$ARCH"
+then
+    echo "Usage: setup_links <debug|release> <arch>"
+    exit 1
+fi
+
+pushd baseq2
+pushd ../linux/$DEBUG_OR_RELEASE$ARCH/
+export BUILD=$PWD
+popd
+ln -sf $BUILD/game$ARCH.so
+popd
+ln -sf $BUILD/ref_headless.so
+ln -sf $BUILD/ref_softx.so
+ln -sf $BUILD/quake2 .
+pwd > quake2.conf
+
+pushd q2dq2
+rm -f config.cfg   
+rm -rf save
+popd
+
+

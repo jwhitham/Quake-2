@@ -1,27 +1,14 @@
 #!/bin/bash -xe
 
-cd /home/jack/durden/Quake-2/linux
+export ARCH=i386
 
-export DISPLAY=:0 
-pushd debugi386/baseq2
-ln -sf ../gamei386.so gamei386.so
-popd
-pushd releasei386
-ln -sf ../debugi386/baseq2
-ln -sf ../debugi386/q2dq2
-popd
+./setup_links debug $ARCH
+./quake2  +game q2dq2 +set vid_ref headless  || true
+mv crc.dat crc.debug.dat
 
-pushd debugi386
-rm -f q2dq2/config.cfg   
-rm -rf q2dq2/save
-rm -f video.bin
-./quake2  +game q2dq2 +set vid_ref headless || true
-popd
+./setup_links release $ARCH
+./quake2  +game q2dq2 +set vid_ref headless  || true
+mv crc.dat crc.release.dat
 
-pushd releasei386
-rm -f q2dq2/config.cfg   
-rm -rf q2dq2/save
-rm -f video.bin
-./quake2  +game q2dq2 +set vid_ref headless || true
-popd
+
 

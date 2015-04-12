@@ -1,3 +1,5 @@
+#if 0
+
 #ifndef __ASM_I386__
 #define __ASM_I386__
 
@@ -451,5 +453,7 @@
 #define mtri_size			16	// !!! if this changes, array indexing in !!!
 								// !!! d_polysa.s must be changed to match !!!
 #define mtri_shift			4
+
+#endif
 
 #endif
