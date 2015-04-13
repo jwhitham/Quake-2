@@ -1,0 +1,10 @@
+#!/bin/bash -xe
+
+export DEBUG_OR_RELEASE=debug
+export ARCH=i386
+export ENDFRAME=1000
+export REFDATA=$PWD/frames.debug.arm.dat
+
+./setup_links $DEBUG_OR_RELEASE $ARCH
+gdb --args ./quake2  +game q2dq2 +set vid_ref headless
+

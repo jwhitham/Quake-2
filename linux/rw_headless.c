@@ -25,6 +25,7 @@ static int curframe;
 static int endframe;
 static FILE * crc_file;
 static FILE * frames_file;
+static FILE * ref_file;
 static unsigned char frames_palette[4 * 256];
 
 void RW_IN_Init(in_state_t *in_state_p)
@@ -71,6 +72,8 @@ void RW_IN_Activate(void)
 */
 int SWimp_Init( void *hInstance, void *wndProc )
 {
+    char * s;
+
     if (!crc_file) {
         curframe++;
         crc_file = fopen ("crc.dat", "wt");
@@ -81,7 +84,18 @@ int SWimp_Init( void *hInstance, void *wndProc )
         if (!frames_file) {
             Sys_Error("frames.dat not created\n");
         }
-        endframe = atoi (getenv ("ENDFRAME"));
+        endframe = 100;
+        s = getenv ("ENDFRAME");
+        if (s && strlen (s)) {
+            endframe = atoi (s);
+        }
+        s = getenv ("REFDATA");
+        if (s && strlen (s)) {
+            ref_file = fopen (s, "rb");
+            if (!ref_file) {
+                Sys_Error("ref data cannot open\n");
+            }
+        }
     }
     return true;
 }
@@ -107,9 +121,30 @@ void SWimp_EndFrame (void)
     } else {
         fprintf (crc_file, "%08x\n", crc);
     }
-    if ((curframe & 127) == 0) {
+    if ((curframe & 31) == 0) {
         printf ("headless: %u frames\n", curframe);
         fflush (crc_file);
+    }
+    if (ref_file) {
+        unsigned char buf[WIDTH * HEIGHT];
+        unsigned i, error, pos;
+
+        fseek (ref_file, sizeof (frames_palette), SEEK_CUR);
+        if (fread (buf, WIDTH * HEIGHT, 1, ref_file) != 1) {
+            Sys_Error ("unable to read from reference file");
+        }
+        for (error = i = pos = 0; i < (WIDTH * HEIGHT); i++) {
+            if (buf[i] != vid.buffer[i]) {
+                if (!error) {
+                    pos = i;
+                }
+                error ++;
+            }
+        }
+        if (error) {
+            Sys_Error ("%u differences detected, curframe = %u, first location = %u",
+                       error, curframe, pos);
+        }
     }
     curframe ++;
 
@@ -166,6 +201,10 @@ void SWimp_Shutdown( void )
     if (frames_file) {
         fclose (frames_file);
         frames_file = NULL;
+    }
+    if (ref_file) {
+        fclose (ref_file);
+        ref_file = NULL;
     }
 }
 

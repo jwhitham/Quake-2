@@ -1028,6 +1028,8 @@ void R_RenderFrame (refdef_t *fd)
 	if (r_dspeeds->value)
 		dp_time2 = Sys_Milliseconds ();
 
+	currententity = &r_worldentity;
+	currentmodel = currententity->model;
 	R_DrawAlphaSurfaces();
 
 	R_SetLightLevel ();
