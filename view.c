@@ -182,12 +182,19 @@ int main (int argc, char ** argv)
                             playing = 1;
                             searching = 0;
                             break;
+                        case SDLK_q:
+                            playing = -1;
+                            searching = 0;
+                            break;
                         case SDLK_s:
                             playing = 0;
                             searching = 1;
                             break;
+                        case SDLK_r:
+                            playing = 0;
+                            searching = -1;
+                            break;
                         case SDLK_ESCAPE:
-                        case SDLK_q:
                             waiting = 0;
                             running = 0;
                             break;
@@ -204,8 +211,10 @@ int main (int argc, char ** argv)
                     break;
             }
         }
-        if (playing || searching) {
+        if ((playing > 0) || (searching > 0)) {
             pos += FRAME_SIZE;
+        } else if ((playing < 0) || (searching < 0)) {
+            pos -= FRAME_SIZE;
         }
     }
     SDL_Quit () ;

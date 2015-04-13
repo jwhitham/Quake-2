@@ -207,7 +207,7 @@ void *Sys_GetGameAPI (void *parms)
 #elif defined __arm__
 	const char *gamename = "gamearm.so";
 #elif defined __amd64__
-	const char *gamename = "gamex64.so";
+	const char *gamename = "gameamd64.so";
 #else
 #error "Unsupported architecture"
 #endif
