@@ -502,7 +502,7 @@ surfcache_t     *D_SCAlloc (int width, int size)
 	new->width = width;
 // DEBUG
 	if (width > 0)
-		new->height = (size - sizeof(*new) + sizeof(new->data)) / width;
+		new->height = (size - sizeof(*new) - sizeof(new->data)) / width;
 
 	new->owner = NULL;              // should be set properly after return
 
