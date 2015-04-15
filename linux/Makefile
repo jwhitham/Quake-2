@@ -45,7 +45,8 @@ XATRIX_DIR=$(MOUNT_DIR)/xatrix
 
 CC=gcc
 BASE_CFLAGS=-Dstricmp=strcasecmp $(ARCH_CFLAGS)
-RELEASE_CFLAGS=$(BASE_CFLAGS) -O2 -g
+RELEASE_CFLAGS=$(BASE_CFLAGS) -O2 -g \
+    -fexcess-precision=standard -ffp-contract=off
 DEBUG_CFLAGS=$(BASE_CFLAGS) -g
 LDFLAGS=-ldl -lm
 SVGALDFLAGS=-lvga

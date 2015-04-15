@@ -80,9 +80,12 @@ int SWimp_Init( void *hInstance, void *wndProc )
         if (!crc_file) {
             Sys_Error("crc.dat not created\n");
         }
-        frames_file = fopen ("frames.dat", "wb");
-        if (!frames_file) {
-            Sys_Error("frames.dat not created\n");
+        s = getenv ("FRAMEDATA");
+        if (s && strlen (s)) {
+            frames_file = fopen (s, "wb");
+            if (!frames_file) {
+                Sys_Error("frames.dat not created\n");
+            }
         }
         endframe = 100;
         s = getenv ("ENDFRAME");
@@ -114,12 +117,12 @@ void SWimp_EndFrame (void)
 
     crc = crc32_8bytes (vid.buffer, WIDTH * HEIGHT, 0);
 
+    if (crc_file) {
+        fprintf (crc_file, "%08x\n", crc);
+    }
     if (frames_file) {
-        fprintf (crc_file, "%08x %08x\n", crc, (unsigned) ftell (frames_file));
         fwrite (frames_palette, sizeof (frames_palette), 1, frames_file);
         fwrite (vid.buffer, WIDTH * HEIGHT, 1, frames_file);
-    } else {
-        fprintf (crc_file, "%08x\n", crc);
     }
     if ((curframe & 31) == 0) {
         printf ("headless: %u frames\n", curframe);
