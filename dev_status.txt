@@ -1,0 +1,74 @@
+
+As of commit d561576710936eb01e6e90e0b8afc5d3c2e2aece -
+
+These are the same, reference group:
+    85a19a80764bc7532e31c9aa5016d94b  crc.debug.amd64.dat
+    85a19a80764bc7532e31c9aa5016d94b  crc.debug.i386.dat
+    85a19a80764bc7532e31c9aa5016d94b  crc.release.i386.dat
+
+ARM group:
+    81fb864aeda98a533e4ca7351194ec74  crc.debug.arm.dat
+    81fb864aeda98a533e4ca7351194ec74  crc.release.arm.dat
+
+AMD64 group:
+    67b90041d81d9918bb44af1ece8ba45d  crc.release.amd64.dat
+
+
+
+ARM group differences:
+    --- crc.debug.amd64.dat	2015-04-18 02:13:31.000000000 +0100
+    +++ crc.debug.arm.dat	2015-04-18 10:20:17.000000000 +0100
+    @@ -13365 +13365 @@
+    -876f36cf
+    +be089a5f
+    @@ -13401 +13401 @@
+    -7b66d4cf
+    +6df912c4
+    @@ -13417 +13417 @@
+    -97a9b135
+    +86001913
+    @@ -13487 +13487 @@
+    -bc4ac814
+    +9169f4ad
+    @@ -13740 +13740 @@
+    -71cd6c34
+    +69aa72c2
+    @@ -16093 +16093 @@
+    -cddd16c7
+    +31e9f98d
+    @@ -16120 +16120 @@
+    -88242998
+    +4361125e
+
+AMD64 group differences (reference is (-)):
+    --- crc.debug.amd64.dat	2015-04-18 02:13:31.000000000 +0100
+    +++ crc.release.amd64.dat	2015-04-18 02:14:45.000000000 +0100
+    @@ -16093 +16093 @@
+    -cddd16c7
+    +31e9f98d
+    @@ -16120 +16120 @@
+    -88242998
+    +4361125e
+
+Note: AMD64 group differences are a subset of ARM's.
+
+The ARM group differences seem to be related to moving through the surface
+of some water.
+
+The AMD64 group differences look like changes in a skybox.
+
+
+---- Bugs fixed to get here
+
+52f326036dfa7e041910135dbacf95aa1853ccf2
+    The alpha surfaces undefined animation frame bug
+
+95c207d44cf54ef0e0f91cc06b06676f915c187c
+    The AMD64 memory corruption bug in R_ClipAndDrawPoly
+
+4ad806ae258785f4ede969cac4773594b07aac87
+    The sizeof(new->data) bug in D_SCAlloc
+
+d561576710936eb01e6e90e0b8afc5d3c2e2aece
+    Turn off GCC builtins
+
