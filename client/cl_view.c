@@ -53,6 +53,8 @@ lightstyle_t	r_lightstyles[MAX_LIGHTSTYLES];
 char cl_weaponmodels[MAX_CLIENTWEAPONMODELS][MAX_QPATH];
 int num_cl_weaponmodels;
 
+extern int headless_mode;
+
 /*
 ====================
 V_ClearScene
@@ -530,7 +532,9 @@ void V_RenderView( float stereo_separation )
 		cl.refdef.rdflags = cl.frame.playerstate.rdflags;
 
 		// sort entities for better cache locality
-        qsort( cl.refdef.entities, cl.refdef.num_entities, sizeof( cl.refdef.entities[0] ), (int (*)(const void *, const void *))entitycmpfnc );
+		if (!headless_mode) {
+			qsort( cl.refdef.entities, cl.refdef.num_entities, sizeof( cl.refdef.entities[0] ), (int (*)(const void *, const void *))entitycmpfnc );
+		}
 	}
 
 	re.RenderFrame (&cl.refdef);

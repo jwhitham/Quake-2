@@ -1,0 +1,37 @@
+#!/bin/bash -e
+
+export STAGE=$1
+export DEBUG_OR_RELEASE=$2
+export ARCH=$3
+
+if test -z "$ARCH" -o -z "$DEBUG_OR_RELEASE"
+then
+    echo "Usage: <stage dir> <mode> <arch>"
+    echo "  mode is one of: debug, release"
+    echo "  arch is one of: i386, arm, amd64"
+    exit 1
+fi
+
+mkdir -p $STAGE
+pushd $STAGE 
+cp -as $PWD/../baseq2 .
+cp -as $PWD/../q2dq2 .
+
+pushd baseq2
+pushd ../../linux/$DEBUG_OR_RELEASE$ARCH/
+export BUILD=$PWD
+popd
+ln -sf $BUILD/game$ARCH.so
+popd
+ln -sf $BUILD/ref_headless.so
+ln -sf $BUILD/ref_softx.so
+ln -sf $BUILD/quake2 .
+pwd > quake2.conf
+
+pushd q2dq2
+rm -f config.cfg   
+rm -rf save
+popd
+popd
+
+
