@@ -3,7 +3,7 @@
 export DEBUG_OR_RELEASE=$1
 export ARCH=$2
 export ENDFRAME=17000
-export FRAMEDATA=frames.dat
+#export FRAMEDATA=frames.dat
 
 ./setup_links $DEBUG_OR_RELEASE $ARCH
 ./quake2  +game q2dq2 +set vid_ref headless  || true
