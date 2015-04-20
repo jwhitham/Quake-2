@@ -529,6 +529,21 @@ void D_DrawSpans16 (espan_t *pspan)
 
 #if	!id386
 
+static int clamp_conv (float zi)
+{
+	// code once counted on FP exceptions being turned off to avoid
+	// range problems, the SSE/x87 behaviour is that
+	// (int)(zi * 0x8000 * 0x10000) == 0x80000000
+	// for fabs(zi) >= 1.0.
+	// But on ARM you get 0x7fffffff for zi >= 1.0.
+
+	if ((zi <= -1.0) || (zi >= 1.0)) {
+		return 0x80000000; // SSE/x87 out of range result
+	} else {
+		return (int)(zi * 0x8000 * 0x10000);
+	}
+}
+
 /*
 =============
 D_DrawZSpans
@@ -543,9 +558,7 @@ void D_DrawZSpans (espan_t *pspan)
 	float			zi;
 	float			du, dv;
 
-// FIXME: check for clamping/range problems
-// we count on FP exceptions being turned off to avoid range problems
-	izistep = (int)(d_zistepu * 0x8000 * 0x10000);
+	izistep = clamp_conv (d_zistepu);
 
 	do
 	{
@@ -559,7 +572,7 @@ void D_DrawZSpans (espan_t *pspan)
 
 		zi = d_ziorigin + dv*d_zistepv + du*d_zistepu;
 	// we count on FP exceptions being turned off to avoid range problems
-		izi = (int)(zi * 0x8000 * 0x10000);
+		izi = clamp_conv (zi);
 
 		if ((long)pdest & 0x02)
 		{

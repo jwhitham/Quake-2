@@ -12,6 +12,10 @@ then
     exit 1
 fi
 
+if test -d "$STAGE"
+then
+    rm -rf "$STAGE"
+fi
 mkdir -p $STAGE
 pushd $STAGE 
 cp -as $PWD/../baseq2 .

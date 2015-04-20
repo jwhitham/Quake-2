@@ -3,9 +3,9 @@
 export DEBUG_OR_RELEASE=debug
 export ARCH=amd64
 export ENDFRAME=17000
-export REFDATA=$PWD/frames.debug.i386.dat
+#export REFDATA=$PWD/frames.debug.i386.dat
 
 ./stage s1 $DEBUG_OR_RELEASE $ARCH
 cd s1
-gdb --args ./quake2  +game q2dq2 +set vid_ref headless
+../../u*/undodb-gdb --args ./quake2  +game q2dq2 +set vid_ref headless
 
