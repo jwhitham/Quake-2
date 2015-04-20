@@ -29,7 +29,7 @@ ARCH_CFLAGS=
     endif
 endif
 
-MOUNT_DIR=/home/jack/durden/Quake-2
+MOUNT_DIR=$(PWD)/..
 
 BUILD_DEBUG_DIR=debug$(ARCH)
 BUILD_RELEASE_DIR=release$(ARCH)

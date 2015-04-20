@@ -12,6 +12,7 @@
 #include <string.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <time.h>
 
 #include "../ref_soft/r_local.h"
 #include "../client/keys.h"
@@ -23,10 +24,15 @@
 
 static int curframe;
 static int endframe;
+static int initialised;
 static FILE * crc_file;
 static FILE * frames_file;
 static FILE * ref_file;
 static unsigned char frames_palette[4 * 256];
+static struct timeval start;
+static struct timeval stop;
+
+void Sys_Quit (void);
 
 void RW_IN_Init(in_state_t *in_state_p)
 {
@@ -74,30 +80,38 @@ int SWimp_Init( void *hInstance, void *wndProc )
 {
     char * s;
 
-    if (!crc_file) {
+    if (!initialised) {
+        initialised = 1;
+        gettimeofday (&start, NULL);
         curframe++;
-        crc_file = fopen ("crc.dat", "wt");
-        if (!crc_file) {
-            Sys_Error("crc.dat not created\n");
-        }
-        s = getenv ("FRAMEDATA");
-        if (s && strlen (s)) {
-            frames_file = fopen (s, "wb");
-            if (!frames_file) {
-                Sys_Error("frames.dat not created\n");
+        s = getenv ("BENCHMARK");
+        if (s && atoi (s)) {
+            /* enable benchmark */
+        } else {
+            /* test mode */
+            crc_file = fopen ("crc.dat", "wt");
+            if (!crc_file) {
+                Sys_Error("crc.dat not created\n");
+            }
+            s = getenv ("FRAMEDATA");
+            if (s && strlen (s)) {
+                frames_file = fopen (s, "wb");
+                if (!frames_file) {
+                    Sys_Error("frames.dat not created\n");
+                }
+            }
+            s = getenv ("REFDATA");
+            if (s && strlen (s)) {
+                ref_file = fopen (s, "rb");
+                if (!ref_file) {
+                    Sys_Error("ref data cannot open\n");
+                }
             }
         }
         endframe = 100;
         s = getenv ("ENDFRAME");
         if (s && strlen (s)) {
             endframe = atoi (s);
-        }
-        s = getenv ("REFDATA");
-        if (s && strlen (s)) {
-            ref_file = fopen (s, "rb");
-            if (!ref_file) {
-                Sys_Error("ref data cannot open\n");
-            }
         }
     }
     return true;
@@ -114,6 +128,10 @@ int SWimp_Init( void *hInstance, void *wndProc )
 void SWimp_EndFrame (void)
 {
     unsigned crc;
+
+    if (!crc_file) {
+        goto fast;
+    }
 
     crc = crc32_8bytes (vid.buffer, WIDTH * HEIGHT, 0);
 
@@ -149,14 +167,29 @@ void SWimp_EndFrame (void)
                        error, curframe, pos);
         }
     }
+fast:
     curframe ++;
 
+     
     if (curframe >= endframe) {
-        fflush (crc_file);
+        double total;
+
+        gettimeofday (&stop, NULL);
+
+        if (crc_file) {
+            fflush (crc_file);
+        }
         if (frames_file) {
             fflush (frames_file);
         }
-        Sys_Error ("SWimp_EndFrame - quit\n");
+        stop.tv_sec -= start.tv_sec;
+        start.tv_sec = 0;
+        total = (((double) stop.tv_sec) + (((double) stop.tv_usec) / 1e6)) -
+                (((double) start.tv_sec) + (((double) start.tv_usec) / 1e6));
+        printf ("\ntotal time: %7.3f seconds, frames %u\n",
+                total, curframe);
+        fflush (stdout);
+        exit (0);
     }
 }
 

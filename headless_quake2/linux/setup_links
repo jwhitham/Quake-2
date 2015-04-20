@@ -12,6 +12,17 @@ then
 fi
 
 pushd baseq2
+md5sum -c reference.txt || {
+    if test -e pak0.pak
+    then
+        echo "baseq2/pak0.pak does not match the expected MD5 sum"
+    else
+        echo "baseq2/pak0.pak is not present"
+    fi
+    echo "Please copy pak0.pak from a Quake 2 installation"
+    exit 1
+}
+
 pushd ../linux/$DEBUG_OR_RELEASE$ARCH/
 export BUILD=$PWD
 popd
