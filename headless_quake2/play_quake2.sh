@@ -7,5 +7,5 @@ export BENCHMARK=0
 linux/setup_links $DEBUG_OR_RELEASE $ARCH
 export DISPLAY=:0 
 
-./quake2  +game q2dq2 +set vid_ref softx
+./quake2 +set vid_ref softx $@
 

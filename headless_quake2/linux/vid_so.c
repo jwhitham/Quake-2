@@ -220,7 +220,7 @@ qboolean VID_LoadRefresh( char *name )
 	strcat(fn, "/");
 	strcat(fn, name);
 
-	if (strstr(fn, "headless") == NULL) {
+	if (strstr(name, "headless") == NULL) {
 		headless_mode = 0;
 	}
 
