@@ -38,7 +38,9 @@ http://quake.speeddemosarchive.com/quake/qdq/movies/q2dq2.html
 
 Instructions:
 
-Run "./build.sh" to compile. 
+Run "./build.sh" to compile. This requires GCC, GNU make, and the
+X11 header files for your Linux system. If you don't have these, try:
+    apt-get install build-essential libxext-dev libx11-dev
 
 Run one of the following commands to run the benchmark:
     ./benchmark_quake2.sh release amd64     (if you compiled for AMD64)
@@ -66,6 +68,8 @@ Typical benchmark timings:
 
     Platform                    GCC         Typical time
 
-    Linux x86 (Core2 E8600)     4.7.2       48.4s
-    Linux x64 (Core2 E8600)     4.7.2       39.5s
+    Linux x86 (Core2 E8600)     4.7.2       37.5s
+    Linux x64 (Core2 E8600)     4.7.2       28.7s
+    RPi 2 (ARMv7 900MHz)        4.6.3       225.1s
+    Linux x64 (Core i3 3200)    4.7.2       20.3s
 
