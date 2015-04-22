@@ -234,8 +234,8 @@ void R_InitTurb (void)
 	
 	for (i=0 ; i<1280 ; i++)
 	{
-		sintable[i] = AMP + sin(i*3.14159*2/CYCLE)*AMP;
-		intsintable[i] = AMP2 + sin(i*3.14159*2/CYCLE)*AMP2;	// AMP2, not 20
+		sintable[i] = AMP + sinf(i*3.14159*2/CYCLE)*AMP;
+		intsintable[i] = AMP2 + sinf(i*3.14159*2/CYCLE)*AMP2;	// AMP2, not 20
 		blanktable[i] = 0;			//PGM
 	}
 }
@@ -1226,7 +1226,7 @@ void Draw_BuildGammaTable (void)
 	
 	for (i=0 ; i<256 ; i++)
 	{
-		inf = 255 * pow ( (i+0.5)/255.5 , g ) + 0.5;
+		inf = 255 * powf ( (i+0.5)/255.5 , g ) + 0.5;
 		if (inf < 0)
 			inf = 0;
 		if (inf > 255)

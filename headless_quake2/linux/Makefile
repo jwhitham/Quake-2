@@ -42,13 +42,14 @@ LINUX_DIR=$(MOUNT_DIR)/linux
 GAME_DIR=$(MOUNT_DIR)/game
 CTF_DIR=$(MOUNT_DIR)/ctf
 XATRIX_DIR=$(MOUNT_DIR)/xatrix
+LIBM_DIR=$(MOUNT_DIR)/openlibm/src
 
 CC=gcc
 BASE_CFLAGS=-Dstricmp=strcasecmp $(ARCH_CFLAGS) \
     -fno-builtin
 RELEASE_CFLAGS=$(BASE_CFLAGS) -O2 -g
 DEBUG_CFLAGS=$(BASE_CFLAGS) -g
-LDFLAGS=-ldl -lm
+LDFLAGS=-ldl
 SVGALDFLAGS=-lvga
 XLDFLAGS=-L/usr/X11R6/lib -lX11 -lXext
 XCFLAGS=
@@ -62,11 +63,16 @@ SHLIBEXT=so
 SHLIBCFLAGS=-fPIC
 SHLIBLDFLAGS=-shared
 
+LIBM=$(BUILDDIR)/libopenlibm.a
+
 DO_CC=$(CC) $(CFLAGS) -o $@ -c $<
 DO_SHLIB_CC=$(CC) $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
 DO_GL_SHLIB_CC=$(CC) $(CFLAGS) $(SHLIBCFLAGS) $(GLCFLAGS) -o $@ -c $<
 DO_AS=$(CC) $(CFLAGS) -DELF -x assembler-with-cpp -o $@ -c $<
 DO_SHLIB_AS=$(CC) $(CFLAGS) $(SHLIBCFLAGS) -DELF -x assembler-with-cpp -o $@ -c $<
+DO_LIBM_CC=$(CC) $(CFLAGS) -o $@ -c $< \
+    -I$(LIBM_DIR)/../include -I$(LIBM_DIR) -D__BSD_VISIBLE \
+    -Wno-implicit-function-declaration
 
 #############################################################################
 # SETUP AND BUILD
@@ -80,22 +86,24 @@ TARGETS=$(BUILDDIR)/quake2 \
 all: build_debug build_release
 
 build_debug:
-	@-mkdir $(BUILD_DEBUG_DIR) \
+	@-mkdir -p $(BUILD_DEBUG_DIR) \
 		$(BUILD_DEBUG_DIR)/client \
 		$(BUILD_DEBUG_DIR)/ref_soft \
 		$(BUILD_DEBUG_DIR)/ref_gl \
 		$(BUILD_DEBUG_DIR)/game \
 		$(BUILD_DEBUG_DIR)/ctf \
+		$(BUILD_DEBUG_DIR)/libm \
 		$(BUILD_DEBUG_DIR)/xatrix
 	$(MAKE) targets BUILDDIR=$(BUILD_DEBUG_DIR) CFLAGS="$(DEBUG_CFLAGS)"
 
 build_release:
-	@-mkdir $(BUILD_RELEASE_DIR) \
+	@-mkdir -p $(BUILD_RELEASE_DIR) \
 		$(BUILD_RELEASE_DIR)/client \
 		$(BUILD_RELEASE_DIR)/ref_soft \
 		$(BUILD_RELEASE_DIR)/ref_gl \
 		$(BUILD_RELEASE_DIR)/game \
 		$(BUILD_RELEASE_DIR)/ctf \
+		$(BUILD_DEBUG_DIR)/libm \
 		$(BUILD_RELEASE_DIR)/xatrix
 	$(MAKE) targets BUILDDIR=$(BUILD_RELEASE_DIR) CFLAGS="$(RELEASE_CFLAGS)"
 
@@ -155,7 +163,8 @@ QUAKE2_OBJS = \
 	$(BUILDDIR)/client/net_udp.o \
 	\
 	$(BUILDDIR)/client/q_shared.o \
-	$(BUILDDIR)/client/pmove.o
+	$(BUILDDIR)/client/pmove.o \
+
 
 ifeq ($(ARCH),axp)
 QUAKE2_AS_OBJS =  #blank
@@ -163,8 +172,8 @@ else
 QUAKE2_AS_OBJS =  #blank
 endif
 
-$(BUILDDIR)/quake2 : $(QUAKE2_OBJS) $(QUAKE2_AS_OBJS)
-	$(CC) $(CFLAGS) -o $@ $(QUAKE2_OBJS) $(QUAKE2_AS_OBJS) $(LDFLAGS)
+$(BUILDDIR)/quake2 : $(QUAKE2_OBJS) $(QUAKE2_AS_OBJS) $(LIBM)
+	$(CC) $(CFLAGS) -o $@ $(QUAKE2_OBJS) $(QUAKE2_AS_OBJS) $(LIBM) $(LDFLAGS)
 
 $(BUILDDIR)/client/cl_cin.o :     $(CLIENT_DIR)/cl_cin.c
 	$(DO_CC)
@@ -308,6 +317,36 @@ $(BUILDDIR)/client/net_udp.o :    $(LINUX_DIR)/net_udp.c
 	$(DO_CC)
 
 #############################################################################
+# LIBM
+#############################################################################
+
+$(LIBM): $(LIBM_OBJS)
+	ar rf $@ $(LIBM_OBJS)
+
+$(BUILDDIR)/libm/%.o :     $(LIBM_DIR)/%.c
+	$(DO_LIBM_CC)
+
+LIBM_OBJS = \
+	$(BUILDDIR)/libm/s_sinf.o \
+	$(BUILDDIR)/libm/k_sinf.o \
+	$(BUILDDIR)/libm/k_cosf.o \
+	$(BUILDDIR)/libm/e_rem_pio2f.o \
+	$(BUILDDIR)/libm/k_rem_pio2.o \
+	$(BUILDDIR)/libm/s_floorf.o \
+	$(BUILDDIR)/libm/s_floor.o \
+	$(BUILDDIR)/libm/s_fabsf.o \
+	$(BUILDDIR)/libm/e_sqrtf.o \
+	$(BUILDDIR)/libm/s_cosf.o \
+	$(BUILDDIR)/libm/s_atanf.o \
+	$(BUILDDIR)/libm/s_tanf.o \
+	$(BUILDDIR)/libm/e_atan2f.o \
+	$(BUILDDIR)/libm/s_ceilf.o \
+	$(BUILDDIR)/libm/e_acosf.o \
+	$(BUILDDIR)/libm/e_fmodf.o \
+	$(BUILDDIR)/libm/k_tanf.o \
+	$(BUILDDIR)/libm/e_powf.o \
+
+#############################################################################
 # GAME
 #############################################################################
 
@@ -360,8 +399,8 @@ GAME_OBJS = \
 	$(BUILDDIR)/game/q_shared.o \
 	$(BUILDDIR)/game/m_flash.o
 
-$(BUILDDIR)/game$(ARCH).$(SHLIBEXT) : $(GAME_OBJS)
-	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(GAME_OBJS)
+$(BUILDDIR)/game$(ARCH).$(SHLIBEXT) : $(GAME_OBJS) $(LIBM)
+	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(GAME_OBJS) $(LIBM)
 
 $(BUILDDIR)/game/g_ai.o :        $(GAME_DIR)/g_ai.c
 	$(DO_SHLIB_CC)
@@ -504,332 +543,6 @@ $(BUILDDIR)/game/q_shared.o :    $(GAME_DIR)/q_shared.c
 $(BUILDDIR)/game/m_flash.o :     $(GAME_DIR)/m_flash.c
 	$(DO_SHLIB_CC)
 
-#############################################################################
-# CTF
-#############################################################################
-
-CTF_OBJS = \
-	$(BUILDDIR)/ctf/g_ai.o \
-	$(BUILDDIR)/ctf/g_chase.o \
-	$(BUILDDIR)/ctf/g_cmds.o \
-	$(BUILDDIR)/ctf/g_combat.o \
-	$(BUILDDIR)/ctf/g_ctf.o \
-	$(BUILDDIR)/ctf/g_func.o \
-	$(BUILDDIR)/ctf/g_items.o \
-	$(BUILDDIR)/ctf/g_main.o \
-	$(BUILDDIR)/ctf/g_misc.o \
-	$(BUILDDIR)/ctf/g_monster.o \
-	$(BUILDDIR)/ctf/g_phys.o \
-	$(BUILDDIR)/ctf/g_save.o \
-	$(BUILDDIR)/ctf/g_spawn.o \
-	$(BUILDDIR)/ctf/g_svcmds.o \
-	$(BUILDDIR)/ctf/g_target.o \
-	$(BUILDDIR)/ctf/g_trigger.o \
-	$(BUILDDIR)/ctf/g_utils.o \
-	$(BUILDDIR)/ctf/g_weapon.o \
-	$(BUILDDIR)/ctf/m_move.o \
-	$(BUILDDIR)/ctf/p_client.o \
-	$(BUILDDIR)/ctf/p_hud.o \
-	$(BUILDDIR)/ctf/p_menu.o \
-	$(BUILDDIR)/ctf/p_trail.o \
-	$(BUILDDIR)/ctf/p_view.o \
-	$(BUILDDIR)/ctf/p_weapon.o \
-	$(BUILDDIR)/ctf/q_shared.o
-
-$(BUILDDIR)/ctf/game$(ARCH).$(SHLIBEXT) : $(CTF_OBJS)
-	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(CTF_OBJS)
-
-$(BUILDDIR)/ctf/g_ai.o :       $(CTF_DIR)/g_ai.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/g_chase.o :    $(CTF_DIR)/g_chase.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/g_cmds.o :     $(CTF_DIR)/g_cmds.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/g_combat.o :   $(CTF_DIR)/g_combat.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/g_ctf.o :      $(CTF_DIR)/g_ctf.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/g_func.o :     $(CTF_DIR)/g_func.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/g_items.o :    $(CTF_DIR)/g_items.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/g_main.o :     $(CTF_DIR)/g_main.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/g_misc.o :     $(CTF_DIR)/g_misc.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/g_monster.o :  $(CTF_DIR)/g_monster.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/g_phys.o :     $(CTF_DIR)/g_phys.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/g_save.o :     $(CTF_DIR)/g_save.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/g_spawn.o :    $(CTF_DIR)/g_spawn.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/g_svcmds.o :   $(CTF_DIR)/g_svcmds.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/g_target.o :   $(CTF_DIR)/g_target.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/g_trigger.o :  $(CTF_DIR)/g_trigger.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/g_utils.o :    $(CTF_DIR)/g_utils.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/g_weapon.o :   $(CTF_DIR)/g_weapon.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/m_move.o :     $(CTF_DIR)/m_move.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/p_client.o :   $(CTF_DIR)/p_client.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/p_hud.o :      $(CTF_DIR)/p_hud.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/p_menu.o :     $(CTF_DIR)/p_menu.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/p_trail.o :    $(CTF_DIR)/p_trail.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/p_view.o :     $(CTF_DIR)/p_view.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/p_weapon.o :   $(CTF_DIR)/p_weapon.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ctf/q_shared.o :   $(CTF_DIR)/q_shared.c
-	$(DO_SHLIB_CC)
-
-#############################################################################
-# XATRIX
-#############################################################################
-
-XATRIX_OBJS = \
-	$(BUILDDIR)/xatrix/g_ai.o \
-	$(BUILDDIR)/xatrix/g_cmds.o \
-	$(BUILDDIR)/xatrix/g_combat.o \
-	$(BUILDDIR)/xatrix/g_func.o \
-	$(BUILDDIR)/xatrix/g_items.o \
-	$(BUILDDIR)/xatrix/g_main.o \
-	$(BUILDDIR)/xatrix/g_misc.o \
-	$(BUILDDIR)/xatrix/g_monster.o \
-	$(BUILDDIR)/xatrix/g_phys.o \
-	$(BUILDDIR)/xatrix/g_save.o \
-	$(BUILDDIR)/xatrix/g_spawn.o \
-	$(BUILDDIR)/xatrix/g_svcmds.o \
-	$(BUILDDIR)/xatrix/g_target.o \
-	$(BUILDDIR)/xatrix/g_trigger.o \
-	$(BUILDDIR)/xatrix/g_turret.o \
-	$(BUILDDIR)/xatrix/g_utils.o \
-	$(BUILDDIR)/xatrix/g_weapon.o \
-	$(BUILDDIR)/xatrix/m_actor.o \
-	$(BUILDDIR)/xatrix/m_berserk.o \
-	$(BUILDDIR)/xatrix/m_boss2.o \
-	$(BUILDDIR)/xatrix/m_boss3.o \
-	$(BUILDDIR)/xatrix/m_boss31.o \
-	$(BUILDDIR)/xatrix/m_boss32.o \
-	$(BUILDDIR)/xatrix/m_boss5.o \
-	$(BUILDDIR)/xatrix/m_brain.o \
-	$(BUILDDIR)/xatrix/m_chick.o \
-	$(BUILDDIR)/xatrix/m_fixbot.o \
-	$(BUILDDIR)/xatrix/m_flash.o \
-	$(BUILDDIR)/xatrix/m_flipper.o \
-	$(BUILDDIR)/xatrix/m_float.o \
-	$(BUILDDIR)/xatrix/m_flyer.o \
-	$(BUILDDIR)/xatrix/m_gekk.o \
-	$(BUILDDIR)/xatrix/m_gladb.o \
-	$(BUILDDIR)/xatrix/m_gladiator.o \
-	$(BUILDDIR)/xatrix/m_gunner.o \
-	$(BUILDDIR)/xatrix/m_hover.o \
-	$(BUILDDIR)/xatrix/m_infantry.o \
-	$(BUILDDIR)/xatrix/m_insane.o \
-	$(BUILDDIR)/xatrix/m_medic.o \
-	$(BUILDDIR)/xatrix/m_move.o \
-	$(BUILDDIR)/xatrix/m_mutant.o \
-	$(BUILDDIR)/xatrix/m_parasite.o \
-	$(BUILDDIR)/xatrix/m_soldier.o \
-	$(BUILDDIR)/xatrix/m_supertank.o \
-	$(BUILDDIR)/xatrix/m_tank.o \
-	$(BUILDDIR)/xatrix/p_client.o \
-	$(BUILDDIR)/xatrix/p_hud.o \
-	$(BUILDDIR)/xatrix/p_trail.o \
-	$(BUILDDIR)/xatrix/p_view.o \
-	$(BUILDDIR)/xatrix/p_weapon.o \
-	$(BUILDDIR)/xatrix/q_shared.o
-
-$(BUILDDIR)/xatrix/game$(ARCH).$(SHLIBEXT) : $(XATRIX_OBJS)
-	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(XATRIX_OBJS)
-
-$(BUILDDIR)/xatrix/g_ai.o :        $(XATRIX_DIR)/g_ai.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/g_cmds.o :      $(XATRIX_DIR)/g_cmds.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/g_combat.o :    $(XATRIX_DIR)/g_combat.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/g_func.o :      $(XATRIX_DIR)/g_func.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/g_items.o :     $(XATRIX_DIR)/g_items.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/g_main.o :      $(XATRIX_DIR)/g_main.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/g_misc.o :      $(XATRIX_DIR)/g_misc.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/g_monster.o :   $(XATRIX_DIR)/g_monster.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/g_phys.o :      $(XATRIX_DIR)/g_phys.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/g_save.o :      $(XATRIX_DIR)/g_save.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/g_spawn.o :     $(XATRIX_DIR)/g_spawn.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/g_svcmds.o :    $(XATRIX_DIR)/g_svcmds.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/g_target.o :    $(XATRIX_DIR)/g_target.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/g_trigger.o :   $(XATRIX_DIR)/g_trigger.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/g_turret.o :    $(XATRIX_DIR)/g_turret.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/g_utils.o :     $(XATRIX_DIR)/g_utils.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/g_weapon.o :    $(XATRIX_DIR)/g_weapon.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_actor.o :     $(XATRIX_DIR)/m_actor.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_berserk.o :   $(XATRIX_DIR)/m_berserk.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_boss2.o :     $(XATRIX_DIR)/m_boss2.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_boss3.o :     $(XATRIX_DIR)/m_boss3.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_boss31.o :    $(XATRIX_DIR)/m_boss31.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_boss32.o :    $(XATRIX_DIR)/m_boss32.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_boss5.o :     $(XATRIX_DIR)/m_boss5.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_brain.o :     $(XATRIX_DIR)/m_brain.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_chick.o :     $(XATRIX_DIR)/m_chick.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_fixbot.o :    $(XATRIX_DIR)/m_fixbot.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_flash.o :     $(XATRIX_DIR)/m_flash.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_flipper.o :   $(XATRIX_DIR)/m_flipper.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_float.o :     $(XATRIX_DIR)/m_float.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_flyer.o :     $(XATRIX_DIR)/m_flyer.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_gekk.o :      $(XATRIX_DIR)/m_gekk.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_gladb.o :     $(XATRIX_DIR)/m_gladb.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_gladiator.o : $(XATRIX_DIR)/m_gladiator.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_gunner.o :    $(XATRIX_DIR)/m_gunner.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_hover.o :     $(XATRIX_DIR)/m_hover.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_infantry.o :  $(XATRIX_DIR)/m_infantry.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_insane.o :    $(XATRIX_DIR)/m_insane.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_medic.o :     $(XATRIX_DIR)/m_medic.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_move.o :      $(XATRIX_DIR)/m_move.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_mutant.o :    $(XATRIX_DIR)/m_mutant.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_parasite.o :  $(XATRIX_DIR)/m_parasite.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_soldier.o :   $(XATRIX_DIR)/m_soldier.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_supertank.o : $(XATRIX_DIR)/m_supertank.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/m_tank.o :      $(XATRIX_DIR)/m_tank.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/p_client.o :    $(XATRIX_DIR)/p_client.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/p_hud.o :       $(XATRIX_DIR)/p_hud.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/p_trail.o :     $(XATRIX_DIR)/p_trail.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/p_view.o :      $(XATRIX_DIR)/p_view.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/p_weapon.o :    $(XATRIX_DIR)/p_weapon.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/xatrix/q_shared.o :    $(XATRIX_DIR)/q_shared.c
-	$(DO_SHLIB_CC)
-
 
 #############################################################################
 # REF_SOFT
@@ -869,17 +582,17 @@ REF_SOFT_HEADLESS_OBJS = \
 	$(BUILDDIR)/ref_soft/rw_headless.o \
 	$(BUILDDIR)/ref_soft/crc.o
 
-$(BUILDDIR)/ref_soft.$(SHLIBEXT) : $(REF_SOFT_OBJS) $(REF_SOFT_SVGA_OBJS)
+$(BUILDDIR)/ref_soft.$(SHLIBEXT) : $(REF_SOFT_OBJS) $(REF_SOFT_SVGA_OBJS) $(LIBM)
 	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(REF_SOFT_OBJS) \
-		$(REF_SOFT_SVGA_OBJS) $(SVGALDFLAGS)
+		$(REF_SOFT_SVGA_OBJS) $(SVGALDFLAGS) $(LIBM)
 
-$(BUILDDIR)/ref_softx.$(SHLIBEXT) : $(REF_SOFT_OBJS) $(REF_SOFT_X11_OBJS)
+$(BUILDDIR)/ref_softx.$(SHLIBEXT) : $(REF_SOFT_OBJS) $(REF_SOFT_X11_OBJS) $(LIBM)
 	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(REF_SOFT_OBJS) \
-		$(REF_SOFT_X11_OBJS) $(XLDFLAGS)
+		$(REF_SOFT_X11_OBJS) $(XLDFLAGS) $(LIBM)
 
-$(BUILDDIR)/ref_headless.$(SHLIBEXT) : $(REF_SOFT_OBJS) $(REF_SOFT_HEADLESS_OBJS)
+$(BUILDDIR)/ref_headless.$(SHLIBEXT) : $(REF_SOFT_OBJS) $(REF_SOFT_HEADLESS_OBJS) $(LIBM)
 	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(REF_SOFT_OBJS) \
-		$(REF_SOFT_HEADLESS_OBJS) $(LDFLAGS)
+		$(REF_SOFT_HEADLESS_OBJS) $(LDFLAGS) $(LIBM)
 
 $(BUILDDIR)/ref_soft/r_aclip.o :      $(REF_SOFT_DIR)/r_aclip.c
 	$(DO_SHLIB_CC)

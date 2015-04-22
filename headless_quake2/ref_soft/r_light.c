@@ -321,7 +321,7 @@ void R_AddDynamicLights (void)
 
 		dist = DotProduct (dl->origin, surf->plane->normal) -
 				surf->plane->dist;
-		rad -= fabs(dist);
+		rad -= fabsf(dist);
 		minlight = 32;		// dl->minlight;
 		if (rad < minlight)
 			continue;

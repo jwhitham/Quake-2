@@ -72,7 +72,7 @@ float	pm_waterspeed = 400;
 PM_ClipVelocity
 
 Slide off of the impacting object
-returns the blocked flags (1 = floor, 2 = step / wall)
+returns the blocked flags (1 = floorf, 2 = step / wall)
 ==================
 */
 #define	STOP_EPSILON	0.1
@@ -351,7 +351,7 @@ void PM_Friction (void)
 	
 	vel = pml.velocity;
 	
-	speed = sqrt(vel[0]*vel[0] +vel[1]*vel[1] + vel[2]*vel[2]);
+	speed = sqrtf(vel[0]*vel[0] +vel[1]*vel[1] + vel[2]*vel[2]);
 	if (speed < 1)
 	{
 		vel[0] = 0;
@@ -444,7 +444,7 @@ void PM_AddCurrents (vec3_t	wishvel)
 	// account for ladders
 	//
 
-	if (pml.ladder && fabs(pml.velocity[2]) <= 200)
+	if (pml.ladder && fabsf(pml.velocity[2]) <= 200)
 	{
 		if ((pm->viewangles[PITCH] <= -15) && (pm->cmd.forwardmove > 0))
 			wishvel[2] = 200;

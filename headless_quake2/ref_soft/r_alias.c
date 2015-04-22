@@ -917,7 +917,7 @@ void R_AliasSetupLighting (void)
 		float	scale;
 		float	min;
 
-		scale = 0.1 * sin(r_newrefdef.time*7);
+		scale = 0.1 * sinf(r_newrefdef.time*7);
 		for (i=0 ; i<3 ; i++)
 		{
 			min = light[i] * 0.8;

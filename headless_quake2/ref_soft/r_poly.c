@@ -764,14 +764,14 @@ void R_PolygonScanLeftEdge (void)
 	if (lmaxindex == 0)
 		lmaxindex = r_polydesc.nump;
 
-	vtop = ceil (r_polydesc.pverts[i].v);
+	vtop = ceilf (r_polydesc.pverts[i].v);
 
 	do
 	{
 		pvert = &r_polydesc.pverts[i];
 		pnext = pvert - 1;
 
-		vbottom = ceil (pnext->v);
+		vbottom = ceilf (pnext->v);
 
 		if (vtop < vbottom)
 		{
@@ -827,7 +827,7 @@ void R_PolygonScanRightEdge (void)
 	if (vvert > r_refdef.fvrectbottom_adj)
 		vvert = r_refdef.fvrectbottom_adj;
 
-	vtop = ceil (vvert);
+	vtop = ceilf (vvert);
 
 	do
 	{
@@ -840,7 +840,7 @@ void R_PolygonScanRightEdge (void)
 		if (vnext > r_refdef.fvrectbottom_adj)
 			vnext = r_refdef.fvrectbottom_adj;
 
-		vbottom = ceil (vnext);
+		vbottom = ceilf (vnext);
 
 		if (vtop < vbottom)
 		{
@@ -1155,8 +1155,8 @@ static void R_DrawPoly( qboolean iswater )
 		pverts++;
 	}
 
-	ymin = ceil (ymin);
-	ymax = ceil (ymax);
+	ymin = ceilf (ymin);
+	ymax = ceilf (ymax);
 
 	if (ymin >= ymax)
 		return;		// doesn't cross any scans at all

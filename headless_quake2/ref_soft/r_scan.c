@@ -534,7 +534,7 @@ static int clamp_conv (float zi)
 	// code once counted on FP exceptions being turned off to avoid
 	// range problems, the SSE/x87 behaviour is that
 	// (int)(zi * 0x8000 * 0x10000) == 0x80000000
-	// for fabs(zi) >= 1.0.
+	// for fabsf(zi) >= 1.0.
 	// But on ARM you get 0x7fffffff for zi >= 1.0.
 
 	if ((zi <= -1.0) || (zi >= 1.0)) {
