@@ -64,16 +64,22 @@ DO_LIBM_CC=$(CC) $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $< \
     -Wno-implicit-function-declaration
 
 #############################################################################
+# If you don't have the X11 headers installed, replace this line:
+#############################################################################
+
+X11_TARGET=$(BUILDDIR)/ref_softx.$(SHLIBEXT)
+
+
+#############################################################################
 # SETUP AND BUILD
 #############################################################################
 
 TARGETS=$(BUILDDIR)/quake2 \
 	$(BUILDDIR)/game$(ARCH).$(SHLIBEXT) \
-	$(BUILDDIR)/ref_headless.$(SHLIBEXT)
+	$(BUILDDIR)/ref_headless.$(SHLIBEXT) \
+    $(X11_TARGET)
 
 all: build_debug build_release
-
-build_x11: $(BUILDDIR)/ref_softx.$(SHLIBEXT)
 
 build_debug:
 	@-mkdir -p $(BUILD_DEBUG_DIR) \

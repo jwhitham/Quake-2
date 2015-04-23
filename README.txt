@@ -5,25 +5,14 @@ It uses Quake 2's software renderer. It is a single-threaded
 benchmark, written in C, with heavy use of floating point. It is 
 intended to be used to test the accuracy of compilers, simulators, 
 software testing tools, CPU hardware and floating-point 
-co-processors. It is not a GPU test; only the CPU, C library,
-math library and disk access are tested. At present, Linux is
-required, and the only supported CPU architectures are x86, ARM,
-and AMD64.
+co-processors. It is not a GPU test; only the CPU, C library
+and disk access are tested. 
 
 There are two modes. In benchmark mode, Headless Quake 2 measures
 the performance of your platform when running through a gameplay
 demo. In test mode, Headless Quake 2 plays the same demo, but also
 computes the CRC-32 of each frame after it is rendered, and checks
 this CRC-32 against a reference. 
-
-The test is extremely sensitive to differences between your 
-platform's floating-point implementation and the SSE2 FPU hardware 
-which was used to compute the reference. If you are running on
-a different platform and don't have SSE2 (or ARM's VFP), you may
-get different results. The x87 FPU is not used for this reason.
-However, the test it is not affected by your math library, because
-the openlibm library is bundled. See headless_quake2/openlibm/README.md.
-
 
 
 Requirements:
@@ -40,6 +29,26 @@ The demo files are included with "Headless Quake 2". For more details of
 Quake 2 Done Quick 2, see:
 http://quake.speeddemosarchive.com/quake/qdq/movies/q2dq2.html
 
+
+Hardware requirements:
+
+The supported CPU architectures are x86, ARM, and AMD64.
+The test is extremely sensitive to differences between your 
+platform's floating-point implementation and the SSE2 FPU hardware 
+which was used to compute the reference. If you are running on
+a different platform and don't have SSE2 (or ARM's VFP), you may
+get different results. The x87 FPU is not used for this reason.
+
+
+Software requirements:
+
+The benchmark and test require Linux and GCC. X11 development
+headers are also required to build a playable version of the game
+(which will assume a 32-bit colour depth). If you don't want to build
+this, edit "X11_TARGET=" line in the Makefile ("linux" subdirectory).
+
+The test is not affected by your math library, because the 
+openlibm library is bundled. See headless_quake2/openlibm/README.md.
 
 
 Instructions:
@@ -65,7 +74,6 @@ This does the same thing as the benchmark, but also computes the
 CRC-32 of each frame rendered, and compares this against a "known good"
 list of reference values. As a result it's somewhat slower. This
 mode can be used to detect subtle software and hardware errors. 
-
 
 
 Typical benchmark timings:
