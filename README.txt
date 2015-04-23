@@ -84,4 +84,7 @@ Typical benchmark timings:
     Linux x86 (Core2 E8600)     4.7.2       38.8s
     Linux x64 (Core2 E8600)     4.7.2       30.0s
     Linux ARMv7 (RPi 2, 900MHz) 4.6.3       218.0s
+    Linux x64 (Core i3 3220)    4.1.2       20.9s
+    Linux x86 (Core i3 3220)    4.7.4       25.4s
+
 
