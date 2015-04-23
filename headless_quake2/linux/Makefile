@@ -320,12 +320,6 @@ $(BUILDDIR)/client/net_udp.o :    $(LINUX_DIR)/net_udp.c
 # LIBM
 #############################################################################
 
-$(LIBM): $(LIBM_OBJS)
-	ar rf $@ $(LIBM_OBJS)
-
-$(BUILDDIR)/libm/%.o :     $(LIBM_DIR)/%.c
-	$(DO_LIBM_CC)
-
 LIBM_OBJS = \
 	$(BUILDDIR)/libm/s_sinf.o \
 	$(BUILDDIR)/libm/k_sinf.o \
@@ -345,6 +339,12 @@ LIBM_OBJS = \
 	$(BUILDDIR)/libm/e_fmodf.o \
 	$(BUILDDIR)/libm/k_tanf.o \
 	$(BUILDDIR)/libm/e_powf.o \
+
+$(LIBM): $(LIBM_OBJS)
+	ar rf $(LIBM) $(LIBM_OBJS)
+
+$(BUILDDIR)/libm/%.o :     $(LIBM_DIR)/%.c
+	$(DO_LIBM_CC)
 
 #############################################################################
 # GAME
