@@ -1,3 +1,0 @@
-[submodule "headless_quake2/openlibm"]
-	path = headless_quake2/openlibm
-	url = git@github.com:JuliaLang/openlibm.git
