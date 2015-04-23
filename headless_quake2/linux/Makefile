@@ -36,12 +36,9 @@ BUILD_RELEASE_DIR=release$(ARCH)
 CLIENT_DIR=$(MOUNT_DIR)/client
 SERVER_DIR=$(MOUNT_DIR)/server
 REF_SOFT_DIR=$(MOUNT_DIR)/ref_soft
-REF_GL_DIR=$(MOUNT_DIR)/ref_gl
 COMMON_DIR=$(MOUNT_DIR)/qcommon
 LINUX_DIR=$(MOUNT_DIR)/linux
 GAME_DIR=$(MOUNT_DIR)/game
-CTF_DIR=$(MOUNT_DIR)/ctf
-XATRIX_DIR=$(MOUNT_DIR)/xatrix
 LIBM_DIR=$(MOUNT_DIR)/openlibm/src
 
 CC=gcc
@@ -50,13 +47,8 @@ BASE_CFLAGS=-Dstricmp=strcasecmp $(ARCH_CFLAGS) \
 RELEASE_CFLAGS=$(BASE_CFLAGS) -O2 -g
 DEBUG_CFLAGS=$(BASE_CFLAGS) -g
 LDFLAGS=-ldl
-SVGALDFLAGS=-lvga
 XLDFLAGS=-L/usr/X11R6/lib -lX11 -lXext
 XCFLAGS=
-
-GLLDFLAGS=-L/usr/local/glide/lib -L/usr/X11/lib -L/usr/local/lib \
-	-L/usr/local/src/Mesa-2.6/lib -lMesaGL -lglide2x -lX11 -lXext -lvga
-GLCFLAGS=-I/usr/local/src/Mesa-2.6/include -I/usr/local/glide/include
 
 SHLIBEXT=so
 
@@ -67,9 +59,6 @@ LIBM=$(BUILDDIR)/libopenlibm.a
 
 DO_CC=$(CC) $(CFLAGS) -o $@ -c $<
 DO_SHLIB_CC=$(CC) $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
-DO_GL_SHLIB_CC=$(CC) $(CFLAGS) $(SHLIBCFLAGS) $(GLCFLAGS) -o $@ -c $<
-DO_AS=$(CC) $(CFLAGS) -DELF -x assembler-with-cpp -o $@ -c $<
-DO_SHLIB_AS=$(CC) $(CFLAGS) $(SHLIBCFLAGS) -DELF -x assembler-with-cpp -o $@ -c $<
 DO_LIBM_CC=$(CC) $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $< \
     -I$(LIBM_DIR)/../include -I$(LIBM_DIR) -D__BSD_VISIBLE \
     -Wno-implicit-function-declaration
@@ -80,31 +69,26 @@ DO_LIBM_CC=$(CC) $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $< \
 
 TARGETS=$(BUILDDIR)/quake2 \
 	$(BUILDDIR)/game$(ARCH).$(SHLIBEXT) \
-	$(BUILDDIR)/ref_headless.$(SHLIBEXT) \
-	$(BUILDDIR)/ref_softx.$(SHLIBEXT)
+	$(BUILDDIR)/ref_headless.$(SHLIBEXT)
 
 all: build_debug build_release
+
+build_x11: $(BUILDDIR)/ref_softx.$(SHLIBEXT)
 
 build_debug:
 	@-mkdir -p $(BUILD_DEBUG_DIR) \
 		$(BUILD_DEBUG_DIR)/client \
 		$(BUILD_DEBUG_DIR)/ref_soft \
-		$(BUILD_DEBUG_DIR)/ref_gl \
 		$(BUILD_DEBUG_DIR)/game \
-		$(BUILD_DEBUG_DIR)/ctf \
-		$(BUILD_DEBUG_DIR)/libm \
-		$(BUILD_DEBUG_DIR)/xatrix
+		$(BUILD_DEBUG_DIR)/libm
 	$(MAKE) targets BUILDDIR=$(BUILD_DEBUG_DIR) CFLAGS="$(DEBUG_CFLAGS)"
 
 build_release:
 	@-mkdir -p $(BUILD_RELEASE_DIR) \
 		$(BUILD_RELEASE_DIR)/client \
 		$(BUILD_RELEASE_DIR)/ref_soft \
-		$(BUILD_RELEASE_DIR)/ref_gl \
 		$(BUILD_RELEASE_DIR)/game \
-		$(BUILD_RELEASE_DIR)/ctf \
-		$(BUILD_RELEASE_DIR)/libm \
-		$(BUILD_RELEASE_DIR)/xatrix
+		$(BUILD_RELEASE_DIR)/libm
 	$(MAKE) targets BUILDDIR=$(BUILD_RELEASE_DIR) CFLAGS="$(RELEASE_CFLAGS)"
 
 targets: $(TARGETS)
@@ -166,14 +150,8 @@ QUAKE2_OBJS = \
 	$(BUILDDIR)/client/pmove.o \
 
 
-ifeq ($(ARCH),axp)
-QUAKE2_AS_OBJS =  #blank
-else
-QUAKE2_AS_OBJS =  #blank
-endif
-
-$(BUILDDIR)/quake2 : $(QUAKE2_OBJS) $(QUAKE2_AS_OBJS) $(LIBM)
-	$(CC) $(CFLAGS) -o $@ $(QUAKE2_OBJS) $(QUAKE2_AS_OBJS) $(LIBM) $(LDFLAGS)
+$(BUILDDIR)/quake2 : $(QUAKE2_OBJS) $(LIBM)
+	$(CC) $(CFLAGS) -o $@ $(QUAKE2_OBJS) $(LIBM) $(LDFLAGS)
 
 $(BUILDDIR)/client/cl_cin.o :     $(CLIENT_DIR)/cl_cin.c
 	$(DO_CC)
@@ -303,9 +281,6 @@ $(BUILDDIR)/client/vid_so.o :     $(LINUX_DIR)/vid_so.c
 
 $(BUILDDIR)/client/snd_linux.o :  $(LINUX_DIR)/snd_linux.c
 	$(DO_CC)
-
-$(BUILDDIR)/client/snd_mixa.o :   $(LINUX_DIR)/snd_mixa.s
-	$(DO_AS)
 
 $(BUILDDIR)/client/sys_linux.o :  $(LINUX_DIR)/sys_linux.c
 	$(DO_CC)
@@ -571,20 +546,12 @@ REF_SOFT_OBJS = \
 	$(BUILDDIR)/ref_soft/q_shlinux.o \
 	$(BUILDDIR)/ref_soft/glob.o
 
-REF_SOFT_SVGA_OBJS = \
-	$(BUILDDIR)/ref_soft/rw_svgalib.o \
-	$(BUILDDIR)/ref_soft/rw_in_svgalib.o
-
 REF_SOFT_X11_OBJS = \
 	$(BUILDDIR)/ref_soft/rw_x11.o
 
 REF_SOFT_HEADLESS_OBJS = \
 	$(BUILDDIR)/ref_soft/rw_headless.o \
 	$(BUILDDIR)/ref_soft/crc.o
-
-$(BUILDDIR)/ref_soft.$(SHLIBEXT) : $(REF_SOFT_OBJS) $(REF_SOFT_SVGA_OBJS) $(LIBM)
-	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(REF_SOFT_OBJS) \
-		$(REF_SOFT_SVGA_OBJS) $(SVGALDFLAGS) $(LIBM)
 
 $(BUILDDIR)/ref_softx.$(SHLIBEXT) : $(REF_SOFT_OBJS) $(REF_SOFT_X11_OBJS) $(LIBM)
 	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(REF_SOFT_OBJS) \
@@ -645,39 +612,6 @@ $(BUILDDIR)/ref_soft/r_sprite.o :     $(REF_SOFT_DIR)/r_sprite.c
 $(BUILDDIR)/ref_soft/r_surf.o :       $(REF_SOFT_DIR)/r_surf.c
 	$(DO_SHLIB_CC)
 
-$(BUILDDIR)/ref_soft/r_aclipa.o :     $(LINUX_DIR)/r_aclipa.s
-	$(DO_SHLIB_AS)
-
-$(BUILDDIR)/ref_soft/r_draw16.o :     $(LINUX_DIR)/r_draw16.s
-	$(DO_SHLIB_AS)
-
-$(BUILDDIR)/ref_soft/r_drawa.o :      $(LINUX_DIR)/r_drawa.s
-	$(DO_SHLIB_AS)
-
-$(BUILDDIR)/ref_soft/r_edgea.o :      $(LINUX_DIR)/r_edgea.s
-	$(DO_SHLIB_AS)
-
-$(BUILDDIR)/ref_soft/r_scana.o :      $(LINUX_DIR)/r_scana.s
-	$(DO_SHLIB_AS)
-
-$(BUILDDIR)/ref_soft/r_spr8.o :       $(LINUX_DIR)/r_spr8.s
-	$(DO_SHLIB_AS)
-
-$(BUILDDIR)/ref_soft/r_surf8.o :      $(LINUX_DIR)/r_surf8.s
-	$(DO_SHLIB_AS)
-
-$(BUILDDIR)/ref_soft/math.o :         $(LINUX_DIR)/math.s
-	$(DO_SHLIB_AS)
-
-$(BUILDDIR)/ref_soft/d_polysa.o :     $(LINUX_DIR)/d_polysa.s
-	$(DO_SHLIB_AS)
-
-$(BUILDDIR)/ref_soft/r_varsa.o :      $(LINUX_DIR)/r_varsa.s
-	$(DO_SHLIB_AS)
-
-$(BUILDDIR)/ref_soft/sys_dosa.o :     $(LINUX_DIR)/sys_dosa.s
-	$(DO_SHLIB_AS)
-
 $(BUILDDIR)/ref_soft/q_shared.o :     $(GAME_DIR)/q_shared.c
 	$(DO_SHLIB_CC)
 
@@ -685,15 +619,6 @@ $(BUILDDIR)/ref_soft/q_shlinux.o :    $(LINUX_DIR)/q_shlinux.c
 	$(DO_SHLIB_CC)
 
 $(BUILDDIR)/ref_soft/glob.o :         $(LINUX_DIR)/glob.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/rw_svgalib.o :   $(LINUX_DIR)/rw_svgalib.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/d_copy.o :       $(LINUX_DIR)/d_copy.s
-	$(DO_SHLIB_AS)
-
-$(BUILDDIR)/ref_soft/rw_in_svgalib.o : $(LINUX_DIR)/rw_in_svgalib.c
 	$(DO_SHLIB_CC)
 
 $(BUILDDIR)/ref_soft/rw_x11.o :       $(LINUX_DIR)/rw_x11.c
@@ -704,76 +629,6 @@ $(BUILDDIR)/ref_soft/rw_headless.o :  $(LINUX_DIR)/rw_headless.c
 
 $(BUILDDIR)/ref_soft/crc.o :  $(LINUX_DIR)/crc.c
 	$(DO_SHLIB_CC)
-
-#############################################################################
-# REF_GL
-#############################################################################
-
-REF_GL_OBJS = \
-	$(BUILDDIR)/ref_gl/gl_draw.o \
-	$(BUILDDIR)/ref_gl/gl_image.o \
-	$(BUILDDIR)/ref_gl/gl_light.o \
-	$(BUILDDIR)/ref_gl/gl_mesh.o \
-	$(BUILDDIR)/ref_gl/gl_model.o \
-	$(BUILDDIR)/ref_gl/gl_rmain.o \
-	$(BUILDDIR)/ref_gl/gl_rmisc.o \
-	$(BUILDDIR)/ref_gl/gl_rsurf.o \
-	$(BUILDDIR)/ref_gl/gl_warp.o \
-	\
-	$(BUILDDIR)/ref_gl/qgl_linux.o \
-	$(BUILDDIR)/ref_gl/gl_fxmesa.o \
-	$(BUILDDIR)/ref_gl/rw_in_svgalib.o \
-	$(BUILDDIR)/ref_gl/q_shared.o \
-	$(BUILDDIR)/ref_gl/q_shlinux.o \
-	$(BUILDDIR)/ref_gl/glob.o
-
-$(BUILDDIR)/ref_gl.$(SHLIBEXT) : $(REF_GL_OBJS)
-	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(REF_GL_OBJS) $(GLLDFLAGS)
-
-$(BUILDDIR)/ref_gl/gl_draw.o :        $(REF_GL_DIR)/gl_draw.c
-	$(DO_GL_SHLIB_CC)
-
-$(BUILDDIR)/ref_gl/gl_image.o :       $(REF_GL_DIR)/gl_image.c
-	$(DO_GL_SHLIB_CC)
-
-$(BUILDDIR)/ref_gl/gl_light.o :       $(REF_GL_DIR)/gl_light.c
-	$(DO_GL_SHLIB_CC)
-
-$(BUILDDIR)/ref_gl/gl_mesh.o :        $(REF_GL_DIR)/gl_mesh.c
-	$(DO_GL_SHLIB_CC)
-
-$(BUILDDIR)/ref_gl/gl_model.o :       $(REF_GL_DIR)/gl_model.c
-	$(DO_GL_SHLIB_CC)
-
-$(BUILDDIR)/ref_gl/gl_rmain.o :       $(REF_GL_DIR)/gl_rmain.c
-	$(DO_GL_SHLIB_CC)
-
-$(BUILDDIR)/ref_gl/gl_rmisc.o :       $(REF_GL_DIR)/gl_rmisc.c
-	$(DO_GL_SHLIB_CC)
-
-$(BUILDDIR)/ref_gl/gl_rsurf.o :       $(REF_GL_DIR)/gl_rsurf.c
-	$(DO_GL_SHLIB_CC)
-
-$(BUILDDIR)/ref_gl/gl_warp.o :        $(REF_GL_DIR)/gl_warp.c
-	$(DO_GL_SHLIB_CC)
-
-$(BUILDDIR)/ref_gl/qgl_linux.o :      $(LINUX_DIR)/qgl_linux.c
-	$(DO_GL_SHLIB_CC)
-
-$(BUILDDIR)/ref_gl/gl_fxmesa.o :      $(LINUX_DIR)/gl_fxmesa.c
-	$(DO_GL_SHLIB_CC)
-
-$(BUILDDIR)/ref_gl/rw_in_svgalib.o :  $(LINUX_DIR)/rw_in_svgalib.c
-	$(DO_GL_SHLIB_CC)
-
-$(BUILDDIR)/ref_gl/q_shared.o :       $(GAME_DIR)/q_shared.c
-	$(DO_GL_SHLIB_CC)
-
-$(BUILDDIR)/ref_gl/q_shlinux.o :      $(LINUX_DIR)/q_shlinux.c
-	$(DO_GL_SHLIB_CC)
-
-$(BUILDDIR)/ref_gl/glob.o :           $(LINUX_DIR)/glob.c
-	$(DO_GL_SHLIB_CC)
 
 #############################################################################
 # MISC
@@ -790,13 +645,8 @@ clean-release:
 clean2:
 	-rm -f \
 	$(QUAKE2_OBJS) \
-	$(QUAKE2_AS_OBJS) \
 	$(GAME_OBJS) \
-	$(CTF_OBJS) \
-	$(XATRIX_OBJS) \
 	$(REF_SOFT_OBJS) \
-	$(REF_SOFT_SVGA_OBJS) \
 	$(REF_SOFT_X11_OBJS) \
-	$(REF_SOFT_HEADLESS_OBJS) \
-	$(REF_GL_OBJS)
+	$(REF_SOFT_HEADLESS_OBJS) 
 

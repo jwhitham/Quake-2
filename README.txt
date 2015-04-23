@@ -14,9 +14,15 @@ There are two modes. In benchmark mode, Headless Quake 2 measures
 the performance of your platform when running through a gameplay
 demo. In test mode, Headless Quake 2 plays the same demo, but also
 computes the CRC-32 of each frame after it is rendered, and checks
-this CRC-32 against a reference. This test is extremely sensitive
-to differences between your platform's floating-point implementation
-and the SSE2/VFP hardware which was used to compute the reference.
+this CRC-32 against a reference. 
+
+The test is extremely sensitive to differences between your 
+platform's floating-point implementation and the SSE2 FPU hardware 
+which was used to compute the reference. If you are running on
+a different platform and don't have SSE2 (or ARM's VFP), you may
+get different results. The x87 FPU is not used for this reason.
+However, the test it is not affected by your math library, because
+the openlibm library is bundled. See headless_quake2/openlibm/README.md.
 
 
 
@@ -66,6 +72,8 @@ Typical benchmark timings:
 
     Platform                    GCC         Typical time
 
-    Linux x86 (Core2 E8600)     4.7.2       48.4s
-    Linux x64 (Core2 E8600)     4.7.2       39.5s
+    Linux x86 (Core2 E8600)     4.7.2       38.8s
+    Linux x64 (Core2 E8600)     4.7.2       30.0s
+    Linux ARMv7 (RPi 2, 900MHz) 4.6.3       218.0s
+
 
