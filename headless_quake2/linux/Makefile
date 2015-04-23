@@ -42,8 +42,7 @@ GAME_DIR=$(MOUNT_DIR)/game
 LIBM_DIR=$(MOUNT_DIR)/openlibm/src
 
 CC=gcc
-BASE_CFLAGS=-Dstricmp=strcasecmp $(ARCH_CFLAGS) \
-    -fno-builtin
+BASE_CFLAGS=-Dstricmp=strcasecmp $(ARCH_CFLAGS)
 RELEASE_CFLAGS=$(BASE_CFLAGS) -O2 -g
 DEBUG_CFLAGS=$(BASE_CFLAGS) -g
 LDFLAGS=-ldl
@@ -303,6 +302,7 @@ $(BUILDDIR)/client/net_udp.o :    $(LINUX_DIR)/net_udp.c
 
 LIBM_OBJS = \
 	$(BUILDDIR)/libm/s_sinf.o \
+	$(BUILDDIR)/libm/s_sincosf.o \
 	$(BUILDDIR)/libm/k_sinf.o \
 	$(BUILDDIR)/libm/k_cosf.o \
 	$(BUILDDIR)/libm/e_rem_pio2f.o \
