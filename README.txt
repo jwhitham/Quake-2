@@ -42,20 +42,19 @@ get different results. The x87 FPU is not used for this reason.
 
 Software requirements:
 
-The benchmark and test require Linux and GCC. X11 development
+The benchmark and test require Linux, GNU make and GCC. X11 development
 headers are also required to build a playable version of the game
 (which will assume a 32-bit colour depth). If you don't want to build
 this, edit "X11_TARGET=" line in the Makefile ("linux" subdirectory).
 
 The test is not affected by your math library, because the 
-openlibm library is bundled. See headless_quake2/openlibm/README.md.
+openlibm library is bundled. See headless_quake2/openlibm/README.md
+or http://openlibm.org/ for details of openlibm.
 
 
 Instructions:
 
-Run "./build.sh" to compile. This requires GCC, GNU make, and the
-X11 header files for your Linux system. If you don't have these, try:
-    apt-get install build-essential libxext-dev libx11-dev
+Run "./build.sh" to compile.
 
 Run one of the following commands to run the benchmark:
     ./benchmark_quake2.sh release amd64     (if you compiled for AMD64)
@@ -64,8 +63,8 @@ Run one of the following commands to run the benchmark:
 
 This runs through the whole "Quake 2 Done Quick 2" demo as quickly as
 possible. A total of 17000 frames will be rendered by Quake 2's software
-renderer, corresponding to 12.5 frames per second of gameplay. As a final
-step, the program prints the total time that elapsed.
+renderer, corresponding to 12.5 frames per gameplay second. As a final
+step, the program prints the total (real) time that elapsed.
 
 Run one of the following commands to test Headless Quake 2:
     ./test_quake2.sh release amd64          (if you compiled for AMD64)
