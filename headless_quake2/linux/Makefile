@@ -70,7 +70,7 @@ DO_SHLIB_CC=$(CC) $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
 DO_GL_SHLIB_CC=$(CC) $(CFLAGS) $(SHLIBCFLAGS) $(GLCFLAGS) -o $@ -c $<
 DO_AS=$(CC) $(CFLAGS) -DELF -x assembler-with-cpp -o $@ -c $<
 DO_SHLIB_AS=$(CC) $(CFLAGS) $(SHLIBCFLAGS) -DELF -x assembler-with-cpp -o $@ -c $<
-DO_LIBM_CC=$(CC) $(CFLAGS) -o $@ -c $< \
+DO_LIBM_CC=$(CC) $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $< \
     -I$(LIBM_DIR)/../include -I$(LIBM_DIR) -D__BSD_VISIBLE \
     -Wno-implicit-function-declaration
 
@@ -103,7 +103,7 @@ build_release:
 		$(BUILD_RELEASE_DIR)/ref_gl \
 		$(BUILD_RELEASE_DIR)/game \
 		$(BUILD_RELEASE_DIR)/ctf \
-		$(BUILD_DEBUG_DIR)/libm \
+		$(BUILD_RELEASE_DIR)/libm \
 		$(BUILD_RELEASE_DIR)/xatrix
 	$(MAKE) targets BUILDDIR=$(BUILD_RELEASE_DIR) CFLAGS="$(RELEASE_CFLAGS)"
 
