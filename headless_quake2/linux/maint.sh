@@ -1,15 +1,11 @@
 #!/bin/bash -xe
 
-if test "$USER" -ne "jack"
-then
-    echo "This test script is for maintainer use"
-    exit 1
-fi
+# This test script is for maintainer use
 
 cd ..
 ./clean.sh
 
-if test "`uname -m`" -eq "armv7l"
+if test "`uname -m`" = "armv7l"
 then
     make -C $PWD/linux
     ./test_quake2.sh debug arm

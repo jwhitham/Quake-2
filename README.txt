@@ -53,7 +53,9 @@ openlibm library is bundled. See headless_quake2/openlibm/README.md.
 
 Instructions:
 
-Run "./build.sh" to compile. 
+Run "./build.sh" to compile. This requires GCC, GNU make, and the
+X11 header files for your Linux system. If you don't have these, try:
+    apt-get install build-essential libxext-dev libx11-dev
 
 Run one of the following commands to run the benchmark:
     ./benchmark_quake2.sh release amd64     (if you compiled for AMD64)
@@ -83,5 +85,4 @@ Typical benchmark timings:
     Linux x86 (Core2 E8600)     4.7.2       38.8s
     Linux x64 (Core2 E8600)     4.7.2       30.0s
     Linux ARMv7 (RPi 2, 900MHz) 4.6.3       218.0s
-
 
