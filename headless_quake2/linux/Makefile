@@ -42,41 +42,22 @@ GAME_DIR=$(MOUNT_DIR)/game
 LIBM_DIR=$(MOUNT_DIR)/openlibm/src
 
 CC=gcc
-BASE_CFLAGS=-Dstricmp=strcasecmp $(ARCH_CFLAGS)
+BASE_CFLAGS=-Dstricmp=strcasecmp -DGAME_HARD_LINKED -DREF_HARD_LINKED $(ARCH_CFLAGS)
 RELEASE_CFLAGS=$(BASE_CFLAGS) -O2 -g
 DEBUG_CFLAGS=$(BASE_CFLAGS) -g
-LDFLAGS=-ldl
-XLDFLAGS=-L/usr/X11R6/lib -lX11 -lXext
-XCFLAGS=
-
-SHLIBEXT=so
-
-SHLIBCFLAGS=-fPIC
-SHLIBLDFLAGS=-shared
-
-LIBM=$(BUILDDIR)/libopenlibm.a
+LDFLAGS=
 
 DO_CC=$(CC) $(CFLAGS) -o $@ -c $<
-DO_SHLIB_CC=$(CC) $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
-DO_LIBM_CC=$(CC) $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $< \
+DO_SHLIB_CC=$(DO_CC)
+DO_LIBM_CC=$(CC) $(CFLAGS) -o $@ -c $< \
     -I$(LIBM_DIR)/../include -I$(LIBM_DIR) -D__BSD_VISIBLE \
     -Wno-implicit-function-declaration
-
-#############################################################################
-# If you don't have the X11 headers installed, replace this line:
-#############################################################################
-
-X11_TARGET=$(BUILDDIR)/ref_softx.$(SHLIBEXT)
-
 
 #############################################################################
 # SETUP AND BUILD
 #############################################################################
 
-TARGETS=$(BUILDDIR)/quake2 \
-	$(BUILDDIR)/game$(ARCH).$(SHLIBEXT) \
-	$(BUILDDIR)/ref_headless.$(SHLIBEXT) \
-    $(X11_TARGET)
+TARGETS=$(BUILDDIR)/quake2
 
 all: build_debug build_release
 
@@ -152,11 +133,7 @@ QUAKE2_OBJS = \
 	$(BUILDDIR)/client/net_udp.o \
 	\
 	$(BUILDDIR)/client/q_shared.o \
-	$(BUILDDIR)/client/pmove.o \
-
-
-$(BUILDDIR)/quake2 : $(QUAKE2_OBJS) $(LIBM)
-	$(CC) $(CFLAGS) -o $@ $(QUAKE2_OBJS) $(LIBM) $(LDFLAGS)
+	$(BUILDDIR)/client/pmove.o
 
 $(BUILDDIR)/client/cl_cin.o :     $(CLIENT_DIR)/cl_cin.c
 	$(DO_CC)
@@ -319,10 +296,7 @@ LIBM_OBJS = \
 	$(BUILDDIR)/libm/e_acosf.o \
 	$(BUILDDIR)/libm/e_fmodf.o \
 	$(BUILDDIR)/libm/k_tanf.o \
-	$(BUILDDIR)/libm/e_powf.o \
-
-$(LIBM): $(LIBM_OBJS)
-	ar rf $(LIBM) $(LIBM_OBJS)
+	$(BUILDDIR)/libm/e_powf.o
 
 $(BUILDDIR)/libm/%.o :     $(LIBM_DIR)/%.c
 	$(DO_LIBM_CC)
@@ -377,152 +351,10 @@ GAME_OBJS = \
 	$(BUILDDIR)/game/p_trail.o \
 	$(BUILDDIR)/game/p_view.o \
 	$(BUILDDIR)/game/p_weapon.o \
-	$(BUILDDIR)/game/q_shared.o \
-	$(BUILDDIR)/game/m_flash.o
+	$(BUILDDIR)/game/g_chase.o
 
-$(BUILDDIR)/game$(ARCH).$(SHLIBEXT) : $(GAME_OBJS) $(LIBM)
-	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(GAME_OBJS) $(LIBM)
-
-$(BUILDDIR)/game/g_ai.o :        $(GAME_DIR)/g_ai.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/p_client.o :    $(GAME_DIR)/p_client.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/g_cmds.o :      $(GAME_DIR)/g_cmds.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/g_svcmds.o :    $(GAME_DIR)/g_svcmds.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/g_combat.o :    $(GAME_DIR)/g_combat.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/g_func.o :      $(GAME_DIR)/g_func.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/g_items.o :     $(GAME_DIR)/g_items.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/g_main.o :      $(GAME_DIR)/g_main.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/g_misc.o :      $(GAME_DIR)/g_misc.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/g_monster.o :   $(GAME_DIR)/g_monster.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/g_phys.o :      $(GAME_DIR)/g_phys.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/g_save.o :      $(GAME_DIR)/g_save.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/g_spawn.o :     $(GAME_DIR)/g_spawn.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/g_target.o :    $(GAME_DIR)/g_target.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/g_trigger.o :   $(GAME_DIR)/g_trigger.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/g_turret.o :    $(GAME_DIR)/g_turret.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/g_utils.o :     $(GAME_DIR)/g_utils.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/g_weapon.o :    $(GAME_DIR)/g_weapon.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_actor.o :     $(GAME_DIR)/m_actor.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_berserk.o :   $(GAME_DIR)/m_berserk.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_boss2.o :     $(GAME_DIR)/m_boss2.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_boss3.o :     $(GAME_DIR)/m_boss3.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_boss31.o :     $(GAME_DIR)/m_boss31.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_boss32.o :     $(GAME_DIR)/m_boss32.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_brain.o :     $(GAME_DIR)/m_brain.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_chick.o :     $(GAME_DIR)/m_chick.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_flipper.o :   $(GAME_DIR)/m_flipper.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_float.o :     $(GAME_DIR)/m_float.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_flyer.o :     $(GAME_DIR)/m_flyer.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_gladiator.o : $(GAME_DIR)/m_gladiator.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_gunner.o :    $(GAME_DIR)/m_gunner.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_hover.o :     $(GAME_DIR)/m_hover.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_infantry.o :  $(GAME_DIR)/m_infantry.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_insane.o :    $(GAME_DIR)/m_insane.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_medic.o :     $(GAME_DIR)/m_medic.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_move.o :      $(GAME_DIR)/m_move.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_mutant.o :    $(GAME_DIR)/m_mutant.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_parasite.o :  $(GAME_DIR)/m_parasite.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_soldier.o :   $(GAME_DIR)/m_soldier.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_supertank.o : $(GAME_DIR)/m_supertank.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_tank.o :      $(GAME_DIR)/m_tank.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/p_hud.o :       $(GAME_DIR)/p_hud.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/p_trail.o :     $(GAME_DIR)/p_trail.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/p_view.o :      $(GAME_DIR)/p_view.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/p_weapon.o :    $(GAME_DIR)/p_weapon.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/q_shared.o :    $(GAME_DIR)/q_shared.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/game/m_flash.o :     $(GAME_DIR)/m_flash.c
-	$(DO_SHLIB_CC)
+$(BUILDDIR)/game/%.o :     $(GAME_DIR)/%.c
+	$(DO_CC)
 
 
 #############################################################################
@@ -547,87 +379,13 @@ REF_SOFT_OBJS = \
 	$(BUILDDIR)/ref_soft/r_scan.o \
 	$(BUILDDIR)/ref_soft/r_sprite.o \
 	$(BUILDDIR)/ref_soft/r_surf.o \
-	\
-	$(BUILDDIR)/ref_soft/q_shared.o \
-	$(BUILDDIR)/ref_soft/q_shlinux.o \
-	$(BUILDDIR)/ref_soft/glob.o
-
-REF_SOFT_X11_OBJS = \
-	$(BUILDDIR)/ref_soft/rw_x11.o
 
 REF_SOFT_HEADLESS_OBJS = \
 	$(BUILDDIR)/ref_soft/rw_headless.o \
 	$(BUILDDIR)/ref_soft/crc.o
 
-$(BUILDDIR)/ref_softx.$(SHLIBEXT) : $(REF_SOFT_OBJS) $(REF_SOFT_X11_OBJS) $(LIBM)
-	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(REF_SOFT_OBJS) \
-		$(REF_SOFT_X11_OBJS) $(XLDFLAGS) $(LIBM)
 
-$(BUILDDIR)/ref_headless.$(SHLIBEXT) : $(REF_SOFT_OBJS) $(REF_SOFT_HEADLESS_OBJS) $(LIBM)
-	$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(REF_SOFT_OBJS) \
-		$(REF_SOFT_HEADLESS_OBJS) $(LDFLAGS) $(LIBM)
-
-$(BUILDDIR)/ref_soft/r_aclip.o :      $(REF_SOFT_DIR)/r_aclip.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/r_alias.o :      $(REF_SOFT_DIR)/r_alias.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/r_bsp.o :        $(REF_SOFT_DIR)/r_bsp.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/r_draw.o :       $(REF_SOFT_DIR)/r_draw.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/r_edge.o :       $(REF_SOFT_DIR)/r_edge.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/r_image.o :      $(REF_SOFT_DIR)/r_image.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/r_light.o :      $(REF_SOFT_DIR)/r_light.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/r_main.o :       $(REF_SOFT_DIR)/r_main.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/r_misc.o :       $(REF_SOFT_DIR)/r_misc.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/r_model.o :      $(REF_SOFT_DIR)/r_model.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/r_part.o :       $(REF_SOFT_DIR)/r_part.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/r_poly.o :       $(REF_SOFT_DIR)/r_poly.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/r_polyse.o :     $(REF_SOFT_DIR)/r_polyse.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/r_rast.o :       $(REF_SOFT_DIR)/r_rast.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/r_scan.o :       $(REF_SOFT_DIR)/r_scan.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/r_sprite.o :     $(REF_SOFT_DIR)/r_sprite.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/r_surf.o :       $(REF_SOFT_DIR)/r_surf.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/q_shared.o :     $(GAME_DIR)/q_shared.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/q_shlinux.o :    $(LINUX_DIR)/q_shlinux.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/glob.o :         $(LINUX_DIR)/glob.c
-	$(DO_SHLIB_CC)
-
-$(BUILDDIR)/ref_soft/rw_x11.o :       $(LINUX_DIR)/rw_x11.c
+$(BUILDDIR)/ref_soft/%.o :       $(REF_SOFT_DIR)/%.c
 	$(DO_SHLIB_CC)
 
 $(BUILDDIR)/ref_soft/rw_headless.o :  $(LINUX_DIR)/rw_headless.c
@@ -653,6 +411,13 @@ clean2:
 	$(QUAKE2_OBJS) \
 	$(GAME_OBJS) \
 	$(REF_SOFT_OBJS) \
-	$(REF_SOFT_X11_OBJS) \
 	$(REF_SOFT_HEADLESS_OBJS) 
+
+#############################################################################
+# Static binary
+#############################################################################
+
+$(BUILDDIR)/quake2 : $(LIBM_OBJS) $(GAME_OBJS) $(REF_SOFT_OBJS) $(REF_SOFT_HEADLESS_OBJS) $(QUAKE2_OBJS) 
+	$(CC) $(CFLAGS) -o $@ \
+        $(LIBM_OBJS) $(GAME_OBJS) $(REF_SOFT_OBJS) $(REF_SOFT_HEADLESS_OBJS) $(QUAKE2_OBJS) $(LDFLAGS) 
 

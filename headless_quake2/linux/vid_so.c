@@ -5,7 +5,6 @@
 #define SO_FILE "quake2.conf"
 
 #include <assert.h>
-#include <dlfcn.h> // ELF dl loader
 #include <sys/stat.h>
 #include <unistd.h>
 #include <errno.h>
@@ -28,7 +27,6 @@ cvar_t		*vid_fullscreen;
 
 // Global variables used internally by this module
 viddef_t	viddef;				// global video state; used by other modules
-void		*reflib_library;		// Handle to refresh DLL 
 qboolean	reflib_active = 0;
 
 #define VID_NUM_MODES ( sizeof( vid_modes ) / sizeof( vid_modes[0] ) )
@@ -37,22 +35,24 @@ qboolean	reflib_active = 0;
 
 void Do_Key_Event(int key, qboolean down);
 
-void (*KBD_Update_fp)(void);
-void (*KBD_Init_fp)(Key_Event_fp_t fp);
-void (*KBD_Close_fp)(void);
+void KBD_Update(void);
+void KBD_Init(Key_Event_fp_t fp);
+void KBD_Close(void);
 
 /** MOUSE *****************************************************************/
 
 in_state_t in_state;
 
-void (*RW_IN_Init_fp)(in_state_t *in_state_p);
-void (*RW_IN_Shutdown_fp)(void);
-void (*RW_IN_Activate_fp)(qboolean active);
-void (*RW_IN_Commands_fp)(void);
-void (*RW_IN_Move_fp)(usercmd_t *cmd);
-void (*RW_IN_Frame_fp)(void);
+void RW_IN_Init(in_state_t *in_state_p);
+void RW_IN_Shutdown(void);
+void RW_IN_Activate(qboolean active);
+void RW_IN_Commands(void);
+void RW_IN_Move(usercmd_t *cmd);
+void RW_IN_Frame(void);
 
 void Real_IN_Init (void);
+
+refexport_t GetRefAPI (refimport_t rimp);
 
 /*
 ==========================================================================
@@ -154,29 +154,14 @@ void VID_NewWindow ( int width, int height)
 
 void VID_FreeReflib (void)
 {
-	if (reflib_library) {
-		if (KBD_Close_fp)
-			KBD_Close_fp();
-		if (RW_IN_Shutdown_fp)
-			RW_IN_Shutdown_fp();
-		dlclose(reflib_library);
-	}
-
-	KBD_Init_fp = NULL;
-	KBD_Update_fp = NULL;
-	KBD_Close_fp = NULL;
-	RW_IN_Init_fp = NULL;
-	RW_IN_Shutdown_fp = NULL;
-	RW_IN_Activate_fp = NULL;
-	RW_IN_Commands_fp = NULL;
-	RW_IN_Move_fp = NULL;
-	RW_IN_Frame_fp = NULL;
+	KBD_Close();
+	RW_IN_Shutdown();
 
 	memset (&re, 0, sizeof(re));
-	reflib_library = NULL;
 	reflib_active  = false;
 }
 
+void R_UnRegister (void);
 /*
 ==============
 VID_LoadRefresh
@@ -185,50 +170,13 @@ VID_LoadRefresh
 qboolean VID_LoadRefresh( char *name )
 {
 	refimport_t	ri;
-	GetRefAPI_t	GetRefAPI;
-	char	fn[MAX_OSPATH];
-	struct stat st;
-	extern uid_t saved_euid;
-	FILE *fp;
-	
-	if ( reflib_active )
-	{
-		if (KBD_Close_fp)
-			KBD_Close_fp();
-		if (RW_IN_Shutdown_fp)
-			RW_IN_Shutdown_fp();
-		KBD_Close_fp = NULL;
-		RW_IN_Shutdown_fp = NULL;
-		re.Shutdown();
-		VID_FreeReflib ();
-	}
 
 	Com_Printf( "------- Loading %s -------\n", name );
 
-	//regain root
-	seteuid(saved_euid);
-
-	if ((fp = fopen(SO_FILE, "r")) == NULL) {
-		Com_Printf( "LoadLibrary(\"%s\") failed: can't open " SO_FILE " (required for location of ref libraries)\n", name);
-		return false;
-	}
-	fgets(fn, sizeof(fn), fp);
-	fclose(fp);
-	if (*fn && fn[strlen(fn) - 1] == '\n')
-		fn[strlen(fn) - 1] = 0;
-
-	strcat(fn, "/");
-	strcat(fn, name);
-
-	if (strstr(name, "headless") == NULL) {
-		headless_mode = 0;
+	if (reflib_active) {
+		R_UnRegister ();
 	}
 
-	if ( ( reflib_library = dlopen( fn, RTLD_NOW ) ) == 0 )
-	{
-		Com_Printf( "LoadLibrary(\"%s\") failed: %s\n", name , dlerror());
-		return false;
-	}
 
 	ri.Cmd_AddCommand = Cmd_AddCommand;
 	ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
@@ -247,9 +195,6 @@ qboolean VID_LoadRefresh( char *name )
 	ri.Vid_MenuInit = VID_MenuInit;
 	ri.Vid_NewWindow = VID_NewWindow;
 
-	if ( ( GetRefAPI = (void *) dlsym( reflib_library, "GetRefAPI" ) ) == 0 )
-		Com_Error( ERR_FATAL, "dlsym failed on %s", name );
-
 	re = GetRefAPI( ri );
 
 	if (re.api_version != API_VERSION)
@@ -264,16 +209,6 @@ qboolean VID_LoadRefresh( char *name )
 	in_state.viewangles = cl.viewangles;
 	in_state.in_strafe_state = &in_strafe.state;
 
-	if ((RW_IN_Init_fp = dlsym(reflib_library, "RW_IN_Init")) == NULL ||
-		(RW_IN_Shutdown_fp = dlsym(reflib_library, "RW_IN_Shutdown")) == NULL ||
-		(RW_IN_Activate_fp = dlsym(reflib_library, "RW_IN_Activate")) == NULL ||
-		(RW_IN_Commands_fp = dlsym(reflib_library, "RW_IN_Commands")) == NULL ||
-		(RW_IN_Move_fp = dlsym(reflib_library, "RW_IN_Move")) == NULL ||
-		(RW_IN_Frame_fp = dlsym(reflib_library, "RW_IN_Frame")) == NULL)
-		Sys_Error("No RW_IN functions in REF.\n");
-
-	Real_IN_Init();
-
 	if ( re.Init( 0, 0 ) == -1 )
 	{
 		re.Shutdown();
@@ -282,27 +217,7 @@ qboolean VID_LoadRefresh( char *name )
 	}
 
 	/* Init KBD */
-#if 1
-	if ((KBD_Init_fp = dlsym(reflib_library, "KBD_Init")) == NULL ||
-		(KBD_Update_fp = dlsym(reflib_library, "KBD_Update")) == NULL ||
-		(KBD_Close_fp = dlsym(reflib_library, "KBD_Close")) == NULL)
-		Sys_Error("No KBD functions in REF.\n");
-#else
-	{
-		void KBD_Init(void);
-		void KBD_Update(void);
-		void KBD_Close(void);
-
-		KBD_Init_fp = KBD_Init;
-		KBD_Update_fp = KBD_Update;
-		KBD_Close_fp = KBD_Close;
-	}
-#endif
-	KBD_Init_fp(Do_Key_Event);
-
-	// give up root now
-	setreuid(getuid(), getuid());
-	setegid(getgid());
+	KBD_Init(Do_Key_Event);
 
 	Com_Printf( "------------------------------------\n");
 	reflib_active = true;
@@ -338,31 +253,10 @@ void VID_CheckChanges (void)
 		cl.refresh_prepped = false;
 		cls.disable_screen = true;
 
-		sprintf( name, "ref_%s.so", vid_ref->string );
+		sprintf( name, "ref_headless.so");
 		if ( !VID_LoadRefresh( name ) )
 		{
-			if ( strcmp (vid_ref->string, "soft") == 0 ||
-				strcmp (vid_ref->string, "softx") == 0 ) {
-Com_Printf("Refresh failed\n");
-				sw_mode = Cvar_Get( "sw_mode", "0", 0 );
-				if (sw_mode->value != 0) {
-Com_Printf("Trying mode 0\n");
-					Cvar_SetValue("sw_mode", 0);
-					if ( !VID_LoadRefresh( name ) )
-						Com_Error (ERR_FATAL, "Couldn't fall back to software refresh!");
-				} else
-					Com_Error (ERR_FATAL, "Couldn't fall back to software refresh!");
-			}
-
-			Cvar_Set( "vid_ref", "soft" );
-
-			/*
-			** drop the console if we fail to load a refresh
-			*/
-			if ( cls.key_dest != key_console )
-			{
-				Con_ToggleConsole_f();
-			}
+			Sys_Error ("ref_headless fake load failed");
 		}
 		cls.disable_screen = false;
 	}
@@ -406,12 +300,8 @@ void VID_Shutdown (void)
 {
 	if ( reflib_active )
 	{
-		if (KBD_Close_fp)
-			KBD_Close_fp();
-		if (RW_IN_Shutdown_fp)
-			RW_IN_Shutdown_fp();
-		KBD_Close_fp = NULL;
-		RW_IN_Shutdown_fp = NULL;
+		KBD_Close();
+		RW_IN_Shutdown();
 		re.Shutdown ();
 		VID_FreeReflib ();
 	}
@@ -432,38 +322,32 @@ void IN_Init (void)
 
 void Real_IN_Init (void)
 {
-	if (RW_IN_Init_fp)
-		RW_IN_Init_fp(&in_state);
+	RW_IN_Init(&in_state);
 }
 
 void IN_Shutdown (void)
 {
-	if (RW_IN_Shutdown_fp)
-		RW_IN_Shutdown_fp();
+	RW_IN_Shutdown();
 }
 
 void IN_Commands (void)
 {
-	if (RW_IN_Commands_fp)
-		RW_IN_Commands_fp();
+	RW_IN_Commands();
 }
 
 void IN_Move (usercmd_t *cmd)
 {
-	if (RW_IN_Move_fp)
-		RW_IN_Move_fp(cmd);
+	RW_IN_Move(cmd);
 }
 
 void IN_Frame (void)
 {
-	if (RW_IN_Frame_fp)
-		RW_IN_Frame_fp();
+	RW_IN_Frame();
 }
 
 void IN_Activate (qboolean active)
 {
-	if (RW_IN_Activate_fp)
-		RW_IN_Activate_fp(active);
+	RW_IN_Activate(active);
 }
 
 void Do_Key_Event(int key, qboolean down)
