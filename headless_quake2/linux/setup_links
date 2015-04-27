@@ -26,12 +26,8 @@ md5sum -c reference.txt || {
 pushd ../linux/$DEBUG_OR_RELEASE$ARCH/
 export BUILD=$PWD
 popd
-ln -sf $BUILD/game$ARCH.so
 popd
-ln -sf $BUILD/ref_headless.so
-ln -sf $BUILD/ref_softx.so
 ln -sf $BUILD/quake2 .
-pwd > quake2.conf
 
 pushd q2dq2
 rm -f config.cfg   
