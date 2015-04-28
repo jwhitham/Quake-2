@@ -25,6 +25,7 @@ viddef_t	vid;
 refimport_t	ri;
 
 unsigned	d_8to24table[256];
+pixel_t  	d_8topixel[256];
 
 entity_t	r_worldentity;
 
@@ -1341,6 +1342,8 @@ void Draw_GetPalette (void)
         out[0] = r;
         out[1] = g;
         out[2] = b;
+
+		d_8topixel[i] = rgb_to_pixel (r, g, b);
 	}
 
 	free (pal);

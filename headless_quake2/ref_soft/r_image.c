@@ -410,10 +410,10 @@ GL_LoadPic
 
 ================
 */
-image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t type)
+static image_t *GL_LoadPic (char *name, byte *pic, byte *palette, int width, int height, imagetype_t type)
 {
 	image_t		*image;
-	int			i, c, b;
+	int			i, c, r, g, b, x;
 
 	image = R_FindFreeImage ();
 	if (strlen(name) >= sizeof(image->name))
@@ -430,10 +430,17 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 	image->transparent = false;
 	for (i=0 ; i<c ; i++)
 	{
-		b = pic[i];
-		if (b == 255)
+		x = pic[i];
+		if (x == 255) {
 			image->transparent = true;
-		image->pixels[0][i] = b; // XXX TODO Need to expand here? 8->32
+			image->pixels[0][i] = TRANSPARENT_COLOR;
+		} else {
+			r = palette[x*3+0];
+			g = palette[x*3+1];
+			b = palette[x*3+2];
+
+			image->pixels[0][i] = rgb_to_pixel (r, g, b);
+		}
 	}
 
 	return image;
@@ -449,7 +456,8 @@ image_t *R_LoadWal (char *name)
 	miptex_t	*mt;
 	int			ofs;
 	image_t		*image;
-	int			size;
+	int			size, i;
+	pixel_t		*palette = d_8topixel;
 
 	ri.FS_LoadFile (name, (void **)&mt);
 	if (!mt)
@@ -466,13 +474,15 @@ image_t *R_LoadWal (char *name)
 	image->registration_sequence = registration_sequence;
 
 	size = image->width*image->height * (256+64+16+4)/256;
-	image->pixels[0] = malloc (size);
+	image->pixels[0] = malloc (size * sizeof (pixel_t));
 	image->pixels[1] = image->pixels[0] + image->width*image->height;
 	image->pixels[2] = image->pixels[1] + image->width*image->height/4;
 	image->pixels[3] = image->pixels[2] + image->width*image->height/16;
 
 	ofs = LittleLong (mt->offsets[0]);
-	memcpy ( image->pixels[0], (byte *)mt + ofs, size);
+	for (i = 0; i < size; i++) {
+		image->pixels[0][i] = palette[((byte *)mt)[ofs + i]];
+	}
 
 	ri.FS_FreeFile ((void *)mt);
 
@@ -520,7 +530,7 @@ image_t	*R_FindImage (char *name, imagetype_t type)
 		LoadPCX (name, &pic, &palette, &width, &height);
 		if (!pic)
 			return NULL;	// ri.Sys_Error (ERR_DROP, "R_FindImage: can't load %s", name);
-		image = GL_LoadPic (name, pic, width, height, type);
+		image = GL_LoadPic (name, pic, palette, width, height, type);
 	}
 	else if (!strcmp(name+len-4, ".wal"))
 	{

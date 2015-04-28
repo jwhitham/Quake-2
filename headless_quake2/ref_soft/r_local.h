@@ -179,7 +179,7 @@ extern oldrefdef_t      r_refdef;
 #define PARTICLE_Z_CLIP 8.0
 
 // !!! must be kept the same as in quakeasm.h !!!
-#define TRANSPARENT_COLOR       0xFF
+#define TRANSPARENT_COLOR       ((pixel_t) (~0))
 
 
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
@@ -791,6 +791,7 @@ void	 R_BeginFrame( float camera_separation );
 void	R_CinematicSetPalette( const unsigned char *palette );
 
 extern unsigned d_8to24table[256]; // base
+extern pixel_t d_8topixel[256];
 
 void    Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length);
 void    Sys_SetFPCW (void);
@@ -847,4 +848,7 @@ void		SWimp_SetPalette( const unsigned char *palette);
 void		SWimp_Shutdown( void );
 rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen );
 void		SWimp_AppActivate( qboolean active );
+
+
+#define rgb_to_pixel(r, g, b) (((r) << 16) | ((g) << 8) | (b))
 

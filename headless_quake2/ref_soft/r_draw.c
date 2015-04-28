@@ -192,7 +192,7 @@ void Draw_StretchPicImplementation (int x, int y, int w, int h, image_t	*pic)
 		sv = (skip + v)*pic->height/h;
 		source = pic->pixels[0] + sv*pic->width;
 		if (w == pic->width)
-			memcpy (dest, source, w);
+			memcpy (dest, source, w * sizeof(pixel_t));
 		else
 		{
 			f = 0;
@@ -255,7 +255,7 @@ void Draw_Pic (int x, int y, char *name)
 	image_t			*pic;
 	pixel_t			*dest, *source;
 	int				v, u;
-	int				tbyte;
+	pixel_t			tpixel;
 	int				height;
 
 	pic = Draw_FindPic (name);
@@ -285,7 +285,7 @@ void Draw_Pic (int x, int y, char *name)
 	{
 		for (v=0 ; v<height ; v++)
 		{
-			memcpy (dest, source, pic->width);
+			memcpy (dest, source, pic->width * sizeof (pixel_t));
 			dest += vid.rowpixels;
 			source += pic->width;
 		}
@@ -297,8 +297,8 @@ void Draw_Pic (int x, int y, char *name)
 			for (v=0 ; v<height ; v++)
 			{
 				for (u=0 ; u<pic->width ; u++)
-					if ( (tbyte=source[u]) != TRANSPARENT_COLOR)
-						dest[u] = tbyte;
+					if ( (tpixel=source[u]) != TRANSPARENT_COLOR)
+						dest[u] = tpixel;
 
 				dest += vid.rowpixels;
 				source += pic->width;
@@ -310,22 +310,22 @@ void Draw_Pic (int x, int y, char *name)
 			{
 				for (u=0 ; u<pic->width ; u+=8)
 				{
-					if ( (tbyte=source[u]) != TRANSPARENT_COLOR)
-						dest[u] = tbyte;
-					if ( (tbyte=source[u+1]) != TRANSPARENT_COLOR)
-						dest[u+1] = tbyte;
-					if ( (tbyte=source[u+2]) != TRANSPARENT_COLOR)
-						dest[u+2] = tbyte;
-					if ( (tbyte=source[u+3]) != TRANSPARENT_COLOR)
-						dest[u+3] = tbyte;
-					if ( (tbyte=source[u+4]) != TRANSPARENT_COLOR)
-						dest[u+4] = tbyte;
-					if ( (tbyte=source[u+5]) != TRANSPARENT_COLOR)
-						dest[u+5] = tbyte;
-					if ( (tbyte=source[u+6]) != TRANSPARENT_COLOR)
-						dest[u+6] = tbyte;
-					if ( (tbyte=source[u+7]) != TRANSPARENT_COLOR)
-						dest[u+7] = tbyte;
+					if ( (tpixel=source[u]) != TRANSPARENT_COLOR)
+						dest[u] = tpixel;
+					if ( (tpixel=source[u+1]) != TRANSPARENT_COLOR)
+						dest[u+1] = tpixel;
+					if ( (tpixel=source[u+2]) != TRANSPARENT_COLOR)
+						dest[u+2] = tpixel;
+					if ( (tpixel=source[u+3]) != TRANSPARENT_COLOR)
+						dest[u+3] = tpixel;
+					if ( (tpixel=source[u+4]) != TRANSPARENT_COLOR)
+						dest[u+4] = tpixel;
+					if ( (tpixel=source[u+5]) != TRANSPARENT_COLOR)
+						dest[u+5] = tpixel;
+					if ( (tpixel=source[u+6]) != TRANSPARENT_COLOR)
+						dest[u+6] = tpixel;
+					if ( (tpixel=source[u+7]) != TRANSPARENT_COLOR)
+						dest[u+7] = tpixel;
 				}
 				dest += vid.rowpixels;
 				source += pic->width;
