@@ -1048,8 +1048,6 @@ void R_AliasDrawModel (void)
 	extern void R_PolysetDrawSpansConstant8_33( void * );
 	extern void R_PolysetDrawSpansConstant8_66( void * );
 
-    return; // XXX TODO REMOVE ME
-
 	s_pmdl = (dmdl_t *)currentmodel->extradata;
 
 	if ( r_lerpmodels->value == 0 )
