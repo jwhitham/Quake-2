@@ -44,14 +44,17 @@ get different results. The x87 FPU is not used for this reason.
 
 Software requirements:
 
-The benchmark and test require Linux, GNU make and GCC. X11 development
-headers are also required to build a playable version of the game
-(which will assume a 32-bit colour depth). If you don't want to build
-this, edit "X11_TARGET=" line in the Makefile ("linux" subdirectory).
+The benchmark and test require Linux, GNU make and GCC. You will need
+the standard C library and its header files.
 
 The test is not affected by your math library, because the 
 openlibm library is bundled. See headless_quake2/openlibm/README.md
 or http://openlibm.org/ for details of openlibm.
+
+Quake 2 is not playable as all parts of the game are statically
+linked together, and the user interface components have been replaced
+by stubs. If you would like to play Quake 2, I suggest
+the Yamagi Quake 2 port: https://github.com/yquake2/
 
 
 Instructions:
