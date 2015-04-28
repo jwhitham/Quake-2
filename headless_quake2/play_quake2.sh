@@ -7,5 +7,7 @@ export BENCHMARK=0
 linux/setup_links $DEBUG_OR_RELEASE $ARCH
 export DISPLAY=:0 
 
-./quake2 +set vid_ref softx $@
+echo run > r
+gdb -x r --args ./quake2 +set vid_ref softx $@
+#valgrind --db-attach=yes ./quake2 +set vid_ref softx $@
 

@@ -435,22 +435,6 @@ end:
 
 #else
 
-static byte BlendParticle33( int pcolor, int dstcolor )
-{
-	return vid.alphamap[pcolor + dstcolor*256];
-}
-
-static byte BlendParticle66( int pcolor, int dstcolor )
-{
-	return vid.alphamap[pcolor*256+dstcolor];
-}
-
-static byte BlendParticle100( int pcolor, int dstcolor )
-{
-	dstcolor = dstcolor;
-	return pcolor;
-}
-
 /*
 ** R_DrawParticle
 **
@@ -470,11 +454,10 @@ void R_DrawParticle( void )
 	int         level     = partparms.level;
 	vec3_t	local, transformed;
 	float	zi;
-	byte	*pdest;
+	pixel_t *pdest;
 	short	*pz;
 	int      color = pparticle->color;
 	int		i, izi, pix, count, u, v;
-	byte  (*blendparticle)( int, int );
 
 	/*
 	** transform the particle
@@ -488,15 +471,6 @@ void R_DrawParticle( void )
 	if (transformed[2] < PARTICLE_Z_CLIP)
 		return;
 
-	/*
-	** bind the blend function pointer to the appropriate blender
-	*/
-	if ( level == PARTICLE_33 )
-		blendparticle = BlendParticle33;
-	else if ( level == PARTICLE_66 )
-		blendparticle = BlendParticle66;
-	else 
-		blendparticle = BlendParticle100;
 
 	/*
 	** project the point
@@ -547,7 +521,8 @@ void R_DrawParticle( void )
                 if (pz[i] <= izi)
                 {
                     pz[i]    = izi;
-                    pdest[i] = vid.alphamap[color + ((int)pdest[i]<<8)];
+                    // pdest[i] = vid.alphamap[color + ((int)pdest[i]<<8)];
+					// XXX TODO FIXUP
                 }
             }
         }
@@ -561,7 +536,8 @@ void R_DrawParticle( void )
                 if (pz[i] <= izi)
                 {
                     pz[i]    = izi;
-                    pdest[i] = vid.alphamap[(color<<8) + (int)pdest[i]];
+                    //pdest[i] = vid.alphamap[(color<<8) + (int)pdest[i]];
+					// XXX TODO FIXUP
                 }
             }
         }
@@ -597,7 +573,6 @@ void R_DrawParticles (void)
 {
 	particle_t *p;
 	int         i;
-	extern unsigned long fpu_sp24_cw, fpu_chop_cw;
 
 	VectorScale( vright, xscaleshrink, r_pright );
 	VectorScale( vup, yscaleshrink, r_pup );

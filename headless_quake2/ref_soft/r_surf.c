@@ -28,13 +28,13 @@ int				lightdelta, lightdeltastep;
 int				lightright, lightleftstep, lightrightstep, blockdivshift;
 unsigned		blockdivmask;
 void			*prowdestbase;
-unsigned char	*pbasesource;
+pixel_t      	*pbasesource;
 int				surfrowbytes;	// used by ASM files
 unsigned		*r_lightptr;
 int				r_stepback;
 int				r_lightwidth;
 int				r_numhblocks, r_numvblocks;
-unsigned char	*r_source, *r_sourcemax;
+pixel_t      	*r_source, *r_sourcemax;
 
 void R_DrawSurfaceBlock8_mip0 (void);
 void R_DrawSurfaceBlock8_mip1 (void);
@@ -89,16 +89,16 @@ R_DrawSurface
 */
 void R_DrawSurface (void)
 {
-	unsigned char	*basetptr;
+	pixel_t      	*basetptr;
 	int				smax, tmax, twidth;
 	int				u;
 	int				soffset, basetoffset, texwidth;
 	int				horzblockstep;
-	unsigned char	*pcolumndest;
+	pixel_t      	*pcolumndest;
 	void			(*pblockdrawer)(void);
 	image_t			*mt;
 
-	surfrowbytes = r_drawsurf.rowbytes;
+	surfrowbytes = r_drawsurf.rowpixels;
 
 	mt = r_drawsurf.image;
 	
@@ -173,7 +173,7 @@ R_DrawSurfaceBlock8_mip0
 void R_DrawSurfaceBlock8_mip0 (void)
 {
 	int				v, i, b, lightstep, lighttemp, light;
-	unsigned char	pix, *psource, *prowdest;
+	pixel_t      	pix, *psource, *prowdest;
 
 	psource = pbasesource;
 	prowdest = prowdestbase;
@@ -198,8 +198,9 @@ void R_DrawSurfaceBlock8_mip0 (void)
 			for (b=15; b>=0; b--)
 			{
 				pix = psource[b];
-				prowdest[b] = ((unsigned char *)vid.colormap)
-						[(light & 0xFF00) + pix];
+				prowdest[b] = pix; // XXX TODO FIXUP
+				//((unsigned char *)vid.colormap)
+				//		[(light & 0xFF00) + pix];
 				light += lightstep;
 			}
 	
@@ -223,7 +224,7 @@ R_DrawSurfaceBlock8_mip1
 void R_DrawSurfaceBlock8_mip1 (void)
 {
 	int				v, i, b, lightstep, lighttemp, light;
-	unsigned char	pix, *psource, *prowdest;
+	pixel_t			pix, *psource, *prowdest;
 
 	psource = pbasesource;
 	prowdest = prowdestbase;
@@ -248,8 +249,9 @@ void R_DrawSurfaceBlock8_mip1 (void)
 			for (b=7; b>=0; b--)
 			{
 				pix = psource[b];
-				prowdest[b] = ((unsigned char *)vid.colormap)
-						[(light & 0xFF00) + pix];
+				prowdest[b] = pix; // XXX TODO FIXUP
+				//prowdest[b] = ((unsigned char *)vid.colormap)
+				//		[(light & 0xFF00) + pix];
 				light += lightstep;
 			}
 	
@@ -273,7 +275,7 @@ R_DrawSurfaceBlock8_mip2
 void R_DrawSurfaceBlock8_mip2 (void)
 {
 	int				v, i, b, lightstep, lighttemp, light;
-	unsigned char	pix, *psource, *prowdest;
+	pixel_t			pix, *psource, *prowdest;
 
 	psource = pbasesource;
 	prowdest = prowdestbase;
@@ -298,8 +300,9 @@ void R_DrawSurfaceBlock8_mip2 (void)
 			for (b=3; b>=0; b--)
 			{
 				pix = psource[b];
-				prowdest[b] = ((unsigned char *)vid.colormap)
-						[(light & 0xFF00) + pix];
+				prowdest[b] = pix; // XXX TODO FIXUP
+				//prowdest[b] = ((unsigned char *)vid.colormap)
+				//		[(light & 0xFF00) + pix];
 				light += lightstep;
 			}
 	
@@ -323,7 +326,7 @@ R_DrawSurfaceBlock8_mip3
 void R_DrawSurfaceBlock8_mip3 (void)
 {
 	int				v, i, b, lightstep, lighttemp, light;
-	unsigned char	pix, *psource, *prowdest;
+	pixel_t			pix, *psource, *prowdest;
 
 	psource = pbasesource;
 	prowdest = prowdestbase;
@@ -348,8 +351,9 @@ void R_DrawSurfaceBlock8_mip3 (void)
 			for (b=1; b>=0; b--)
 			{
 				pix = psource[b];
-				prowdest[b] = ((unsigned char *)vid.colormap)
-						[(light & 0xFF00) + pix];
+				prowdest[b] = pix; // XXX TODO FIXUP
+				//prowdest[b] = ((unsigned char *)vid.colormap)
+				//		[(light & 0xFF00) + pix];
 				light += lightstep;
 			}
 	
@@ -393,6 +397,8 @@ void R_InitCaches (void)
 		pix = vid.width*vid.height;
 		if (pix > 64000)
 			size += (pix-64000)*3;
+
+		size *= sizeof (pixel_t);
 	}		
 
 	// round up to page size
@@ -447,7 +453,7 @@ surfcache_t     *D_SCAlloc (int width, int size)
 	if ((width < 0) || (width > 256))
 		ri.Sys_Error (ERR_FATAL,"D_SCAlloc: bad cache width %d\n", width);
 
-	if ((size <= 0) || (size > 0x10000))
+	if ((size <= 0) || (size > (0x10000 * sizeof (pixel_t))))
 		ri.Sys_Error (ERR_FATAL,"D_SCAlloc: bad cache size %d\n", size);
 	
 	size = (int) ((intptr_t) &((surfcache_t *)0)->data[size]);
@@ -604,7 +610,7 @@ surfcache_t *D_CacheSurface (msurface_t *surface, int miplevel)
 	surfscale = 1.0 / (1<<miplevel);
 	r_drawsurf.surfmip = miplevel;
 	r_drawsurf.surfwidth = surface->extents[0] >> miplevel;
-	r_drawsurf.rowbytes = r_drawsurf.surfwidth;
+	r_drawsurf.rowpixels = r_drawsurf.surfwidth;
 	r_drawsurf.surfheight = surface->extents[1] >> miplevel;
 	
 //
@@ -613,7 +619,7 @@ surfcache_t *D_CacheSurface (msurface_t *surface, int miplevel)
 	if (!cache)     // if a texture just animated, don't reallocate it
 	{
 		cache = D_SCAlloc (r_drawsurf.surfwidth,
-						   r_drawsurf.surfwidth * r_drawsurf.surfheight);
+						   r_drawsurf.surfwidth * r_drawsurf.surfheight * sizeof (pixel_t));
 		surface->cachespots[miplevel] = cache;
 		cache->owner = &surface->cachespots[miplevel];
 		cache->mipscale = surfscale;

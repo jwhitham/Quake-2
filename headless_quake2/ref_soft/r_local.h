@@ -38,6 +38,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // fall over
 #define ROLL    2
 
+typedef uint32_t pixel_t;
+
 
 /*
 
@@ -68,13 +70,11 @@ typedef struct image_s
 	int             width, height;
 	qboolean        transparent;    // true if any 255 pixels in image
 	int             registration_sequence;  // 0 = free
-	byte		*pixels[4];				// mip levels
+	pixel_t *pixels[4];				// mip levels
 } image_t;
 
 
 //===================================================================
-
-typedef unsigned char pixel_t;
 
 typedef struct vrect_s
 {
@@ -87,7 +87,7 @@ typedef struct
 	pixel_t                 *buffer;                // invisible buffer
 	pixel_t                 *colormap;              // 256 * VID_GRADES size
 	pixel_t                 *alphamap;              // 256 * 256 translucency map
-	int                             rowbytes;               // may be > width if displayed in a window
+	int                             rowpixels;               // may be > width if displayed in a window
 									// can be negative for stupid dibs
 	int						width;          
 	int						height;
@@ -316,8 +316,8 @@ typedef struct
 
 typedef struct
 {
-	byte            *surfdat;       // destination for generated surface
-	int                     rowbytes;       // destination logical width in bytes
+	pixel_t         *surfdat;       // destination for generated surface
+	int                     rowpixels;       // destination logical width in pixels
 	msurface_t      *surf;          // description for surface to generate
 	fixed8_t        lightadj[MAXLIGHTMAPS];
 							// adjust for lightmap levels for dynamic lighting
@@ -367,7 +367,7 @@ typedef struct surfcache_s
 	unsigned                        height;         // DEBUG only needed for debug
 	float                           mipscale;
 	image_t							*image;
-	byte                            data[4];        // width*height elements
+	pixel_t                         data[4];        // width*height elements
 } surfcache_t;
 
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
@@ -382,7 +382,7 @@ typedef struct
 {
 	int                     nump;
 	emitpoint_t     *pverts;
-	byte            *pixels;                        // image
+	pixel_t			*pixels;                        // image
 	int                     pixel_width;            // image width
 	int         pixel_height;       // image height
 	vec3_t          vup, vright, vpn;       // in worldspace, for plane eq
@@ -466,7 +466,7 @@ void R_DrawSurface (void);
 
 extern int              c_surf;
 
-extern byte             r_warpbuffer[WARP_WIDTH * WARP_HEIGHT];
+extern pixel_t			r_warpbuffer[WARP_WIDTH * WARP_HEIGHT];
 
 
 

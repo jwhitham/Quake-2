@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 typedef struct
 {
-	byte     *pbase, *pdest;
+	pixel_t	*pbase, *pdest;
 	short	 *pz;
 	fixed16_t s, t;
 	fixed16_t sstep, tstep;
@@ -92,7 +92,7 @@ void R_DrawSpanletTurbulentStipple33( void )
 {
 	unsigned btemp;
 	int	     sturb, tturb;
-	byte    *pdest = s_spanletvars.pdest;
+	pixel_t	*pdest = s_spanletvars.pdest;
 	short   *pz    = s_spanletvars.pz;
 	int      izi   = s_spanletvars.izi;
 	
@@ -149,7 +149,7 @@ void R_DrawSpanletTurbulentStipple66( void )
 {
 	unsigned btemp;
 	int	     sturb, tturb;
-	byte    *pdest = s_spanletvars.pdest;
+	pixel_t	*pdest = s_spanletvars.pdest;
 	short   *pz    = s_spanletvars.pz;
 	int      izi   = s_spanletvars.izi;
 	
@@ -365,7 +365,7 @@ void R_DrawSpanlet66( void )
 void R_DrawSpanlet33Stipple( void )
 {
 	unsigned btemp;
-	byte    *pdest = s_spanletvars.pdest;
+	pixel_t	*pdest = s_spanletvars.pdest;
 	short   *pz    = s_spanletvars.pz;
 	int      izi   = s_spanletvars.izi;
 	
@@ -424,7 +424,7 @@ void R_DrawSpanlet33Stipple( void )
 void R_DrawSpanlet66Stipple( void )
 {
 	unsigned btemp;
-	byte    *pdest = s_spanletvars.pdest;
+	pixel_t	*pdest = s_spanletvars.pdest;
 	short   *pz    = s_spanletvars.pz;
 	int      izi   = s_spanletvars.izi;
 
@@ -607,7 +607,7 @@ void R_PolygonDrawSpans(espan_t *pspan, qboolean iswater )
 
 	do
 	{
-		s_spanletvars.pdest   = (byte *)d_viewbuffer + ( d_scantable[pspan->v] /*r_screenwidth * pspan->v*/) + pspan->u;
+		s_spanletvars.pdest   = d_viewbuffer + ( d_scantable[pspan->v] /*r_screenwidth * pspan->v*/) + pspan->u;
 		s_spanletvars.pz      = d_pzbuffer + (d_zwidth * pspan->v) + pspan->u;
 		s_spanletvars.u       = pspan->u;
 		s_spanletvars.v       = pspan->v;
@@ -1005,7 +1005,6 @@ void R_BuildPolygonFromSurface(msurface_t *fa)
 {
 	int			i, lindex, lnumverts;
 	medge_t		*pedges, *r_pedge;
-	int			vertpage;
 	float		*vec;
 	vec5_t     *pverts;
 	float       tmins[2] = { 0, 0 };
@@ -1015,7 +1014,6 @@ void R_BuildPolygonFromSurface(msurface_t *fa)
 	// reconstruct the polygon
 	pedges = currentmodel->edges;
 	lnumverts = fa->numedges;
-	vertpage = 0;
 
 	pverts = r_clip_verts[0];
 

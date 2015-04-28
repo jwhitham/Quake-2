@@ -73,8 +73,8 @@ smoothly scrolled off.
 */
 void Draw_Char (int x, int y, int num)
 {
-	byte			*dest;
-	byte			*source;
+	pixel_t			*dest;
+	pixel_t			*source;
 	int				drawline;	
 	int				row, col;
 
@@ -111,7 +111,7 @@ void Draw_Char (int x, int y, int num)
 		drawline = 8;
 
 
-	dest = vid.buffer + y*vid.rowbytes + x;
+	dest = vid.buffer + y*vid.rowpixels + x;
 
 	while (drawline--)
 	{
@@ -132,7 +132,7 @@ void Draw_Char (int x, int y, int num)
 		if (source[7] != TRANSPARENT_COLOR)
 			dest[7] = source[7];
 		source += 128;
-		dest += vid.rowbytes;
+		dest += vid.rowpixels;
 	}
 }
 
@@ -162,7 +162,7 @@ Draw_StretchPicImplementation
 */
 void Draw_StretchPicImplementation (int x, int y, int w, int h, image_t	*pic)
 {
-	byte			*dest, *source;
+	pixel_t			*dest, *source;
 	int				v, u, sv;
 	int				height;
 	int				f, fstep;
@@ -185,9 +185,9 @@ void Draw_StretchPicImplementation (int x, int y, int w, int h, image_t	*pic)
 	else
 		skip = 0;
 
-	dest = vid.buffer + y * vid.rowbytes + x;
+	dest = vid.buffer + y * vid.rowpixels + x;
 
-	for (v=0 ; v<height ; v++, dest += vid.rowbytes)
+	for (v=0 ; v<height ; v++, dest += vid.rowpixels)
 	{
 		sv = (skip + v)*pic->height/h;
 		source = pic->pixels[0] + sv*pic->width;
@@ -239,7 +239,7 @@ void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data
 {
 	image_t	pic;
 
-	pic.pixels[0] = data;
+	pic.pixels[0] = (pixel_t *) data; // XXX TODO BAD CAST
 	pic.width = cols;
 	pic.height = rows;
 	Draw_StretchPicImplementation (x, y, w, h, &pic);
@@ -253,7 +253,7 @@ Draw_Pic
 void Draw_Pic (int x, int y, char *name)
 {
 	image_t			*pic;
-	byte			*dest, *source;
+	pixel_t			*dest, *source;
 	int				v, u;
 	int				tbyte;
 	int				height;
@@ -279,14 +279,14 @@ void Draw_Pic (int x, int y, char *name)
 		y = 0;
 	}
 
-	dest = vid.buffer + y * vid.rowbytes + x;
+	dest = vid.buffer + y * vid.rowpixels + x;
 
 	if (!pic->transparent)
 	{
 		for (v=0 ; v<height ; v++)
 		{
 			memcpy (dest, source, pic->width);
-			dest += vid.rowbytes;
+			dest += vid.rowpixels;
 			source += pic->width;
 		}
 	}
@@ -300,7 +300,7 @@ void Draw_Pic (int x, int y, char *name)
 					if ( (tbyte=source[u]) != TRANSPARENT_COLOR)
 						dest[u] = tbyte;
 
-				dest += vid.rowbytes;
+				dest += vid.rowpixels;
 				source += pic->width;
 			}
 		}
@@ -327,7 +327,7 @@ void Draw_Pic (int x, int y, char *name)
 					if ( (tbyte=source[u+7]) != TRANSPARENT_COLOR)
 						dest[u+7] = tbyte;
 				}
-				dest += vid.rowbytes;
+				dest += vid.rowpixels;
 				source += pic->width;
 			}
 		}
@@ -345,8 +345,8 @@ refresh window.
 void Draw_TileClear (int x, int y, int w, int h, char *name)
 {
 	int			i, j;
-	byte		*psrc;
-	byte		*pdest;
+	pixel_t		*psrc;
+	pixel_t		*pdest;
 	image_t		*pic;
 	int			x2;
 
@@ -374,8 +374,8 @@ void Draw_TileClear (int x, int y, int w, int h, char *name)
 		return;
 	}
 	x2 = x + w;
-	pdest = vid.buffer + y*vid.rowbytes;
-	for (i=0 ; i<h ; i++, pdest += vid.rowbytes)
+	pdest = vid.buffer + y*vid.rowpixels;
+	for (i=0 ; i<h ; i++, pdest += vid.rowpixels)
 	{
 		psrc = pic->pixels[0] + pic->width * ((i+y)&63);
 		for (j=x ; j<x2 ; j++)
@@ -393,7 +393,7 @@ Fills a box of pixels with a single color
 */
 void Draw_Fill (int x, int y, int w, int h, int c)
 {
-	byte			*dest;
+	pixel_t			*dest;
 	int				u, v;
 
 	if (x+w > vid.width)
@@ -412,8 +412,8 @@ void Draw_Fill (int x, int y, int w, int h, int c)
 	}
 	if (w < 0 || h < 0)
 		return;
-	dest = vid.buffer + y*vid.rowbytes + x;
-	for (v=0 ; v<h ; v++, dest += vid.rowbytes)
+	dest = vid.buffer + y*vid.rowpixels + x;
+	for (v=0 ; v<h ; v++, dest += vid.rowpixels)
 		for (u=0 ; u<w ; u++)
 			dest[u] = c;
 }
@@ -428,12 +428,12 @@ Draw_FadeScreen
 void Draw_FadeScreen (void)
 {
 	int			x,y;
-	byte		*pbuf;
+	pixel_t		*pbuf;
 	int	t;
 
 	for (y=0 ; y<vid.height ; y++)
 	{
-		pbuf = (byte *)(vid.buffer + vid.rowbytes*y);
+		pbuf = (vid.buffer + vid.rowpixels*y);
 		t = (y & 1) << 1;
 
 		for (x=0 ; x<vid.width ; x++)

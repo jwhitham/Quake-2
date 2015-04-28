@@ -568,55 +568,55 @@ $(BUILDDIR)/ref_headless.$(SHLIBEXT) : $(REF_SOFT_OBJS) $(REF_SOFT_HEADLESS_OBJS
 		$(REF_SOFT_HEADLESS_OBJS) $(LDFLAGS) $(LIBM)
 
 $(BUILDDIR)/ref_soft/r_aclip.o :      $(REF_SOFT_DIR)/r_aclip.c
-	$(DO_SHLIB_CC)
+	$(DO_SHLIB_CC) -Wall -Werror
 
 $(BUILDDIR)/ref_soft/r_alias.o :      $(REF_SOFT_DIR)/r_alias.c
-	$(DO_SHLIB_CC)
+	$(DO_SHLIB_CC) -Wall -Werror
 
 $(BUILDDIR)/ref_soft/r_bsp.o :        $(REF_SOFT_DIR)/r_bsp.c
-	$(DO_SHLIB_CC)
+	$(DO_SHLIB_CC) -Wall -Werror
 
 $(BUILDDIR)/ref_soft/r_draw.o :       $(REF_SOFT_DIR)/r_draw.c
-	$(DO_SHLIB_CC)
+	$(DO_SHLIB_CC) -Wall -Werror
 
 $(BUILDDIR)/ref_soft/r_edge.o :       $(REF_SOFT_DIR)/r_edge.c
-	$(DO_SHLIB_CC)
+	$(DO_SHLIB_CC) -Wall -Werror
 
 $(BUILDDIR)/ref_soft/r_image.o :      $(REF_SOFT_DIR)/r_image.c
-	$(DO_SHLIB_CC)
+	$(DO_SHLIB_CC) -Wall -Werror
 
 $(BUILDDIR)/ref_soft/r_light.o :      $(REF_SOFT_DIR)/r_light.c
-	$(DO_SHLIB_CC)
+	$(DO_SHLIB_CC) -Wall -Werror
 
 $(BUILDDIR)/ref_soft/r_main.o :       $(REF_SOFT_DIR)/r_main.c
-	$(DO_SHLIB_CC)
+	$(DO_SHLIB_CC) -Wall -Werror
 
 $(BUILDDIR)/ref_soft/r_misc.o :       $(REF_SOFT_DIR)/r_misc.c
-	$(DO_SHLIB_CC)
+	$(DO_SHLIB_CC) -Wall -Werror
 
 $(BUILDDIR)/ref_soft/r_model.o :      $(REF_SOFT_DIR)/r_model.c
-	$(DO_SHLIB_CC)
+	$(DO_SHLIB_CC) -Wall -Werror
 
 $(BUILDDIR)/ref_soft/r_part.o :       $(REF_SOFT_DIR)/r_part.c
-	$(DO_SHLIB_CC)
+	$(DO_SHLIB_CC) -Wall -Werror
 
 $(BUILDDIR)/ref_soft/r_poly.o :       $(REF_SOFT_DIR)/r_poly.c
-	$(DO_SHLIB_CC)
+	$(DO_SHLIB_CC) -Wall -Werror
 
 $(BUILDDIR)/ref_soft/r_polyse.o :     $(REF_SOFT_DIR)/r_polyse.c
-	$(DO_SHLIB_CC)
+	$(DO_SHLIB_CC) -Wall -Werror
 
 $(BUILDDIR)/ref_soft/r_rast.o :       $(REF_SOFT_DIR)/r_rast.c
-	$(DO_SHLIB_CC)
+	$(DO_SHLIB_CC) -Wall -Werror
 
 $(BUILDDIR)/ref_soft/r_scan.o :       $(REF_SOFT_DIR)/r_scan.c
-	$(DO_SHLIB_CC)
+	$(DO_SHLIB_CC) -Wall -Werror
 
 $(BUILDDIR)/ref_soft/r_sprite.o :     $(REF_SOFT_DIR)/r_sprite.c
-	$(DO_SHLIB_CC)
+	$(DO_SHLIB_CC) -Wall -Werror
 
 $(BUILDDIR)/ref_soft/r_surf.o :       $(REF_SOFT_DIR)/r_surf.c
-	$(DO_SHLIB_CC)
+	$(DO_SHLIB_CC) -Wall -Werror
 
 $(BUILDDIR)/ref_soft/q_shared.o :     $(GAME_DIR)/q_shared.c
 	$(DO_SHLIB_CC)

@@ -38,7 +38,7 @@ model_t		*currentmodel;
 
 model_t		*r_worldmodel;
 
-byte		r_warpbuffer[WARP_WIDTH * WARP_HEIGHT];
+pixel_t		r_warpbuffer[WARP_WIDTH * WARP_HEIGHT];
 
 swstate_t sw_state;
 
@@ -186,7 +186,7 @@ unsigned int	d_zwidth;
 
 #endif	// !id386
 
-byte	r_notexture_buffer[1024];
+pixel_t r_notexture_buffer[1024];
 
 /*
 ==================
@@ -196,7 +196,7 @@ R_InitTextures
 void	R_InitTextures (void)
 {
 	int		x,y, m;
-	byte	*dest;
+	pixel_t *dest;
 	
 // create a simple checkerboard texture for the default
 	r_notexture_mip = (image_t *)&r_notexture_buffer;
@@ -1174,13 +1174,13 @@ void R_CinematicSetPalette( const unsigned char *palette )
 {
 	byte palette32[1024];
 	int		i, j, w;
-	int		*d;
+	pixel_t *d;
 
 	// clear screen to black to avoid any palette flash
-	w = abs(vid.rowbytes)>>2;	// stupid negative pitch win32 stuff...
+	w = vid.rowpixels;	// stupid negative pitch win32 stuff...
 	for (i=0 ; i<vid.height ; i++, d+=w)
 	{
-		d = (int *)(vid.buffer + i*vid.rowbytes);
+		d = (vid.buffer + i*vid.rowpixels);
 		for (j=0 ; j<w ; j++)
 			d[j] = 0;
 	}
@@ -1326,7 +1326,7 @@ void Draw_GetPalette (void)
 	int		r, g, b;
 
 	// get the palette and colormap
-	LoadPCX ("pics/colormap.pcx", &vid.colormap, &pal, NULL, NULL);
+	LoadPCX ("pics/colormap.pcx", (byte **) &vid.colormap, &pal, NULL, NULL); // XXX TODO THIS IS WRONG CAST
 	if (!vid.colormap)
 		ri.Sys_Error (ERR_FATAL, "Couldn't load pics/colormap.pcx");
 	vid.alphamap = vid.colormap + 64*256;

@@ -132,7 +132,7 @@ void LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *heigh
 		return;
 	}
 
-	out = malloc ( (pcx->ymax+1) * (pcx->xmax+1) );
+	out = malloc ( (pcx->ymax+1) * (pcx->xmax+1) * sizeof (pixel_t) );
 
 	*pic = out;
 
@@ -208,7 +208,6 @@ void LoadTGA (char *name, byte **pic, int *width, int *height)
 	int		row, column;
 	byte	*buf_p;
 	byte	*buffer;
-	int		length;
 	TargaHeader		targa_header;
 	byte			*targa_rgba;
 
@@ -217,7 +216,7 @@ void LoadTGA (char *name, byte **pic, int *width, int *height)
 	//
 	// load the file
 	//
-	length = ri.FS_LoadFile (name, (void **)&buffer);
+	(void) ri.FS_LoadFile (name, (void **)&buffer);
 	if (!buffer)
 	{
 		ri.Con_Printf (PRINT_DEVELOPER, "Bad tga file %s\n", name);
@@ -427,14 +426,14 @@ image_t *GL_LoadPic (char *name, byte *pic, int width, int height, imagetype_t t
 	image->type = type;
 
 	c = width*height;
-	image->pixels[0] = malloc (c);
+	image->pixels[0] = malloc (c*sizeof (pixel_t));
 	image->transparent = false;
 	for (i=0 ; i<c ; i++)
 	{
 		b = pic[i];
 		if (b == 255)
 			image->transparent = true;
-		image->pixels[0][i] = b;
+		image->pixels[0][i] = b; // XXX TODO Need to expand here? 8->32
 	}
 
 	return image;

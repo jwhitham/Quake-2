@@ -160,7 +160,7 @@ cvar_t *Cvar_Get (char *var_name, char *var_value, int flags)
 	var->name = CopyString (var_name);
 	var->string = CopyString (var_value);
 	var->modified = true;
-	var->value = atof (var->string);
+	var->value = atof (var_value);
 
 	// link the variable in
 	var->next = cvar_vars;

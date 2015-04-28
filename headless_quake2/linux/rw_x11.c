@@ -282,30 +282,6 @@ PIXEL xlib_rgb(int r,int g,int b)
     return p;
 }
 
-void st2_fixup( XImage *framebuf, int x, int y, int width, int height)
-{
-	int xi,yi;
-	unsigned char *src;
-	PIXEL *dest;
-
-	if( (x<0)||(y<0) )return;
-
-	for (yi = y; yi < (y+height); yi++) {
-		src = &framebuf->data [yi * framebuf->bytes_per_line];
-		dest = (PIXEL*)src;
-		for(xi = (x+width-1); xi >= x; xi -= 8) {
-			dest[xi  ] = st2d_8to16table[src[xi  ]];
-			dest[xi-1] = st2d_8to16table[src[xi-1]];
-			dest[xi-2] = st2d_8to16table[src[xi-2]];
-			dest[xi-3] = st2d_8to16table[src[xi-3]];
-			dest[xi-4] = st2d_8to16table[src[xi-4]];
-			dest[xi-5] = st2d_8to16table[src[xi-5]];
-			dest[xi-6] = st2d_8to16table[src[xi-6]];
-			dest[xi-7] = st2d_8to16table[src[xi-7]];
-		}
-	}
-}
-
 // ========================================================================
 // makes a null cursor
 // ========================================================================
@@ -334,7 +310,7 @@ static Cursor CreateNullCursor(Display *display, Window root)
 
 void ResetFrameBuffer(void)
 {
-	int mem;
+	size_t mem;
 	int pwidth;
 
 	if (x_framebuffer[0])
@@ -346,7 +322,7 @@ void ResetFrameBuffer(void)
 // alloc an extra line in case we want to wrap, and allocate the z-buffer
 	pwidth = x_visinfo->depth / 8;
 	if (pwidth == 3) pwidth = 4;
-	mem = ((vid.width*pwidth+7)&~7) * vid.height;
+	mem = sizeof (pixel_t) * ((vid.width*pwidth+7)&~7) * vid.height;
 
 	x_framebuffer[0] = XCreateImage(	x_disp,
 		x_vis,
@@ -361,7 +337,7 @@ void ResetFrameBuffer(void)
 	if (!x_framebuffer[0])
 		Sys_Error("VID: XCreateImage failed\n");
 
-	vid.buffer = (byte*) (x_framebuffer[0]);
+	vid.buffer = (pixel_t *) (x_framebuffer[0]);
 }
 
 void ResetSharedFrameBuffers(void)
@@ -862,8 +838,8 @@ static qboolean SWimp_InitGraphics( qboolean fullscreen )
 		ResetFrameBuffer();
 
 	current_framebuffer = 0;
-	vid.rowbytes = x_framebuffer[0]->bytes_per_line;
-	vid.buffer = x_framebuffer[0]->data;
+	vid.rowpixels = x_framebuffer[0]->bytes_per_line / sizeof (pixel_t);
+	vid.buffer = (pixel_t *) x_framebuffer[0]->data;
 
 //	XSynchronize(x_disp, False);
 
@@ -905,9 +881,6 @@ void SWimp_EndFrame (void)
 	if (doShm)
 	{
 
-		if (x_visinfo->depth != 8)
-			st2_fixup( x_framebuffer[current_framebuffer], 
-				0, 0, vid.width, vid.height);	
 		if (!XShmPutImage(x_disp, x_win, x_gc,
 			x_framebuffer[current_framebuffer], 0, 0,
 			0, 0, vid.width, vid.height, True))
@@ -916,14 +889,11 @@ void SWimp_EndFrame (void)
 		while (!oktodraw) 
 			GetEvent();
 		current_framebuffer = !current_framebuffer;
-		vid.buffer = x_framebuffer[current_framebuffer]->data;
+		vid.buffer = (pixel_t *) x_framebuffer[current_framebuffer]->data;
 		XSync(x_disp, False);
 	}
 	else
 	{
-		if (x_visinfo->depth != 8)
-			st2_fixup( x_framebuffer[current_framebuffer], 
-				0, 0, vid.width, vid.height);
 		XPutImage(x_disp, x_win, x_gc, x_framebuffer[0],
 			0, 0, 0, 0, vid.width, vid.height);
 		XSync(x_disp, False);

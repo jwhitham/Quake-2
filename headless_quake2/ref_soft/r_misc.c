@@ -73,7 +73,7 @@ void D_Patch (void)
 D_ViewChanged
 ================
 */
-unsigned char *alias_colormap;
+pixel_t *alias_colormap;
 
 void D_ViewChanged (void)
 {
@@ -474,7 +474,7 @@ void R_SetupFrame (void)
 		vrect.height = r_newrefdef.height;
 
 		d_viewbuffer = (void *)vid.buffer;
-		r_screenwidth = vid.rowbytes;
+		r_screenwidth = vid.rowpixels;
 	}
 	
 	R_ViewChanged (&vrect);
@@ -662,7 +662,7 @@ void R_ScreenShot_f (void)
 // save the pcx file 
 // 
 
-	WritePCXfile (checkname, vid.buffer, vid.width, vid.height, vid.rowbytes,
+	WritePCXfile (checkname, (byte *) vid.buffer, vid.width, vid.height, vid.rowpixels, // XXX TODO BAD CAST
 				  palette);
 
 	ri.Con_Printf (PRINT_ALL, "Wrote %s\n", checkname);

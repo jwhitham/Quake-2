@@ -202,8 +202,8 @@ rserr_t SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 
     vid.width = WIDTH;
     vid.height = HEIGHT;
-    vid.rowbytes = WIDTH;
-    vid.buffer = malloc(vid.rowbytes * vid.height);
+    vid.rowpixels = WIDTH;
+    vid.buffer = malloc(vid.rowpixels * vid.height * sizeof (pixel_t));
     ri.Vid_NewWindow (vid.width, vid.height);
     R_GammaCorrectAndSetPalette( ( const unsigned char * ) d_8to24table );
 
