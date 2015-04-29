@@ -73,7 +73,8 @@ void R_DrawSpanletOpaque( void )
 			if (*s_spanletvars.pz <= (s_spanletvars.izi >> 16))
 			{
 				*s_spanletvars.pz    = s_spanletvars.izi >> 16;
-				*s_spanletvars.pdest = btemp;
+				//*s_spanletvars.pdest = btemp;
+				// XXX TODO FIXUP
 			}
 		}
 
@@ -90,8 +91,8 @@ void R_DrawSpanletOpaque( void )
 */
 void R_DrawSpanletTurbulentStipple33( void )
 {
-	unsigned btemp;
-	int	     sturb, tturb;
+	//unsigned btemp;
+	//int	     sturb, tturb;
 	pixel_t	*pdest = s_spanletvars.pdest;
 	short   *pz    = s_spanletvars.pz;
 	int      izi   = s_spanletvars.izi;
@@ -122,13 +123,14 @@ void R_DrawSpanletTurbulentStipple33( void )
 
 		while ( s_spanletvars.spancount > 0 )
 		{
-			sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
-			tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
+			//sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
+			//tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
 			
-			btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
+			//btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
 			
-			if ( *pz <= ( izi >> 16 ) )
-				*pdest = btemp;
+			//if ( *pz <= ( izi >> 16 ) )
+			//	*pdest = btemp;
+			// XXX TODO FIXUP
 			
 			izi               += s_spanletvars.izistep_times_2;
 			s_spanletvars.s   += s_spanletvars.sstep;
@@ -147,8 +149,8 @@ void R_DrawSpanletTurbulentStipple33( void )
 */
 void R_DrawSpanletTurbulentStipple66( void )
 {
-	unsigned btemp;
-	int	     sturb, tturb;
+	//unsigned btemp;
+	//int	     sturb, tturb;
 	pixel_t	*pdest = s_spanletvars.pdest;
 	short   *pz    = s_spanletvars.pz;
 	int      izi   = s_spanletvars.izi;
@@ -179,13 +181,14 @@ void R_DrawSpanletTurbulentStipple66( void )
 
 		while ( s_spanletvars.spancount > 0 )
 		{
-			sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
-			tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
+			//sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
+			//tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
 			
-			btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
+			//btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
 			
-			if ( *pz <= ( izi >> 16 ) )
-				*pdest = btemp;
+			//if ( *pz <= ( izi >> 16 ) )
+			//	*pdest = btemp;
+			// XXX TODO FIXUP
 			
 			izi               += s_spanletvars.izistep_times_2;
 			s_spanletvars.s   += s_spanletvars.sstep;
@@ -209,13 +212,14 @@ void R_DrawSpanletTurbulentStipple66( void )
 		
 		while ( s_spanletvars.spancount > 0 )
 		{
-			sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
-			tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
+			//sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
+			//tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
 			
-			btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
+			//btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
 			
-			if ( *pz <= ( izi >> 16 ) )
-				*pdest = btemp;
+			//if ( *pz <= ( izi >> 16 ) )
+			//	*pdest = btemp;
+			// XXX TODO FIXUP
 			
 			izi               += s_spanletvars.izistep;
 			s_spanletvars.s   += s_spanletvars.sstep;
@@ -234,18 +238,21 @@ void R_DrawSpanletTurbulentStipple66( void )
 */
 void R_DrawSpanletTurbulentBlended66( void )
 {
-	unsigned btemp;
-	int	     sturb, tturb;
+	//unsigned btemp;
+	//int	     sturb, tturb;
 
 	do
 	{
-		sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
-		tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
+		//sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
+		//tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
 
-		btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
+		//btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
+		// XXX TODO FIXUP
 
-		if ( *s_spanletvars.pz <= ( s_spanletvars.izi >> 16 ) )
-			*s_spanletvars.pdest = vid.alphamap[btemp*256+*s_spanletvars.pdest];
+		if ( *s_spanletvars.pz <= ( s_spanletvars.izi >> 16 ) ) {
+			//*s_spanletvars.pdest = vid.alphamap[btemp*256+*s_spanletvars.pdest];
+			// XXX TODO FIXUP
+		}
 
 		s_spanletvars.izi += s_spanletvars.izistep;
 		s_spanletvars.pdest++;
@@ -258,18 +265,19 @@ void R_DrawSpanletTurbulentBlended66( void )
 
 void R_DrawSpanletTurbulentBlended33( void )
 {
-	unsigned btemp;
-	int	     sturb, tturb;
+	//unsigned btemp;
+	//int	     sturb, tturb;
 
 	do
 	{
-		sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
-		tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
+		//sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
+		//tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
 
-		btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
+		//btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
 
-		if ( *s_spanletvars.pz <= ( s_spanletvars.izi >> 16 ) )
-			*s_spanletvars.pdest = vid.alphamap[btemp+*s_spanletvars.pdest*256];
+		//if ( *s_spanletvars.pz <= ( s_spanletvars.izi >> 16 ) )
+		//	*s_spanletvars.pdest = vid.alphamap[btemp+*s_spanletvars.pdest*256];
+		// XXX TODO FIXUP
 
 		s_spanletvars.izi += s_spanletvars.izistep;
 		s_spanletvars.pdest++;
@@ -300,7 +308,8 @@ void R_DrawSpanlet33( void )
 		{
 			if (*s_spanletvars.pz <= (s_spanletvars.izi >> 16))
 			{
-				*s_spanletvars.pdest = vid.alphamap[btemp+*s_spanletvars.pdest*256];
+				//*s_spanletvars.pdest = vid.alphamap[btemp+*s_spanletvars.pdest*256];
+				// XXX TODO FIXUP REQUIRED
 			}
 		}
 
@@ -318,7 +327,8 @@ void R_DrawSpanletConstant33( void )
 	{
 		if (*s_spanletvars.pz <= (s_spanletvars.izi >> 16))
 		{
-			*s_spanletvars.pdest = vid.alphamap[r_polyblendcolor+*s_spanletvars.pdest*256];
+			//*s_spanletvars.pdest = vid.alphamap[r_polyblendcolor+*s_spanletvars.pdest*256];
+			// XXX TODO FIXUP
 		}
 
 		s_spanletvars.izi += s_spanletvars.izistep;
@@ -347,7 +357,8 @@ void R_DrawSpanlet66( void )
 		{
 			if (*s_spanletvars.pz <= (s_spanletvars.izi >> 16))
 			{
-				*s_spanletvars.pdest = vid.alphamap[btemp*256+*s_spanletvars.pdest];
+				//*s_spanletvars.pdest = vid.alphamap[btemp*256+*s_spanletvars.pdest];
+				// XXX TODO FIXUP REQUIRED
 			}
 		}
 
