@@ -40,7 +40,7 @@ vec3_t          r_lerped[1024];
 vec3_t          r_lerp_frontv, r_lerp_backv, r_lerp_move;
 
 int				r_ambientlight;
-int				r_aliasblendcolor;
+int				r_aliasblendcolor; // XXX TODO FIXUP - pixel_t
 float			r_shadelight;
 
 

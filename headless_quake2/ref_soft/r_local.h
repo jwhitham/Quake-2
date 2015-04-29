@@ -893,13 +893,32 @@ static inline pixel_t apply_lighting (uint16_t light, pixel_t pix)
 {
 	byte r, g, b;
 
-	r = (byte) (pix >> 16);
-	g = (byte) (pix >> 8);
-	b = (byte) (pix >> 0);
+	r = apply_lighting_channel (light, pix >> 16);
+	g = apply_lighting_channel (light, pix >> 8);
+	b = apply_lighting_channel (light, pix >> 0);
+	return rgb_to_pixel (r, g, b);
+}
 
-	r = apply_lighting_channel (light, r);
-	g = apply_lighting_channel (light, g);
-	b = apply_lighting_channel (light, b);
+static inline byte apply_alpha_channel (byte mix33, byte mix66)
+{
+	unsigned temp = 0;
+
+	// output = (mix33 * 1/3) + (mix66 * 2/3)
+
+	temp += mix33 * 85;
+	temp += mix66 * 171;
+	temp /= 256;
+	return (byte) temp;
+}
+
+static inline pixel_t apply_alpha (pixel_t mix33, pixel_t mix66)
+{
+	byte r, g, b;
+
+	r = apply_alpha_channel (mix33 >> 16, mix66 >> 16);
+	g = apply_alpha_channel (mix33 >> 8,  mix66 >> 8);
+	b = apply_alpha_channel (mix33 >> 0,  mix66 >> 0);
+
 	return rgb_to_pixel (r, g, b);		
 }
 #else
@@ -908,5 +927,11 @@ static inline pixel_t apply_lighting (int light, pixel_t pix)
 {
 	return ((unsigned char *)vid.colormap)[(light & 0xFF00) + pix];
 }
+
+static inline pixel_t apply_alpha (pixel_t mix33, pixel_t mix66)
+{
+	return vid.alphamap[mix33 + mix66*256];
+}
+
 #endif
 

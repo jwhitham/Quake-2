@@ -521,8 +521,7 @@ void R_DrawParticle( void )
                 if (pz[i] <= izi)
                 {
                     pz[i]    = izi;
-                    // pdest[i] = vid.alphamap[color + ((int)pdest[i]<<8)];
-					// XXX TODO FIXUP
+					pdest[i] = apply_alpha (color, pdest[i]);
                 }
             }
         }
@@ -536,8 +535,7 @@ void R_DrawParticle( void )
                 if (pz[i] <= izi)
                 {
                     pz[i]    = izi;
-                    //pdest[i] = vid.alphamap[(color<<8) + (int)pdest[i]];
-					// XXX TODO FIXUP
+					pdest[i] = apply_alpha (pdest[i], color);
                 }
             }
         }

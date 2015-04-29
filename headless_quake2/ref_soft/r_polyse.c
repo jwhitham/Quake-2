@@ -856,10 +856,8 @@ void R_PolysetDrawSpans8_33( spanpackage_t *pspanpackage)
 			{
 				if ((lzi >> 16) >= *lpz)
 				{
-					//int temp = vid.colormap[*lptex + ( llight & 0xFF00 )];
-
-					//*lpdest = vid.alphamap[temp+ *lpdest*256];
-					// XXX TODO FIXUP
+					pixel_t temp = apply_lighting (llight, *lptex);
+					*lpdest = apply_alpha (temp, *lpdest);
 				}
 				lpdest++;
 				lzi += r_zistepx;
@@ -914,8 +912,7 @@ void R_PolysetDrawSpansConstant8_33( spanpackage_t *pspanpackage)
 			{
 				if ((lzi >> 16) >= *lpz)
 				{
-					//*lpdest = vid.alphamap[r_aliasblendcolor + *lpdest*256];
-					// XXX TODO FIXUP
+					*lpdest = apply_alpha (r_aliasblendcolor, *lpdest);
 				}
 				lpdest++;
 				lzi += r_zistepx;
@@ -966,10 +963,8 @@ void R_PolysetDrawSpans8_66(spanpackage_t *pspanpackage)
 			{
 				if ((lzi >> 16) >= *lpz)
 				{
-					//int temp = vid.colormap[*lptex + ( llight & 0xFF00 )];
-
-					//*lpdest = vid.alphamap[temp*256 + *lpdest];
-					// XXX TODO FIXUP
+					pixel_t temp = apply_lighting (llight, *lptex);
+					*lpdest = apply_alpha (*lpdest, temp);
 					*lpz = lzi >> 16;
 				}
 				lpdest++;
@@ -1025,8 +1020,7 @@ void R_PolysetDrawSpansConstant8_66( spanpackage_t *pspanpackage)
 			{
 				if ((lzi >> 16) >= *lpz)
 				{
-					//*lpdest = vid.alphamap[r_aliasblendcolor*256 + *lpdest];
-					// XXX TODO FIXUP
+					*lpdest = apply_alpha (*lpdest, r_aliasblendcolor);
 				}
 				lpdest++;
 				lzi += r_zistepx;
