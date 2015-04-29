@@ -40,7 +40,7 @@ typedef struct {
 	void			*pdest;
 	short			*pz;
 	int				count;
-	byte			*ptex;
+	pixel_t			*ptex;
 	int				sfrac, tfrac, light, zi;
 } spanpackage_t;
 
@@ -91,7 +91,7 @@ int				d_aspancount, d_countextrastep;
 spanpackage_t			*a_spans;
 spanpackage_t			*d_pedgespanpackage;
 static int				ystart;
-byte					*d_pdest, *d_ptex;
+pixel_t					*d_pdest, *d_ptex;
 short					*d_pz;
 int						d_sfrac, d_tfrac, d_light, d_zi;
 int						d_ptexextrastep, d_sfracextrastep;
@@ -745,8 +745,8 @@ Random fizzle fade rasterizer
 void R_PolysetDrawThreshSpans8 (spanpackage_t *pspanpackage)
 {
 	int		lcount;
-	byte	*lpdest;
-	byte	*lptex;
+	pixel_t *lpdest;
+	pixel_t	*lptex;
 	int		lsfrac, ltfrac;
 	int		llight;
 	int		lzi;
@@ -785,7 +785,7 @@ void R_PolysetDrawThreshSpans8 (spanpackage_t *pspanpackage)
 
 					if (rand1k[rand1k_index] <= r_affinetridesc.vis_thresh)
 					{
-						*lpdest = ((byte *)vid.colormap)[*lptex + (llight & 0xFF00)];
+						*lpdest = apply_lighting (llight, *lptex);
 						*lpz = lzi >> 16;
 					}
 				}
@@ -820,8 +820,8 @@ R_PolysetDrawSpans8
 void R_PolysetDrawSpans8_33( spanpackage_t *pspanpackage)
 {
 	int		lcount;
-	byte	*lpdest;
-	byte	*lptex;
+	pixel_t	*lpdest;
+	pixel_t	*lptex;
 	int		lsfrac, ltfrac;
 	int		llight;
 	int		lzi;
@@ -930,8 +930,8 @@ void R_PolysetDrawSpansConstant8_33( spanpackage_t *pspanpackage)
 void R_PolysetDrawSpans8_66(spanpackage_t *pspanpackage)
 {
 	int		lcount;
-	byte	*lpdest;
-	byte	*lptex;
+	pixel_t	*lpdest;
+	pixel_t	*lptex;
 	int		lsfrac, ltfrac;
 	int		llight;
 	int		lzi;
@@ -1061,8 +1061,8 @@ void R_PolysetDrawSpans8_Opaque (spanpackage_t *pspanpackage)
 		if (lcount)
 		{
 			int		lsfrac, ltfrac;
-			byte	*lpdest;
-			byte	*lptex;
+			pixel_t	*lpdest;
+			pixel_t	*lptex;
 			int		llight;
 			int		lzi;
 			short	*lpz;
@@ -1080,10 +1080,11 @@ void R_PolysetDrawSpans8_Opaque (spanpackage_t *pspanpackage)
 				if ((lzi >> 16) >= *lpz)
 				{
 //PGM
-					if(r_newrefdef.rdflags & RDF_IRGOGGLES && currententity->flags & RF_IR_VISIBLE)
-						*lpdest = ((byte *)vid.colormap)[irtable[*lptex]];
-					else
-					*lpdest = ((byte *)vid.colormap)[*lptex + (llight & 0xFF00)];
+					//if(r_newrefdef.rdflags & RDF_IRGOGGLES && currententity->flags & RF_IR_VISIBLE)
+					//	*lpdest = ((byte *)vid.colormap)[irtable[*lptex]];
+					//else 
+					// XXX TODO FIXUP
+					*lpdest = apply_lighting (llight, *lptex);
 //PGM
 					*lpz = lzi >> 16;
 				}
@@ -1184,7 +1185,7 @@ void R_RasterizeAliasPolySmooth (void)
 	ystart = plefttop[1];
 	d_aspancount = plefttop[0] - prighttop[0];
 
-	d_ptex = (byte *)r_affinetridesc.pskin + (plefttop[2] >> 16) +
+	d_ptex = r_affinetridesc.pskin + (plefttop[2] >> 16) +
 			(plefttop[3] >> 16) * r_affinetridesc.skinwidth;
 //#if	id386ALIAS
 #if id386
@@ -1204,7 +1205,7 @@ void R_RasterizeAliasPolySmooth (void)
 	d_light = plefttop[4];
 	d_zi = plefttop[5];
 
-	d_pdest = (byte *)d_viewbuffer +
+	d_pdest = d_viewbuffer +
 			ystart * r_screenwidth + plefttop[0];
 	d_pz = d_pzbuffer + ystart * d_zwidth + plefttop[0];
 
@@ -1329,14 +1330,14 @@ void R_RasterizeAliasPolySmooth (void)
 
 		ystart = plefttop[1];
 		d_aspancount = plefttop[0] - prighttop[0];
-		d_ptex = (byte *)r_affinetridesc.pskin + (plefttop[2] >> 16) +
+		d_ptex = r_affinetridesc.pskin + (plefttop[2] >> 16) +
 				(plefttop[3] >> 16) * r_affinetridesc.skinwidth;
 		d_sfrac = 0;
 		d_tfrac = 0;
 		d_light = plefttop[4];
 		d_zi = plefttop[5];
 
-		d_pdest = (byte *)d_viewbuffer + ystart * r_screenwidth + plefttop[0];
+		d_pdest = d_viewbuffer + ystart * r_screenwidth + plefttop[0];
 		d_pz = d_pzbuffer + ystart * d_zwidth + plefttop[0];
 
 		if (height == 1)

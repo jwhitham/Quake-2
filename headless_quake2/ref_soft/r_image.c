@@ -413,7 +413,7 @@ GL_LoadPic
 static image_t *GL_LoadPic (char *name, byte *pic, byte *palette, int width, int height, imagetype_t type)
 {
 	image_t		*image;
-	int			i, c, r, g, b, x;
+	int			i, c, x;
 
 	image = R_FindFreeImage ();
 	if (strlen(name) >= sizeof(image->name))
@@ -435,11 +435,15 @@ static image_t *GL_LoadPic (char *name, byte *pic, byte *palette, int width, int
 			image->transparent = true;
 			image->pixels[0][i] = TRANSPARENT_COLOR;
 		} else {
-			r = palette[x*3+0];
-			g = palette[x*3+1];
-			b = palette[x*3+2];
+#ifdef COLOR_32
+			byte r = palette[x*3+0];
+			byte g = palette[x*3+1];
+			byte b = palette[x*3+2];
 
 			image->pixels[0][i] = rgb_to_pixel (r, g, b);
+#else
+			image->pixels[0][i] = x;
+#endif
 		}
 	}
 

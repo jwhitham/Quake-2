@@ -17,7 +17,9 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-  
+
+#define COLOR_32 1
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,7 +40,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // fall over
 #define ROLL    2
 
+#ifdef COLOR_32
 typedef uint32_t pixel_t;
+#else
+typedef uint8_t pixel_t;
+#endif
 
 
 /*
@@ -850,5 +856,57 @@ rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen
 void		SWimp_AppActivate( qboolean active );
 
 
-#define rgb_to_pixel(r, g, b) (((r) << 16) | ((g) << 8) | (b))
+/*
+====================================================================
+
+32-BIT RGB
+
+====================================================================
+*/
+#ifdef COLOR_32
+// 32-BIT COLOR
+static inline pixel_t rgb_to_pixel (byte r, byte g, byte b)
+{
+	return (r << 16) | (g << 8) | b;
+}
+
+static inline byte apply_lighting_channel (uint16_t light, byte c)
+{
+	// light == 0x0000  is maximum brightness, i.e. return min(255, c * 2)
+	// light == 0x2000  is normal brightness, i.e. return c
+	// light == 0x4000  is darkness, i.e. return 0
+	// light >  0x4000  is unspecified in Quake 2 (will return 255 here)
+	// so... output = min(255, 2c - ((c * light) / 0x2000))
+
+	unsigned temp;
+	
+	temp = (unsigned) c * (unsigned) light;
+	temp = temp / 0x2000;
+	temp = ((unsigned) c * 2) - temp;
+	if (temp > 0xff) {
+		temp = 0xff;
+	}
+	return (byte) temp;
+}
+	
+static inline pixel_t apply_lighting (uint16_t light, pixel_t pix)
+{
+	byte r, g, b;
+
+	r = (byte) (pix >> 16);
+	g = (byte) (pix >> 8);
+	b = (byte) (pix >> 0);
+
+	r = apply_lighting_channel (light, r);
+	g = apply_lighting_channel (light, g);
+	b = apply_lighting_channel (light, b);
+	return rgb_to_pixel (r, g, b);		
+}
+#else
+// 8-BIT COLOR
+static inline pixel_t apply_lighting (int light, pixel_t pix)
+{
+	return ((unsigned char *)vid.colormap)[(light & 0xFF00) + pix];
+}
+#endif
 

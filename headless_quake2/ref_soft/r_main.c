@@ -1343,7 +1343,11 @@ void Draw_GetPalette (void)
         out[1] = g;
         out[2] = b;
 
+#ifdef COLOR_32
 		d_8topixel[i] = rgb_to_pixel (r, g, b);
+#else
+		d_8topixel[i] = i;
+#endif
 	}
 
 	free (pal);
