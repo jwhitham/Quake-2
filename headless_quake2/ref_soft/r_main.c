@@ -1281,7 +1281,7 @@ void R_DrawBeam( entity_t *e )
 		                    end_points[i],
 							end_points[(i+1)%NUM_BEAM_SEGS],
 							start_points[(i+1)%NUM_BEAM_SEGS],
-							e->skinnum & 0xFF,
+							palette_to_pixel (e->skinnum & 0xFF),
 							e->alpha );
 	}
 }

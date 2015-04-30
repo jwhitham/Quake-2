@@ -40,7 +40,7 @@ vec3_t          r_lerped[1024];
 vec3_t          r_lerp_frontv, r_lerp_backv, r_lerp_move;
 
 int				r_ambientlight;
-int				r_aliasblendcolor; // XXX TODO FIXUP - pixel_t
+pixel_t			r_aliasblendcolor;
 float			r_shadelight;
 
 
@@ -1104,50 +1104,50 @@ void R_AliasDrawModel (void)
 		// PMM - reordered, old code first
 /*
 		if ( color == RF_SHELL_RED )
-			r_aliasblendcolor = SHELL_RED_COLOR;
+			r_aliasblendcolor = palette_to_pixel (SHELL_RED_COLOR);
 		else if ( color == RF_SHELL_GREEN )
-			r_aliasblendcolor = SHELL_GREEN_COLOR;
+			r_aliasblendcolor = palette_to_pixel (SHELL_GREEN_COLOR);
 		else if ( color == RF_SHELL_BLUE )
-			r_aliasblendcolor = SHELL_BLUE_COLOR;
+			r_aliasblendcolor = palette_to_pixel (SHELL_BLUE_COLOR);
 		else if ( color == (RF_SHELL_RED | RF_SHELL_GREEN) )
-			r_aliasblendcolor = SHELL_RG_COLOR;
+			r_aliasblendcolor = palette_to_pixel (SHELL_RG_COLOR);
 		else if ( color == (RF_SHELL_RED | RF_SHELL_BLUE) )
-			r_aliasblendcolor = SHELL_RB_COLOR;
+			r_aliasblendcolor = palette_to_pixel (SHELL_RB_COLOR);
 		else if ( color == (RF_SHELL_BLUE | RF_SHELL_GREEN) )
-			r_aliasblendcolor = SHELL_BG_COLOR;
+			r_aliasblendcolor = palette_to_pixel (SHELL_BG_COLOR);
 		// PMM - added this .. it's yellowish
 		else if ( color == (RF_SHELL_DOUBLE) )
-			r_aliasblendcolor = SHELL_DOUBLE_COLOR;
+			r_aliasblendcolor = palette_to_pixel (SHELL_DOUBLE_COLOR);
 		else if ( color == (RF_SHELL_HALF_DAM) )
-			r_aliasblendcolor = SHELL_HALF_DAM_COLOR;
+			r_aliasblendcolor = palette_to_pixel (SHELL_HALF_DAM_COLOR);
 		// pmm
 		else
-			r_aliasblendcolor = SHELL_WHITE_COLOR;
+			r_aliasblendcolor = palette_to_pixel (SHELL_WHITE_COLOR);
 */
 		if ( color & RF_SHELL_RED )
 		{
 			if ( ( color & RF_SHELL_BLUE) && ( color & RF_SHELL_GREEN) )
-				r_aliasblendcolor = SHELL_WHITE_COLOR;
+				r_aliasblendcolor = palette_to_pixel (SHELL_WHITE_COLOR);
 			else if ( color & (RF_SHELL_BLUE | RF_SHELL_DOUBLE))
-				r_aliasblendcolor = SHELL_RB_COLOR;
+				r_aliasblendcolor = palette_to_pixel (SHELL_RB_COLOR);
 			else
-				r_aliasblendcolor = SHELL_RED_COLOR;
+				r_aliasblendcolor = palette_to_pixel (SHELL_RED_COLOR);
 		}
 		else if ( color & RF_SHELL_BLUE)
 		{
 			if ( color & RF_SHELL_DOUBLE )
-				r_aliasblendcolor = SHELL_CYAN_COLOR;
+				r_aliasblendcolor = palette_to_pixel (SHELL_CYAN_COLOR);
 			else
-				r_aliasblendcolor = SHELL_BLUE_COLOR;
+				r_aliasblendcolor = palette_to_pixel (SHELL_BLUE_COLOR);
 		}
 		else if ( color & (RF_SHELL_DOUBLE) )
-			r_aliasblendcolor = SHELL_DOUBLE_COLOR;
+			r_aliasblendcolor = palette_to_pixel (SHELL_DOUBLE_COLOR);
 		else if ( color & (RF_SHELL_HALF_DAM) )
-			r_aliasblendcolor = SHELL_HALF_DAM_COLOR;
+			r_aliasblendcolor = palette_to_pixel (SHELL_HALF_DAM_COLOR);
 		else if ( color & RF_SHELL_GREEN )
-			r_aliasblendcolor = SHELL_GREEN_COLOR;
+			r_aliasblendcolor = palette_to_pixel (SHELL_GREEN_COLOR);
 		else
-			r_aliasblendcolor = SHELL_WHITE_COLOR;
+			r_aliasblendcolor = palette_to_pixel (SHELL_WHITE_COLOR);
 
 
 		if ( currententity->alpha > 0.33 )

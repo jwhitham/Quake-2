@@ -456,7 +456,7 @@ void R_DrawParticle( void )
 	float	zi;
 	pixel_t *pdest;
 	short	*pz;
-	int      color = pparticle->color;
+	int      color = palette_to_pixel (pparticle->color);
 	int		i, izi, pix, count, u, v;
 
 	/*
@@ -591,7 +591,7 @@ void R_DrawParticles (void)
 			partparms.level = PARTICLE_33;
 
 		partparms.particle = p;
-		partparms.color    = p->color;
+		partparms.color    = palette_to_pixel (p->color);
 
 #if id386 && !defined __linux__
 		if ( i < r_newrefdef.num_particles-1 )

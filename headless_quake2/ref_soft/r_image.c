@@ -461,7 +461,6 @@ image_t *R_LoadWal (char *name)
 	int			ofs;
 	image_t		*image;
 	int			size, i;
-	pixel_t		*palette = d_8topixel;
 
 	ri.FS_LoadFile (name, (void **)&mt);
 	if (!mt)
@@ -485,7 +484,7 @@ image_t *R_LoadWal (char *name)
 
 	ofs = LittleLong (mt->offsets[0]);
 	for (i = 0; i < size; i++) {
-		image->pixels[0][i] = palette[((byte *)mt)[ofs + i]];
+		image->pixels[0][i] = palette_to_pixel (((byte *)mt)[ofs + i]);
 	}
 
 	ri.FS_FreeFile ((void *)mt);

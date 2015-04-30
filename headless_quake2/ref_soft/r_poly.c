@@ -36,7 +36,7 @@ typedef struct
 
 spanletvars_t s_spanletvars;
 
-static int r_polyblendcolor; // XXX TODO pixel_t
+static pixel_t r_polyblendcolor;
 
 static espan_t	*s_polygon_spans;
 
@@ -1209,7 +1209,7 @@ void R_DrawAlphaSurfaces( void )
 /*
 ** R_IMFlatShadedQuad
 */
-void R_IMFlatShadedQuad( vec3_t a, vec3_t b, vec3_t c, vec3_t d, int color, float alpha )
+void R_IMFlatShadedQuad( vec3_t a, vec3_t b, vec3_t c, vec3_t d, pixel_t color, float alpha )
 {
 	vec3_t s0, s1;
 

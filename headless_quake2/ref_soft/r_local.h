@@ -702,7 +702,7 @@ extern  edge_t  edge_head;
 extern  edge_t  edge_tail;
 extern  edge_t  edge_aftertail;
 
-extern	int	r_aliasblendcolor;
+extern	pixel_t r_aliasblendcolor;
 
 extern float    aliasxscale, aliasyscale, aliasxcenter, aliasycenter;
 
@@ -825,7 +825,7 @@ typedef struct swstate_s
 
 } swstate_t;
 
-void R_IMFlatShadedQuad( vec3_t a, vec3_t b, vec3_t c, vec3_t d, int color, float alpha );
+void R_IMFlatShadedQuad( vec3_t a, vec3_t b, vec3_t c, vec3_t d, pixel_t color, float alpha );
 
 extern swstate_t sw_state;
 
@@ -868,6 +868,11 @@ void		SWimp_AppActivate( qboolean active );
 static inline pixel_t rgb_to_pixel (byte r, byte g, byte b)
 {
 	return (r << 16) | (g << 8) | b;
+}
+
+static inline pixel_t palette_to_pixel (byte c)
+{
+	return d_8topixel[c];
 }
 
 static inline byte apply_lighting_channel (uint16_t light, byte c)
@@ -931,6 +936,11 @@ static inline pixel_t apply_lighting (int light, pixel_t pix)
 static inline pixel_t apply_alpha (pixel_t mix33, pixel_t mix66)
 {
 	return vid.alphamap[mix33 + mix66*256];
+}
+
+static inline pixel_t palette_to_pixel (byte c)
+{
+	return c;
 }
 
 #endif
