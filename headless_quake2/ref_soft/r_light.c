@@ -127,7 +127,7 @@ int RecursiveLightPoint (mnode_t *node, vec3_t start, vec3_t end)
 	int			s, t, ds, dt;
 	int			i;
 	mtexinfo_t	*tex;
-	byte		*lightmap;
+	pixel_t		*lightmap;
 	float		*scales;
 	int			maps;
 	float		samp;
@@ -201,6 +201,7 @@ int RecursiveLightPoint (mnode_t *node, vec3_t start, vec3_t end)
 			for (maps = 0 ; maps < MAXLIGHTMAPS && surf->styles[maps] != 255 ;
 					maps++)
 			{
+				/// XXX TODO FIXUP
 				samp = *lightmap * /* 0.5 * */ (1.0/255);	// adjust for gl scale
 				scales = r_newrefdef.lightstyles[surf->styles[maps]].rgb;
 				VectorMA (pointcolor, samp, scales, pointcolor);
@@ -384,7 +385,7 @@ void R_BuildLightMap (void)
 	int			smax, tmax;
 	int			t;
 	int			i, size;
-	byte		*lightmap;
+	pixel_t		*lightmap;
 	unsigned	scale;
 	int			maps;
 	msurface_t	*surf;
@@ -414,8 +415,9 @@ void R_BuildLightMap (void)
 			 maps++)
 		{
 			scale = r_drawsurf.lightadj[maps];	// 8.8 fraction		
-			for (i=0 ; i<size ; i++)
+			for (i=0 ; i<size ; i++) { // XXX TODO FIXUP NEEDED
 				blocklights[i] += lightmap[i] * scale;
+			}
 			lightmap += size;	// skip to next lightmap
 		}
 

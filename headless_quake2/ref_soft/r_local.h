@@ -923,6 +923,12 @@ static inline pixel_t apply_alpha (pixel_t mix33, pixel_t mix66)
 
 	return rgb_to_pixel (r, g, b);		
 }
+
+static inline int convert_lighting (int i)
+{
+	return i;
+}
+
 #else
 // 8-BIT COLOR
 static inline pixel_t apply_lighting (int light, pixel_t pix)
@@ -938,6 +944,12 @@ static inline pixel_t apply_alpha (pixel_t mix33, pixel_t mix66)
 static inline pixel_t palette_to_pixel (byte c)
 {
 	return c;
+}
+
+static inline int convert_lighting (int i)
+{
+	// lighting info is converted from 24 bit on disk to 8 bit
+	return i/3;
 }
 
 #endif
