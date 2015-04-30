@@ -60,7 +60,7 @@ aliastriangleparms_t aliastriangleparms;
 
 int	r_p0[6], r_p1[6], r_p2[6];
 
-byte		*d_pcolormap;
+pixel_t		*d_pcolormap;
 
 int			d_aflatcolor;
 int			d_xdenom;
@@ -110,9 +110,9 @@ static adivtab_t	adivtab[32*32] = {
 #include "adivtab.h"
 };
 
-byte	*skintable[MAX_LBM_HEIGHT];
+pixel_t *skintable[MAX_LBM_HEIGHT];
 int		skinwidth;
-byte	*skinstart;
+pixel_t *skinstart;
 
 void	(*d_pdrawspans)(spanpackage_t *pspanpackage);
 
@@ -182,7 +182,7 @@ R_PolysetUpdateTables
 void R_PolysetUpdateTables (void)
 {
 	int		i;
-	byte	*s;
+	pixel_t *s;
 	
 	if (r_affinetridesc.skinwidth != skinwidth ||
 		r_affinetridesc.pskin != skinstart)
@@ -883,7 +883,7 @@ void R_PolysetDrawSpans8_33( spanpackage_t *pspanpackage)
 void R_PolysetDrawSpansConstant8_33( spanpackage_t *pspanpackage)
 {
 	int		lcount;
-	byte	*lpdest;
+	pixel_t *lpdest;
 	int		lzi;
 	short	*lpz;
 
@@ -991,7 +991,7 @@ void R_PolysetDrawSpans8_66(spanpackage_t *pspanpackage)
 void R_PolysetDrawSpansConstant8_66( spanpackage_t *pspanpackage)
 {
 	int		lcount;
-	byte	*lpdest;
+	pixel_t *lpdest;
 	int		lzi;
 	short	*lpz;
 
@@ -1121,7 +1121,7 @@ void R_PolysetFillSpans8 (spanpackage_t *pspanpackage)
 	while (1)
 	{
 		int		lcount;
-		byte	*lpdest;
+		pixel_t *lpdest;
 
 		lcount = pspanpackage->count;
 
@@ -1179,7 +1179,7 @@ void R_RasterizeAliasPolySmooth (void)
 	ystart = plefttop[1];
 	d_aspancount = plefttop[0] - prighttop[0];
 
-	d_ptex = r_affinetridesc.pskin + (plefttop[2] >> 16) +
+	d_ptex = (pixel_t *) r_affinetridesc.pskin + (plefttop[2] >> 16) +
 			(plefttop[3] >> 16) * r_affinetridesc.skinwidth;
 //#if	id386ALIAS
 #if id386
@@ -1324,7 +1324,7 @@ void R_RasterizeAliasPolySmooth (void)
 
 		ystart = plefttop[1];
 		d_aspancount = plefttop[0] - prighttop[0];
-		d_ptex = r_affinetridesc.pskin + (plefttop[2] >> 16) +
+		d_ptex = (pixel_t *) r_affinetridesc.pskin + (plefttop[2] >> 16) +
 				(plefttop[3] >> 16) * r_affinetridesc.skinwidth;
 		d_sfrac = 0;
 		d_tfrac = 0;

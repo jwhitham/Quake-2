@@ -29,7 +29,7 @@ typedef struct
 {
 	particle_t *particle;
 	int         level;
-	int         color;
+	pixel_t		color;
 } partparms_t;
 
 static partparms_t partparms;
@@ -456,7 +456,7 @@ void R_DrawParticle( void )
 	float	zi;
 	pixel_t *pdest;
 	short	*pz;
-	int      color = palette_to_pixel (pparticle->color);
+	pixel_t color = palette_to_pixel (pparticle->color);
 	int		i, izi, pix, count, u, v;
 
 	/*
