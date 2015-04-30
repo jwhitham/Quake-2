@@ -282,6 +282,30 @@ PIXEL xlib_rgb(int r,int g,int b)
     return p;
 }
 
+void st2_fixup( XImage *framebuf, int x, int y, int width, int height)
+{
+	int xi,yi;
+	unsigned char *src;
+	PIXEL *dest;
+
+	if( (x<0)||(y<0) )return;
+
+	for (yi = y; yi < (y+height); yi++) {
+		src = &framebuf->data [yi * framebuf->bytes_per_line];
+		dest = (PIXEL*)src;
+		for(xi = (x+width-1); xi >= x; xi -= 8) {
+			dest[xi  ] = st2d_8to16table[src[xi  ]];
+			dest[xi-1] = st2d_8to16table[src[xi-1]];
+			dest[xi-2] = st2d_8to16table[src[xi-2]];
+			dest[xi-3] = st2d_8to16table[src[xi-3]];
+			dest[xi-4] = st2d_8to16table[src[xi-4]];
+			dest[xi-5] = st2d_8to16table[src[xi-5]];
+			dest[xi-6] = st2d_8to16table[src[xi-6]];
+			dest[xi-7] = st2d_8to16table[src[xi-7]];
+		}
+	}
+}
+
 // ========================================================================
 // makes a null cursor
 // ========================================================================
@@ -881,6 +905,9 @@ void SWimp_EndFrame (void)
 	if (doShm)
 	{
 
+		if ((sizeof (pixel_t) == 1) && (x_visinfo->depth != 8))
+			st2_fixup( x_framebuffer[current_framebuffer], 
+				0, 0, vid.width, vid.height);	
 		if (!XShmPutImage(x_disp, x_win, x_gc,
 			x_framebuffer[current_framebuffer], 0, 0,
 			0, 0, vid.width, vid.height, True))
@@ -894,6 +921,9 @@ void SWimp_EndFrame (void)
 	}
 	else
 	{
+		if ((sizeof (pixel_t) == 1) && (x_visinfo->depth != 8))
+			st2_fixup( x_framebuffer[current_framebuffer], 
+				0, 0, vid.width, vid.height);
 		XPutImage(x_disp, x_win, x_gc, x_framebuffer[0],
 			0, 0, 0, 0, vid.width, vid.height);
 		XSync(x_disp, False);
