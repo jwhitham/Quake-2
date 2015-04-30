@@ -307,7 +307,7 @@ typedef struct finalvert_s {
 
 typedef struct
 {
-	void                            *pskin;
+	pixel_t								*pskin;
 	int                                     pskindesc;
 	int                                     skinwidth;
 	int                                     skinheight;
@@ -459,8 +459,6 @@ void R_DrawParticle( void );
 void D_ViewChanged (void);
 void D_WarpScreen (void);
 void R_PolysetUpdateTables (void);
-
-extern void *acolormap; // FIXME: should go away
 
 //=======================================================================//
 
@@ -757,7 +755,6 @@ extern  refdef_t        r_newrefdef;
 
 extern  surfcache_t     *sc_rover, *sc_base;
 
-extern  void            *colormap;
 
 //====================================================================
 

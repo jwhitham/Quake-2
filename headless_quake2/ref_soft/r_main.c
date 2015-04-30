@@ -43,7 +43,6 @@ pixel_t		r_warpbuffer[WARP_WIDTH * WARP_HEIGHT];
 
 swstate_t sw_state;
 
-void		*colormap;
 vec3_t		viewlightvec;
 alight_t	r_viewlighting = {128, 192, viewlightvec};
 float		r_time1;

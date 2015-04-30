@@ -185,7 +185,7 @@ void turret_breach_think (edict_t *self)
 
 		// z
 		angle = self->s.angles[PITCH] * (M_PI*2 / 360);
-		target_z = SnapToEights(self->s.origin[2] + self->owner->move_origin[0] * tan(angle) + self->owner->move_origin[2]);
+		target_z = SnapToEights(self->s.origin[2] + self->owner->move_origin[0] * tanf(angle) + self->owner->move_origin[2]);
 
 		diff = target_z - self->owner->s.origin[2];
 		self->owner->velocity[2] = diff * 1.0 / FRAMETIME;
