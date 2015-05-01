@@ -128,9 +128,7 @@ int RecursiveLightPoint (mnode_t *node, vec3_t start, vec3_t end)
 	int			i;
 	mtexinfo_t	*tex;
 	pixel_t		*lightmap;
-	float		*scales;
 	int			maps;
-	float		samp;
 	int			r;
 
 	if (node->contents != -1)
@@ -201,10 +199,30 @@ int RecursiveLightPoint (mnode_t *node, vec3_t start, vec3_t end)
 			for (maps = 0 ; maps < MAXLIGHTMAPS && surf->styles[maps] != 255 ;
 					maps++)
 			{
-				/// XXX TODO FIXUP
+#ifdef COLOR_32
+				// This is how the GL renderer does this:
+				int i;
+				vec3_t scale;
+				byte r, g, b;
+
+				for (i=0 ; i<3 ; i++)
+					scale[i] = r_newrefdef.lightstyles[surf->styles[maps]].rgb[i];
+				r = (* lightmap) >> 16;
+				g = (* lightmap) >> 8;
+				b = (* lightmap) >> 0;
+
+				pointcolor[0] += r * scale[0] * (1.0/255);
+				pointcolor[1] += g * scale[1] * (1.0/255);
+				pointcolor[2] += b * scale[2] * (1.0/255);
+#else
+				// This is how the 8-bit software renderer does this:
+				float samp;
+				float *scales;
+
 				samp = *lightmap * /* 0.5 * */ (1.0/255);	// adjust for gl scale
 				scales = r_newrefdef.lightstyles[surf->styles[maps]].rgb;
 				VectorMA (pointcolor, samp, scales, pointcolor);
+#endif
 				lightmap += ((surf->extents[0]>>4)+1) *
 						((surf->extents[1]>>4)+1);
 			}
@@ -272,8 +290,47 @@ void R_LightPoint (vec3_t p, vec3_t color)
 
 //===================================================================
 
+#ifdef COLOR_32
+bl_item_t blocklights_r[MAX_LIGHTMAP_SIZE];
+bl_item_t blocklights_g[MAX_LIGHTMAP_SIZE];
+bl_item_t blocklights_b[MAX_LIGHTMAP_SIZE];
+#else
+bl_item_t blocklights[MAX_LIGHTMAP_SIZE];
+#endif
 
-unsigned		blocklights[1024];	// allow some very large lightmaps
+static inline unsigned bound_light (unsigned tin)
+{
+	int t = (int)tin;
+	if (t < 0)
+		t = 0;
+	t = (255*256 - t) >> (8 - VID_CBITS);
+
+	if (t < (1 << 6))
+		t = (1 << 6);
+
+	return (unsigned) t;
+}
+
+static inline void dynamic_light (unsigned *inout,
+								  int negativeLight,
+								  float dist,
+								  float minlight,
+								  unsigned rd256)
+{
+	if(!negativeLight)
+	{
+		if (dist < minlight) {
+			(*inout) += rd256;
+		}
+	} else {
+		if (dist < minlight) {
+			(*inout) -= rd256;
+		}
+		if ((*inout) < minlight) {
+			(*inout) = minlight;
+		}
+	}
+}
 
 /*
 ===============
@@ -345,6 +402,8 @@ void R_AddDynamicLights (void)
 				td = -td;
 			for (s=0 ; s<smax ; s++)
 			{
+				unsigned rd256;
+
 				sd = local[0] - s*16;
 				if (sd < 0)
 					sd = -sd;
@@ -354,18 +413,22 @@ void R_AddDynamicLights (void)
 					dist = td + (sd>>1);
 //====
 //PGM
-				if(!negativeLight)
-				{
-					if (dist < minlight)
-						blocklights[t*smax + s] += (rad - dist)*256;
-				}
-				else
-				{
-					if (dist < minlight)
-						blocklights[t*smax + s] -= (rad - dist)*256;
-					if(blocklights[t*smax + s] < minlight)
-						blocklights[t*smax + s] = minlight;
-				}
+				rd256 = (rad - dist) * 256;
+#ifdef COLOR_32
+				dynamic_light
+					(&blocklights_r[t*smax + s], 
+					 negativeLight, dist, minlight, rd256);
+				dynamic_light
+					(&blocklights_g[t*smax + s], 
+					 negativeLight, dist, minlight, rd256);
+				dynamic_light
+					(&blocklights_b[t*smax + s], 
+					 negativeLight, dist, minlight, rd256);
+#else
+				dynamic_light
+					(&blocklights[t*smax + s], 
+					 negativeLight, dist, minlight, rd256);
+#endif
 //PGM
 //====
 			}
@@ -383,7 +446,6 @@ Combine and scale multiple lightmaps into the 8.8 format in blocklights
 void R_BuildLightMap (void)
 {
 	int			smax, tmax;
-	int			t;
 	int			i, size;
 	pixel_t		*lightmap;
 	unsigned	scale;
@@ -396,17 +458,19 @@ void R_BuildLightMap (void)
 	tmax = (surf->extents[1]>>4)+1;
 	size = smax*tmax;
 
+// clear to no light
+#ifdef COLOR_32
+	memset (blocklights_r, 0, size * sizeof (blocklights_r[0]));
+	memset (blocklights_g, 0, size * sizeof (blocklights_g[0]));
+	memset (blocklights_b, 0, size * sizeof (blocklights_b[0]));
+#else
+	memset (blocklights, 0, size * sizeof (blocklights[0]));
+#endif
+
 	if (r_fullbright->value || !r_worldmodel->lightdata)
 	{
-		for (i=0 ; i<size ; i++)
-			blocklights[i] = 0;
 		return;
 	}
-
-// clear to no light
-	for (i=0 ; i<size ; i++)
-		blocklights[i] = 0;
-
 
 // add all the lightmaps
 	lightmap = surf->samples;
@@ -415,9 +479,21 @@ void R_BuildLightMap (void)
 			 maps++)
 		{
 			scale = r_drawsurf.lightadj[maps];	// 8.8 fraction		
-			for (i=0 ; i<size ; i++) { // XXX TODO FIXUP NEEDED
+#ifdef COLOR_32
+			for (i=0 ; i<size ; i++) {
+				byte r, g, b;
+				r = lightmap[i] >> 16;
+				g = lightmap[i] >> 8;
+				b = lightmap[i] >> 0;
+				blocklights_r[i] += r * scale;
+				blocklights_g[i] += g * scale;
+				blocklights_b[i] += b * scale;
+			}
+#else
+			for (i=0 ; i<size ; i++) {
 				blocklights[i] += lightmap[i] * scale;
 			}
+#endif
 			lightmap += size;	// skip to next lightmap
 		}
 
@@ -428,15 +504,13 @@ void R_BuildLightMap (void)
 // bound, invert, and shift
 	for (i=0 ; i<size ; i++)
 	{
-		t = (int)blocklights[i];
-		if (t < 0)
-			t = 0;
-		t = (255*256 - t) >> (8 - VID_CBITS);
-
-		if (t < (1 << 6))
-			t = (1 << 6);
-
-		blocklights[i] = t;
+#ifdef COLOR_32
+		blocklights_r[i] = bound_light (blocklights_r[i]);
+		blocklights_g[i] = bound_light (blocklights_g[i]);
+		blocklights_b[i] = bound_light (blocklights_b[i]);
+#else
+		blocklights[i] = bound_light (blocklights[i]);
+#endif
 	}
 }
 

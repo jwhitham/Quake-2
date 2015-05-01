@@ -860,6 +860,10 @@ void		SWimp_AppActivate( qboolean active );
 
 ====================================================================
 */
+
+typedef unsigned bl_item_t;
+#define MAX_LIGHTMAP_SIZE 1024
+
 #ifdef COLOR_32
 // 32-BIT COLOR
 static inline pixel_t rgb_to_pixel (byte r, byte g, byte b)
@@ -929,6 +933,10 @@ static inline int convert_lighting (int i)
 	return i;
 }
 
+extern bl_item_t blocklights_r[MAX_LIGHTMAP_SIZE];
+extern bl_item_t blocklights_g[MAX_LIGHTMAP_SIZE];
+extern bl_item_t blocklights_b[MAX_LIGHTMAP_SIZE];
+
 #else
 // 8-BIT COLOR
 static inline pixel_t apply_lighting (int light, pixel_t pix)
@@ -951,6 +959,8 @@ static inline int convert_lighting (int i)
 	// lighting info is converted from 24 bit on disk to 8 bit
 	return i/3;
 }
+
+extern bl_item_t blocklights[MAX_LIGHTMAP_SIZE];
 
 #endif
 
