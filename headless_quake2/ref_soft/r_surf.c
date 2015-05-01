@@ -577,10 +577,10 @@ surfcache_t *D_CacheSurface (msurface_t *surface, int miplevel)
 // if the surface is animating or flashing, flush the cache
 //
 	r_drawsurf.image = R_TextureAnimation (surface->texinfo);
-	r_drawsurf.lightadj[0] = r_newrefdef.lightstyles[surface->styles[0]].white*128;
-	r_drawsurf.lightadj[1] = r_newrefdef.lightstyles[surface->styles[1]].white*128;
-	r_drawsurf.lightadj[2] = r_newrefdef.lightstyles[surface->styles[2]].white*128;
-	r_drawsurf.lightadj[3] = r_newrefdef.lightstyles[surface->styles[3]].white*128;
+	r_drawsurf.dlightadj[0] = r_newrefdef.lightstyles[surface->styles[0]].white*128;
+	r_drawsurf.dlightadj[1] = r_newrefdef.lightstyles[surface->styles[1]].white*128;
+	r_drawsurf.dlightadj[2] = r_newrefdef.lightstyles[surface->styles[2]].white*128;
+	r_drawsurf.dlightadj[3] = r_newrefdef.lightstyles[surface->styles[3]].white*128;
 	
 //
 // see if the cache holds apropriate data
@@ -589,10 +589,10 @@ surfcache_t *D_CacheSurface (msurface_t *surface, int miplevel)
 
 	if (cache && !cache->dlight && surface->dlightframe != r_framecount
 			&& cache->image == r_drawsurf.image
-			&& cache->lightadj[0] == r_drawsurf.lightadj[0]
-			&& cache->lightadj[1] == r_drawsurf.lightadj[1]
-			&& cache->lightadj[2] == r_drawsurf.lightadj[2]
-			&& cache->lightadj[3] == r_drawsurf.lightadj[3] )
+			&& cache->lightadj[0] == r_drawsurf.dlightadj[0]
+			&& cache->lightadj[1] == r_drawsurf.dlightadj[1]
+			&& cache->lightadj[2] == r_drawsurf.dlightadj[2]
+			&& cache->lightadj[3] == r_drawsurf.dlightadj[3] )
 		return cache;
 
 //
@@ -624,10 +624,10 @@ surfcache_t *D_CacheSurface (msurface_t *surface, int miplevel)
 	r_drawsurf.surfdat = (pixel_t *)cache->data;
 	
 	cache->image = r_drawsurf.image;
-	cache->lightadj[0] = r_drawsurf.lightadj[0];
-	cache->lightadj[1] = r_drawsurf.lightadj[1];
-	cache->lightadj[2] = r_drawsurf.lightadj[2];
-	cache->lightadj[3] = r_drawsurf.lightadj[3];
+	cache->lightadj[0] = r_drawsurf.dlightadj[0];
+	cache->lightadj[1] = r_drawsurf.dlightadj[1];
+	cache->lightadj[2] = r_drawsurf.dlightadj[2];
+	cache->lightadj[3] = r_drawsurf.dlightadj[3];
 
 //
 // draw and light the surface texture
