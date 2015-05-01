@@ -577,11 +577,11 @@ surfcache_t *D_CacheSurface (msurface_t *surface, int miplevel)
 // if the surface is animating or flashing, flush the cache
 //
 	r_drawsurf.image = R_TextureAnimation (surface->texinfo);
-	r_drawsurf.dlightadj[0].b = r_newrefdef.lightstyles[surface->styles[0]].white*128;
-	r_drawsurf.dlightadj[1].b = r_newrefdef.lightstyles[surface->styles[1]].white*128;
-	r_drawsurf.dlightadj[2].b = r_newrefdef.lightstyles[surface->styles[2]].white*128;
-	r_drawsurf.dlightadj[3].b = r_newrefdef.lightstyles[surface->styles[3]].white*128;
-	
+	r_drawsurf.dlightadj[0] = lightstyle_to_lightadj (r_newrefdef.lightstyles[surface->styles[0]]);
+	r_drawsurf.dlightadj[1] = lightstyle_to_lightadj (r_newrefdef.lightstyles[surface->styles[1]]);
+	r_drawsurf.dlightadj[2] = lightstyle_to_lightadj (r_newrefdef.lightstyles[surface->styles[2]]);
+	r_drawsurf.dlightadj[3] = lightstyle_to_lightadj (r_newrefdef.lightstyles[surface->styles[3]]);
+
 //
 // see if the cache holds apropriate data
 //
@@ -589,10 +589,10 @@ surfcache_t *D_CacheSurface (msurface_t *surface, int miplevel)
 
 	if (cache && !cache->dlight && surface->dlightframe != r_framecount
 			&& cache->image == r_drawsurf.image
-			&& cache->lightadj[0].b == r_drawsurf.dlightadj[0].b
-			&& cache->lightadj[1].b == r_drawsurf.dlightadj[1].b
-			&& cache->lightadj[2].b == r_drawsurf.dlightadj[2].b
-			&& cache->lightadj[3].b == r_drawsurf.dlightadj[3].b )
+			&& lightadj_eq (cache->lightadj[0], r_drawsurf.dlightadj[0])
+			&& lightadj_eq (cache->lightadj[1], r_drawsurf.dlightadj[1])
+			&& lightadj_eq (cache->lightadj[2], r_drawsurf.dlightadj[2])
+			&& lightadj_eq (cache->lightadj[3], r_drawsurf.dlightadj[3]) )
 		return cache;
 
 //

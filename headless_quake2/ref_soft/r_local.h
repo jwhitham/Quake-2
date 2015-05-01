@@ -978,3 +978,32 @@ static inline unsigned light_bis_channel (unsigned ti)
 	return (unsigned) t;
 }
 
+static inline lightadj_t lightstyle_to_lightadj (lightstyle_t s)
+{
+	lightadj_t l;
+	l.b = s.white * 128;
+	return l;
+}
+
+static inline int lightadj_eq (lightadj_t l, lightadj_t r)
+{
+	return l.b == r.b;
+}
+
+static inline void blocklight_add_dynamic
+	(unsigned index, int negativeLight, float dist, float minlight, float addend)
+{
+	if(!negativeLight)
+	{
+		if (dist < minlight)
+			blocklights[index].b += addend;
+	}
+	else
+	{
+		if (dist < minlight)
+			blocklights[index].b -= addend;
+		if(blocklights[index].b < minlight)
+			blocklights[index].b = minlight;
+	}
+}
+

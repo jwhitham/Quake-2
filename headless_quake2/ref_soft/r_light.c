@@ -352,18 +352,7 @@ void R_AddDynamicLights (void)
 					dist = td + (sd>>1);
 //====
 //PGM
-				if(!negativeLight)
-				{
-					if (dist < minlight)
-						blocklights[t*smax + s].b += (rad - dist)*256;
-				}
-				else
-				{
-					if (dist < minlight)
-						blocklights[t*smax + s].b -= (rad - dist)*256;
-					if(blocklights[t*smax + s].b < minlight)
-						blocklights[t*smax + s].b = minlight;
-				}
+				blocklight_add_dynamic (t * smax + s, negativeLight, dist, minlight, (rad - dist) * 256);
 //PGM
 //====
 			}
