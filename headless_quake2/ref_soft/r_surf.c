@@ -30,7 +30,7 @@ unsigned		blockdivmask;
 void			*prowdestbase;
 pixel_t      	*pbasesource;
 int				surfrowbytes;	// used by ASM files
-unsigned		*r_lightptr;
+blocklight_t	*r_lightptr;
 int				r_stepback;
 int				r_lightwidth;
 int				r_numhblocks, r_numvblocks;
@@ -49,7 +49,6 @@ static void	(*surfmiptable[4])(void) = {
 };
 
 void R_BuildLightMap (void);
-extern	unsigned		blocklights[1024];	// allow some very large lightmaps
 
 float           surfscale;
 qboolean        r_cache_thrash;         // set if surface cache is thrashing
@@ -182,11 +181,11 @@ void R_DrawSurfaceBlock8_mip0 (void)
 	{
 	// FIXME: make these locals?
 	// FIXME: use delta rather than both right and left, like ASM?
-		lightleft = r_lightptr[0];
-		lightright = r_lightptr[1];
+		lightleft = r_lightptr[0].b;
+		lightright = r_lightptr[1].b;
 		r_lightptr += r_lightwidth;
-		lightleftstep = (r_lightptr[0] - lightleft) >> 4;
-		lightrightstep = (r_lightptr[1] - lightright) >> 4;
+		lightleftstep = (r_lightptr[0].b - lightleft) >> 4;
+		lightrightstep = (r_lightptr[1].b - lightright) >> 4;
 
 		for (i=0 ; i<16 ; i++)
 		{
@@ -231,11 +230,11 @@ void R_DrawSurfaceBlock8_mip1 (void)
 	{
 	// FIXME: make these locals?
 	// FIXME: use delta rather than both right and left, like ASM?
-		lightleft = r_lightptr[0];
-		lightright = r_lightptr[1];
+		lightleft = r_lightptr[0].b;
+		lightright = r_lightptr[1].b;
 		r_lightptr += r_lightwidth;
-		lightleftstep = (r_lightptr[0] - lightleft) >> 3;
-		lightrightstep = (r_lightptr[1] - lightright) >> 3;
+		lightleftstep = (r_lightptr[0].b - lightleft) >> 3;
+		lightrightstep = (r_lightptr[1].b - lightright) >> 3;
 
 		for (i=0 ; i<8 ; i++)
 		{
@@ -280,11 +279,11 @@ void R_DrawSurfaceBlock8_mip2 (void)
 	{
 	// FIXME: make these locals?
 	// FIXME: use delta rather than both right and left, like ASM?
-		lightleft = r_lightptr[0];
-		lightright = r_lightptr[1];
+		lightleft = r_lightptr[0].b;
+		lightright = r_lightptr[1].b;
 		r_lightptr += r_lightwidth;
-		lightleftstep = (r_lightptr[0] - lightleft) >> 2;
-		lightrightstep = (r_lightptr[1] - lightright) >> 2;
+		lightleftstep = (r_lightptr[0].b - lightleft) >> 2;
+		lightrightstep = (r_lightptr[1].b - lightright) >> 2;
 
 		for (i=0 ; i<4 ; i++)
 		{
@@ -329,11 +328,11 @@ void R_DrawSurfaceBlock8_mip3 (void)
 	{
 	// FIXME: make these locals?
 	// FIXME: use delta rather than both right and left, like ASM?
-		lightleft = r_lightptr[0];
-		lightright = r_lightptr[1];
+		lightleft = r_lightptr[0].b;
+		lightright = r_lightptr[1].b;
 		r_lightptr += r_lightwidth;
-		lightleftstep = (r_lightptr[0] - lightleft) >> 1;
-		lightrightstep = (r_lightptr[1] - lightright) >> 1;
+		lightleftstep = (r_lightptr[0].b - lightleft) >> 1;
+		lightrightstep = (r_lightptr[1].b - lightright) >> 1;
 
 		for (i=0 ; i<2 ; i++)
 		{

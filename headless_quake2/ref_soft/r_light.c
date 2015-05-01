@@ -271,8 +271,7 @@ void R_LightPoint (vec3_t p, vec3_t color)
 
 //===================================================================
 
-
-unsigned		blocklights[1024];	// allow some very large lightmaps
+blocklight_t blocklights[MAX_LIGHTMAP_SIZE];
 
 /*
 ===============
@@ -356,14 +355,14 @@ void R_AddDynamicLights (void)
 				if(!negativeLight)
 				{
 					if (dist < minlight)
-						blocklights[t*smax + s] += (rad - dist)*256;
+						blocklights[t*smax + s].b += (rad - dist)*256;
 				}
 				else
 				{
 					if (dist < minlight)
-						blocklights[t*smax + s] -= (rad - dist)*256;
-					if(blocklights[t*smax + s] < minlight)
-						blocklights[t*smax + s] = minlight;
+						blocklights[t*smax + s].b -= (rad - dist)*256;
+					if(blocklights[t*smax + s].b < minlight)
+						blocklights[t*smax + s].b = minlight;
 				}
 //PGM
 //====
@@ -382,7 +381,6 @@ Combine and scale multiple lightmaps into the 8.8 format in blocklights
 void R_BuildLightMap (void)
 {
 	int			smax, tmax;
-	int			t;
 	int			i, size;
 	byte		*lightmap;
 	unsigned	scale;
@@ -395,17 +393,13 @@ void R_BuildLightMap (void)
 	tmax = (surf->extents[1]>>4)+1;
 	size = smax*tmax;
 
+// clear to no light
+	memset (blocklights, 0, sizeof (blocklight_t) * size);
+
 	if (r_fullbright->value || !r_worldmodel->lightdata)
 	{
-		for (i=0 ; i<size ; i++)
-			blocklights[i] = 0;
 		return;
 	}
-
-// clear to no light
-	for (i=0 ; i<size ; i++)
-		blocklights[i] = 0;
-
 
 // add all the lightmaps
 	lightmap = surf->samples;
@@ -415,7 +409,9 @@ void R_BuildLightMap (void)
 		{
 			scale = r_drawsurf.lightadj[maps];	// 8.8 fraction		
 			for (i=0 ; i<size ; i++)
-				blocklights[i] += lightmap[i] * scale;
+			{
+				blocklights[i].b += lightmap[i] * scale;
+			}
 			lightmap += size;	// skip to next lightmap
 		}
 
@@ -426,15 +422,7 @@ void R_BuildLightMap (void)
 // bound, invert, and shift
 	for (i=0 ; i<size ; i++)
 	{
-		t = (int)blocklights[i];
-		if (t < 0)
-			t = 0;
-		t = (255*256 - t) >> (8 - VID_CBITS);
-
-		if (t < (1 << 6))
-			t = (1 << 6);
-
-		blocklights[i] = t;
+		blocklights[i].b = light_bis_channel (blocklights[i].b);
 	}
 }
 

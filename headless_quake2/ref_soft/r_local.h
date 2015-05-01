@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#define COLOR_32 1
+// #define COLOR_32 1
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,14 +47,26 @@ typedef union pixel_s {
 		byte b, g, r, padding;
 	} rgb;
 } pixel_t;
+
 #define TRANSPARENT_COLOR ((uint32_t) 0xffffffffU)
+
 #else
+
 typedef union pixel_s {
 	byte c;
 } pixel_t;
+
 #define TRANSPARENT_COLOR ((byte) 0xff)
+
 #endif
 
+typedef struct blocklight_s {
+	unsigned b;
+} blocklight_t;
+
+#define MAX_LIGHTMAP_SIZE	1024 // allow some very large lightmaps
+
+extern blocklight_t blocklights[MAX_LIGHTMAP_SIZE];
 
 /*
 
@@ -949,4 +961,17 @@ static inline pixel_t palette_to_pixel (byte c)
 }
 
 #endif
+
+static inline unsigned light_bis_channel (unsigned ti)
+{
+	int t = (int)ti;
+	if (t < 0)
+		t = 0;
+	t = (255*256 - t) >> (8 - VID_CBITS);
+
+	if (t < (1 << 6))
+		t = (1 << 6);
+
+	return (unsigned) t;
+}
 
