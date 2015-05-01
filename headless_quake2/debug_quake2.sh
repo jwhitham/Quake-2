@@ -8,5 +8,5 @@ export REFDATA=$PWD/ref.dat
 #export FRAMEDATA=$PWD/debug.dat
 
 linux/setup_links $DEBUG_OR_RELEASE $ARCH
-gdb --args ./quake2  +game q2dq2 +set vid_ref headless
+gdb -x run --args ./quake2  +game q2dq2 +set vid_ref headless
 

@@ -64,6 +64,10 @@ typedef struct blocklight_s {
 	unsigned b;
 } blocklight_t;
 
+typedef struct dlightadj_s {
+	fixed8_t b;
+} lightadj_t;
+
 #define MAX_LIGHTMAP_SIZE	1024 // allow some very large lightmaps
 
 extern blocklight_t blocklights[MAX_LIGHTMAP_SIZE];
@@ -345,7 +349,7 @@ typedef struct
 	pixel_t         *surfdat;       // destination for generated surface
 	int                     rowpixels;       // destination logical width in pixels
 	msurface_t      *surf;          // description for surface to generate
-	fixed8_t        dlightadj[MAXLIGHTMAPS];
+	lightadj_t		dlightadj[MAXLIGHTMAPS];
 							// adjust for lightmap levels for dynamic lighting
 	image_t			*image;
 	int                     surfmip;        // mipmapped ratio of surface texels / world pixels
@@ -381,12 +385,11 @@ typedef struct clipplane_s
 	byte            reserved[2];
 } clipplane_t;
 
-
 typedef struct surfcache_s
 {
 	struct surfcache_s      *next;
 	struct surfcache_s      **owner;                // NULL is an empty chunk of memory
-	int                                     lightadj[MAXLIGHTMAPS]; // checked for strobe flush
+	lightadj_t                      lightadj[MAXLIGHTMAPS]; // checked for strobe flush
 	int                                     dlight;
 	int                                     size;           // including header
 	unsigned                        width;
