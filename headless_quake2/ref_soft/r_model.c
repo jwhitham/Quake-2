@@ -308,11 +308,11 @@ void Mod_LoadLighting (lump_t *l)
 	for (i=0 ; i<size ; i++, in+=3)
 	{
 		if (in[0] > in[1] && in[0] > in[2])
-			loadmodel->lightdata[i] = in[0];
+			loadmodel->lightdata[i].b = in[0];
 		else if (in[1] > in[0] && in[1] > in[2])
-			loadmodel->lightdata[i] = in[1];
+			loadmodel->lightdata[i].b = in[1];
 		else
-			loadmodel->lightdata[i] = in[2];
+			loadmodel->lightdata[i].b = in[2];
 	}
 }
 

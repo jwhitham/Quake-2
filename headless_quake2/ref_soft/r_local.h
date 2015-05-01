@@ -68,6 +68,10 @@ typedef struct dlightadj_s {
 	fixed8_t b;
 } lightadj_t;
 
+typedef union lightdata_s {
+	byte b;
+} lightdata_t;
+
 #define MAX_LIGHTMAP_SIZE	1024 // allow some very large lightmaps
 
 extern blocklight_t blocklights[MAX_LIGHTMAP_SIZE];
