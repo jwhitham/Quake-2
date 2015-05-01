@@ -23,14 +23,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 drawsurf_t	r_drawsurf;
 
-bl_item_t		lightleft, lightright, lightleftstep, lightrightstep;
-int				sourcesstep, blocksize, sourcetstep;
-int				blockdivshift;
+int				lightleft, sourcesstep, blocksize, sourcetstep;
+int				lightdelta, lightdeltastep;
+int				lightright, lightleftstep, lightrightstep, blockdivshift;
 unsigned		blockdivmask;
 void			*prowdestbase;
 pixel_t      	*pbasesource;
 int				surfrowbytes;	// used by ASM files
-bl_item_t		*r_lightptr;
+unsigned		*r_lightptr;
 int				r_stepback;
 int				r_lightwidth;
 int				r_numhblocks, r_numvblocks;
@@ -49,6 +49,7 @@ static void	(*surfmiptable[4])(void) = {
 };
 
 void R_BuildLightMap (void);
+extern	unsigned		blocklights[1024];	// allow some very large lightmaps
 
 float           surfscale;
 qboolean        r_cache_thrash;         // set if surface cache is thrashing
@@ -143,8 +144,10 @@ void R_DrawSurface (void)
 
 	for (u=0 ; u<r_numhblocks; u++)
 	{
-		r_lightptr = blocklights_g + u;
+		r_lightptr = blocklights + u;
+
 		prowdestbase = pcolumndest;
+
 		pbasesource = basetptr + soffset;
 
 		(*pblockdrawer)();

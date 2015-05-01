@@ -115,21 +115,21 @@ void Draw_Char (int x, int y, int num)
 
 	while (drawline--)
 	{
-		if (source[0] != TRANSPARENT_COLOR)
+		if (source[0].c != TRANSPARENT_COLOR)
 			dest[0] = source[0];
-		if (source[1] != TRANSPARENT_COLOR)
+		if (source[1].c != TRANSPARENT_COLOR)
 			dest[1] = source[1];
-		if (source[2] != TRANSPARENT_COLOR)
+		if (source[2].c != TRANSPARENT_COLOR)
 			dest[2] = source[2];
-		if (source[3] != TRANSPARENT_COLOR)
+		if (source[3].c != TRANSPARENT_COLOR)
 			dest[3] = source[3];
-		if (source[4] != TRANSPARENT_COLOR)
+		if (source[4].c != TRANSPARENT_COLOR)
 			dest[4] = source[4];
-		if (source[5] != TRANSPARENT_COLOR)
+		if (source[5].c != TRANSPARENT_COLOR)
 			dest[5] = source[5];
-		if (source[6] != TRANSPARENT_COLOR)
+		if (source[6].c != TRANSPARENT_COLOR)
 			dest[6] = source[6];
-		if (source[7] != TRANSPARENT_COLOR)
+		if (source[7].c != TRANSPARENT_COLOR)
 			dest[7] = source[7];
 		source += 128;
 		dest += vid.rowpixels;
@@ -297,7 +297,7 @@ void Draw_Pic (int x, int y, char *name)
 			for (v=0 ; v<height ; v++)
 			{
 				for (u=0 ; u<pic->width ; u++)
-					if ( (tpixel=source[u]) != TRANSPARENT_COLOR)
+					if ( (tpixel=source[u]).c != TRANSPARENT_COLOR)
 						dest[u] = tpixel;
 
 				dest += vid.rowpixels;
@@ -310,21 +310,21 @@ void Draw_Pic (int x, int y, char *name)
 			{
 				for (u=0 ; u<pic->width ; u+=8)
 				{
-					if ( (tpixel=source[u]) != TRANSPARENT_COLOR)
+					if ( (tpixel=source[u]).c != TRANSPARENT_COLOR)
 						dest[u] = tpixel;
-					if ( (tpixel=source[u+1]) != TRANSPARENT_COLOR)
+					if ( (tpixel=source[u+1]).c != TRANSPARENT_COLOR)
 						dest[u+1] = tpixel;
-					if ( (tpixel=source[u+2]) != TRANSPARENT_COLOR)
+					if ( (tpixel=source[u+2]).c != TRANSPARENT_COLOR)
 						dest[u+2] = tpixel;
-					if ( (tpixel=source[u+3]) != TRANSPARENT_COLOR)
+					if ( (tpixel=source[u+3]).c != TRANSPARENT_COLOR)
 						dest[u+3] = tpixel;
-					if ( (tpixel=source[u+4]) != TRANSPARENT_COLOR)
+					if ( (tpixel=source[u+4]).c != TRANSPARENT_COLOR)
 						dest[u+4] = tpixel;
-					if ( (tpixel=source[u+5]) != TRANSPARENT_COLOR)
+					if ( (tpixel=source[u+5]).c != TRANSPARENT_COLOR)
 						dest[u+5] = tpixel;
-					if ( (tpixel=source[u+6]) != TRANSPARENT_COLOR)
+					if ( (tpixel=source[u+6]).c != TRANSPARENT_COLOR)
 						dest[u+6] = tpixel;
-					if ( (tpixel=source[u+7]) != TRANSPARENT_COLOR)
+					if ( (tpixel=source[u+7]).c != TRANSPARENT_COLOR)
 						dest[u+7] = tpixel;
 				}
 				dest += vid.rowpixels;
@@ -415,7 +415,7 @@ void Draw_Fill (int x, int y, int w, int h, int c)
 	dest = vid.buffer + y*vid.rowpixels + x;
 	for (v=0 ; v<h ; v++, dest += vid.rowpixels)
 		for (u=0 ; u<w ; u++)
-			dest[u] = c;
+			dest[u].c = c;
 }
 //=============================================================================
 
@@ -439,7 +439,7 @@ void Draw_FadeScreen (void)
 		for (x=0 ; x<vid.width ; x++)
 		{
 			if ((x & 3) != t)
-				pbuf[x] = 0;
+				pbuf[x].c = 0;
 		}
 	}
 }

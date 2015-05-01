@@ -197,6 +197,7 @@ void	R_InitTextures (void)
 {
 	int		x,y, m;
 	pixel_t *dest;
+	pixel_t black, undef;
 	
 // create a simple checkerboard texture for the default
 	r_notexture_mip = (image_t *)&r_notexture_buffer;
@@ -206,6 +207,9 @@ void	R_InitTextures (void)
 	r_notexture_mip->pixels[1] = r_notexture_mip->pixels[0] + 16*16;
 	r_notexture_mip->pixels[2] = r_notexture_mip->pixels[1] + 8*8;
 	r_notexture_mip->pixels[3] = r_notexture_mip->pixels[2] + 4*4;
+
+	black = palette_to_pixel (0x00);
+	undef = palette_to_pixel (0xff);
 	
 	for (m=0 ; m<4 ; m++)
 	{
@@ -215,9 +219,9 @@ void	R_InitTextures (void)
 			{
 				if (  (y< (8>>m) ) ^ (x< (8>>m) ) )
 
-					*dest++ = 0;
+					*dest++ = black;
 				else
-					*dest++ = 0xff;
+					*dest++ = undef;
 			}
 	}	
 }
@@ -358,12 +362,15 @@ void R_Shutdown (void)
 		sc_base = NULL;
 	}
 
+#ifdef COLOR_32
+#else
 	// free colormap
 	if (vid.colormap)
 	{
 		free (vid.colormap);
 		vid.colormap = NULL;
 	}
+#endif
 	R_UnRegister ();
 	Mod_FreeAll ();
 	R_ShutdownImages ();
@@ -1175,6 +1182,9 @@ void R_CinematicSetPalette( const unsigned char *palette )
 	byte palette32[1024];
 	int		i, j, w;
 	pixel_t *d;
+	pixel_t black;
+
+	black.c = 0;
 
 	// clear screen to black to avoid any palette flash
 	w = vid.rowpixels;	// stupid negative pitch win32 stuff...
@@ -1182,7 +1192,7 @@ void R_CinematicSetPalette( const unsigned char *palette )
 	{
 		d = (vid.buffer + i*vid.rowpixels);
 		for (j=0 ; j<w ; j++)
-			d[j] = 0;
+			d[j] = black;
 	}
 	// flush it to the screen
 	SWimp_EndFrame ();
@@ -1321,15 +1331,14 @@ Draw_GetPalette
 */
 void Draw_GetPalette (void)
 {
-	byte	*pal, *out;
+	byte	*pal, *out, *tmp;
 	int		i;
 	int		r, g, b;
 
 	// get the palette and colormap
-	LoadPCX ("pics/colormap.pcx", (byte **) &vid.colormap, &pal, NULL, NULL); // XXX TODO THIS IS WRONG CAST
-	if (!vid.colormap)
+	LoadPCX ("pics/colormap.pcx", &tmp, &pal, NULL, NULL);
+	if (!tmp)
 		ri.Sys_Error (ERR_FATAL, "Couldn't load pics/colormap.pcx");
-	vid.alphamap = vid.colormap + 64*256;
 
 	out = (byte *)d_8to24table;
 	for (i=0 ; i<256 ; i++, out+=4)
@@ -1343,13 +1352,22 @@ void Draw_GetPalette (void)
         out[2] = b;
 
 #ifdef COLOR_32
-		d_8topixel[i] = rgb_to_pixel (r, g, b);
+		d_8topixel[i].c = 0;
+		d_8topixel[i].rgb.r = r;
+		d_8topixel[i].rgb.g = g;
+		d_8topixel[i].rgb.b = b;
 #else
-		d_8topixel[i] = i;
+		d_8topixel[i].c = i;
 #endif
 	}
 
 	free (pal);
+#ifdef COLOR_32
+	free (tmp);
+#else
+	vid.colormap = (pixel_t *) tmp;
+	vid.alphamap = vid.colormap + 64*256;
+#endif
 }
 
 struct image_s *R_RegisterSkin (char *name);

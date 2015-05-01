@@ -433,16 +433,15 @@ static image_t *GL_LoadPic (char *name, byte *pic, byte *palette, int width, int
 		x = pic[i];
 		if (x == 255) {
 			image->transparent = true;
-			image->pixels[0][i] = TRANSPARENT_COLOR;
+			image->pixels[0][i].c = TRANSPARENT_COLOR;
 		} else {
 #ifdef COLOR_32
-			byte r = palette[x*3+0];
-			byte g = palette[x*3+1];
-			byte b = palette[x*3+2];
-
-			image->pixels[0][i] = rgb_to_pixel (r, g, b);
+			image->pixels[0][i].c = 0;
+			image->pixels[0][i].rgb.r = palette[x*3+0];
+			image->pixels[0][i].rgb.g = palette[x*3+1];
+			image->pixels[0][i].rgb.b = palette[x*3+2];
 #else
-			image->pixels[0][i] = x;
+			image->pixels[0][i].c = x;
 #endif
 		}
 	}

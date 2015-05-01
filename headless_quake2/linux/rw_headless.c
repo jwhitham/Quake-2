@@ -133,29 +133,29 @@ void SWimp_EndFrame (void)
         goto fast;
     }
 
-    crc = crc32_8bytes (vid.buffer, WIDTH * HEIGHT, 0);
+    crc = crc32_8bytes (vid.buffer, WIDTH * HEIGHT * sizeof (pixel_t), 0);
 
     if (crc_file) {
         fprintf (crc_file, "%08x\n", crc);
     }
     if (frames_file) {
         fwrite (frames_palette, sizeof (frames_palette), 1, frames_file);
-        fwrite (vid.buffer, WIDTH * HEIGHT, 1, frames_file);
+        fwrite (vid.buffer, WIDTH * HEIGHT, sizeof (pixel_t), frames_file);
     }
     if ((curframe & 31) == 0) {
         printf ("headless: %u frames\n", curframe);
         fflush (crc_file);
     }
     if (ref_file) {
-        unsigned char buf[WIDTH * HEIGHT];
+        pixel_t buf[WIDTH * HEIGHT];
         unsigned i, error, pos;
 
         fseek (ref_file, sizeof (frames_palette), SEEK_CUR);
-        if (fread (buf, WIDTH * HEIGHT, 1, ref_file) != 1) {
+        if (fread (buf, WIDTH * HEIGHT * sizeof (pixel_t), 1, ref_file) != 1) {
             Sys_Error ("unable to read from reference file");
         }
         for (error = i = pos = 0; i < (WIDTH * HEIGHT); i++) {
-            if (buf[i] != vid.buffer[i]) {
+            if (buf[i].c != vid.buffer[i].c) {
                 if (!error) {
                     pos = i;
                 }

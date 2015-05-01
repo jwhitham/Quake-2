@@ -289,7 +289,7 @@ byte	*mod_base;
 Mod_LoadLighting
 
 Converts the 24 bit lighting down to 8 bit
-by taking the brightest component, unless COLOR_32 is defined
+by taking the brightest component
 =================
 */
 void Mod_LoadLighting (lump_t *l)
@@ -302,13 +302,6 @@ void Mod_LoadLighting (lump_t *l)
 		loadmodel->lightdata = NULL;
 		return;
 	}
-#ifdef COLOR_32
-	i = size = l->filelen;
-	(void) i;
-	loadmodel->lightdata = Hunk_Alloc (size);
-	in = (void *)(mod_base + l->fileofs);
-	memcpy (loadmodel->lightdata, in, size);
-#else
 	size = l->filelen/3;
 	loadmodel->lightdata = Hunk_Alloc (size);
 	in = (void *)(mod_base + l->fileofs);
@@ -321,7 +314,6 @@ void Mod_LoadLighting (lump_t *l)
 		else
 			loadmodel->lightdata[i] = in[2];
 	}
-#endif
 }
 
 
@@ -640,8 +632,8 @@ void Mod_LoadFaces (lump_t *l)
 		if (i == -1)
 			out->samples = NULL;
 		else
-			out->samples = loadmodel->lightdata + convert_lighting (i);
-
+			out->samples = loadmodel->lightdata + i/3;
+		
 	// set the drawing flags flag
 		
 		if (!out->texinfo->image)

@@ -73,8 +73,6 @@ void D_Patch (void)
 D_ViewChanged
 ================
 */
-pixel_t *alias_colormap;
-
 void D_ViewChanged (void)
 {
 	int		i;
@@ -115,8 +113,6 @@ void D_ViewChanged (void)
 		memset( d_pzbuffer, 0xff, vid.width * vid.height * sizeof( d_pzbuffer[0] ) );
 		Draw_Fill( r_newrefdef.x, r_newrefdef.y, r_newrefdef.width, r_newrefdef.height,( int ) sw_clearcolor->value & 0xff );
 	}
-
-	alias_colormap = vid.colormap;
 
 	D_Patch ();
 }

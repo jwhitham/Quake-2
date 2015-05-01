@@ -1112,11 +1112,11 @@ R_PolysetFillSpans8
 */
 void R_PolysetFillSpans8 (spanpackage_t *pspanpackage)
 {
-	int				color;
+	pixel_t color;
 
 // FIXME: do z buffering
 
-	color = d_aflatcolor++;
+	color = palette_to_pixel (d_aflatcolor++);
 
 	while (1)
 	{

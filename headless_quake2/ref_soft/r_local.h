@@ -41,9 +41,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define ROLL    2
 
 #ifdef COLOR_32
-typedef uint32_t pixel_t;
+typedef union pixel_s {
+	uint32_t c;
+	struct {
+		byte b, g, r, padding;
+	} rgb;
+} pixel_t;
+#define TRANSPARENT_COLOR ((uint32_t) 0xffffffffU)
 #else
-typedef uint8_t pixel_t;
+typedef union pixel_s {
+	byte c;
+} pixel_t;
+#define TRANSPARENT_COLOR ((byte) 0xff)
 #endif
 
 
@@ -91,8 +100,11 @@ typedef struct vrect_s
 typedef struct
 {
 	pixel_t                 *buffer;                // invisible buffer
+#ifdef COLOR_32
+#else
 	pixel_t                 *colormap;              // 256 * VID_GRADES size
 	pixel_t                 *alphamap;              // 256 * 256 translucency map
+#endif
 	int                             rowpixels;               // may be > width if displayed in a window
 									// can be negative for stupid dibs
 	int						width;          
@@ -183,10 +195,6 @@ extern oldrefdef_t      r_refdef;
 
 
 #define PARTICLE_Z_CLIP 8.0
-
-// !!! must be kept the same as in quakeasm.h !!!
-#define TRANSPARENT_COLOR       ((pixel_t) (~0))
-
 
 // !!! if this is changed, it must be changed in d_ifacea.h too !!!
 #define TURB_TEX_SIZE   64              // base turbulent texture size
@@ -860,17 +868,8 @@ void		SWimp_AppActivate( qboolean active );
 
 ====================================================================
 */
-
-typedef unsigned bl_item_t;
-#define MAX_LIGHTMAP_SIZE 1024
-
 #ifdef COLOR_32
 // 32-BIT COLOR
-static inline pixel_t rgb_to_pixel (byte r, byte g, byte b)
-{
-	return (r << 16) | (g << 8) | b;
-}
-
 static inline pixel_t palette_to_pixel (byte c)
 {
 	return d_8topixel[c];
@@ -897,12 +896,13 @@ static inline byte apply_lighting_channel (uint16_t light, byte c)
 	
 static inline pixel_t apply_lighting (uint16_t light, pixel_t pix)
 {
-	byte r, g, b;
+	pixel_t p;
 
-	r = apply_lighting_channel (light, pix >> 16);
-	g = apply_lighting_channel (light, pix >> 8);
-	b = apply_lighting_channel (light, pix >> 0);
-	return rgb_to_pixel (r, g, b);
+	p.c = 0;
+	p.rgb.r = apply_lighting_channel (light, pix.rgb.r);
+	p.rgb.g = apply_lighting_channel (light, pix.rgb.g);
+	p.rgb.b = apply_lighting_channel (light, pix.rgb.b);
+	return p;
 }
 
 static inline byte apply_alpha_channel (byte mix33, byte mix66)
@@ -919,48 +919,34 @@ static inline byte apply_alpha_channel (byte mix33, byte mix66)
 
 static inline pixel_t apply_alpha (pixel_t mix33, pixel_t mix66)
 {
-	byte r, g, b;
+	pixel_t p;
 
-	r = apply_alpha_channel (mix33 >> 16, mix66 >> 16);
-	g = apply_alpha_channel (mix33 >> 8,  mix66 >> 8);
-	b = apply_alpha_channel (mix33 >> 0,  mix66 >> 0);
-
-	return rgb_to_pixel (r, g, b);		
+	p.c = 0;
+	p.rgb.r = apply_alpha_channel (mix33.rgb.r, mix66.rgb.r);
+	p.rgb.g = apply_alpha_channel (mix33.rgb.g, mix66.rgb.g);
+	p.rgb.b = apply_alpha_channel (mix33.rgb.b, mix66.rgb.b);
+	return p;
 }
-
-static inline int convert_lighting (int i)
-{
-	return i;
-}
-
-extern bl_item_t blocklights_r[MAX_LIGHTMAP_SIZE];
-extern bl_item_t blocklights_g[MAX_LIGHTMAP_SIZE];
-extern bl_item_t blocklights_b[MAX_LIGHTMAP_SIZE];
-
 #else
 // 8-BIT COLOR
 static inline pixel_t apply_lighting (int light, pixel_t pix)
 {
-	return ((unsigned char *)vid.colormap)[(light & 0xFF00) + pix];
+	pixel_t p;
+	p.c = ((unsigned char *)vid.colormap)[(light & 0xFF00) + pix.c];
+	return p;
 }
 
 static inline pixel_t apply_alpha (pixel_t mix33, pixel_t mix66)
 {
-	return vid.alphamap[mix33 + mix66*256];
+	return vid.alphamap[mix33.c + mix66.c*256];
 }
 
 static inline pixel_t palette_to_pixel (byte c)
 {
-	return c;
+	pixel_t p;
+	p.c = c;
+	return p;
 }
-
-static inline int convert_lighting (int i)
-{
-	// lighting info is converted from 24 bit on disk to 8 bit
-	return i/3;
-}
-
-extern bl_item_t blocklights[MAX_LIGHTMAP_SIZE];
 
 #endif
 
