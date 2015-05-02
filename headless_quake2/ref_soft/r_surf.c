@@ -27,8 +27,8 @@ int				lightleft, sourcesstep, blocksize, sourcetstep;
 int				lightdelta, lightdeltastep;
 int				lightright, lightleftstep, lightrightstep, blockdivshift;
 unsigned		blockdivmask;
-void			*prowdestbase;
-pixel_t      	*pbasesource;
+pixel_t			*prowdestbase;
+pixel_t			*pbasesource;
 int				surfrowbytes;	// used by ASM files
 blocklight_t	*r_lightptr;
 int				r_stepback;
@@ -55,6 +55,30 @@ qboolean        r_cache_thrash;         // set if surface cache is thrashing
 
 int         sc_size;
 surfcache_t	*sc_rover, *sc_base;
+
+
+#ifdef COLOR_32
+static inline int get_light_channel (int offset)
+{
+	return r_lightptr[offset].r;
+}
+
+static inline void surf_apply_lighting (byte * dest, byte * src, int light)
+{
+	(* dest) = apply_lighting_channel (light, (* src));
+}
+
+#else
+static inline int get_light_channel (int offset)
+{
+	return r_lightptr[offset].c;
+}
+
+static inline void surf_apply_lighting (byte * dest, byte * src, int light)
+{
+	(* dest) = ((unsigned char *)vid.colormap)[(light & 0xFF00) + (* src)];
+}
+#endif
 
 /*
 ===============
@@ -146,10 +170,24 @@ void R_DrawSurface (void)
 		r_lightptr = blocklights + u;
 
 		prowdestbase = pcolumndest;
+		pbasesource = (basetptr + soffset);
 
-		pbasesource = basetptr + soffset;
+#ifdef COLOR_32
+		{
+			int i;
+			// Do each channel in three separate passes,
+			// moving the pointers by one unit between passes
+			for (i = 0; i < 3; i++) {
+				(*pblockdrawer)();
+				prowdestbase = (pixel_t *) (((byte *) prowdestbase) + 1);
+				pbasesource = (pixel_t *) (((byte *) pbasesource) + 1);
+				r_lightptr = (blocklight_t *) (((byte *) r_lightptr) + 4);
+			}
+		}
 
+#else
 		(*pblockdrawer)();
+#endif
 
 		soffset = soffset + blocksize;
 		if (soffset >= smax)
@@ -172,7 +210,7 @@ R_DrawSurfaceBlock8_mip0
 void R_DrawSurfaceBlock8_mip0 (void)
 {
 	int				v, i, b, lightstep, lighttemp, light;
-	pixel_t      	pix, *psource, *prowdest;
+	pixel_t      	*psource, *prowdest;
 
 	psource = pbasesource;
 	prowdest = prowdestbase;
@@ -181,11 +219,11 @@ void R_DrawSurfaceBlock8_mip0 (void)
 	{
 	// FIXME: make these locals?
 	// FIXME: use delta rather than both right and left, like ASM?
-		lightleft = r_lightptr[0].c;
-		lightright = r_lightptr[1].c;
+		lightleft = get_light_channel (0);
+		lightright = get_light_channel (1);
 		r_lightptr += r_lightwidth;
-		lightleftstep = (r_lightptr[0].c - lightleft) >> 4;
-		lightrightstep = (r_lightptr[1].c - lightright) >> 4;
+		lightleftstep = (get_light_channel (0) - lightleft) >> 4;
+		lightrightstep = (get_light_channel (1) - lightright) >> 4;
 
 		for (i=0 ; i<16 ; i++)
 		{
@@ -196,8 +234,7 @@ void R_DrawSurfaceBlock8_mip0 (void)
 
 			for (b=15; b>=0; b--)
 			{
-				pix = psource[b];
-				prowdest[b] = apply_lighting (light, pix);
+				surf_apply_lighting ((byte *) &prowdest[b], (byte *) &psource[b], light);
 				light += lightstep;
 			}
 	
@@ -221,7 +258,7 @@ R_DrawSurfaceBlock8_mip1
 void R_DrawSurfaceBlock8_mip1 (void)
 {
 	int				v, i, b, lightstep, lighttemp, light;
-	pixel_t			pix, *psource, *prowdest;
+	pixel_t			*psource, *prowdest;
 
 	psource = pbasesource;
 	prowdest = prowdestbase;
@@ -230,11 +267,11 @@ void R_DrawSurfaceBlock8_mip1 (void)
 	{
 	// FIXME: make these locals?
 	// FIXME: use delta rather than both right and left, like ASM?
-		lightleft = r_lightptr[0].c;
-		lightright = r_lightptr[1].c;
+		lightleft = get_light_channel (0);
+		lightright = get_light_channel (1);
 		r_lightptr += r_lightwidth;
-		lightleftstep = (r_lightptr[0].c - lightleft) >> 3;
-		lightrightstep = (r_lightptr[1].c - lightright) >> 3;
+		lightleftstep = (get_light_channel (0) - lightleft) >> 3;
+		lightrightstep = (get_light_channel (1) - lightright) >> 3;
 
 		for (i=0 ; i<8 ; i++)
 		{
@@ -245,8 +282,7 @@ void R_DrawSurfaceBlock8_mip1 (void)
 
 			for (b=7; b>=0; b--)
 			{
-				pix = psource[b];
-				prowdest[b] = apply_lighting (light, pix);
+				surf_apply_lighting ((byte *) &prowdest[b], (byte *) &psource[b], light);
 				light += lightstep;
 			}
 	
@@ -270,7 +306,7 @@ R_DrawSurfaceBlock8_mip2
 void R_DrawSurfaceBlock8_mip2 (void)
 {
 	int				v, i, b, lightstep, lighttemp, light;
-	pixel_t			pix, *psource, *prowdest;
+	pixel_t			*psource, *prowdest;
 
 	psource = pbasesource;
 	prowdest = prowdestbase;
@@ -279,11 +315,11 @@ void R_DrawSurfaceBlock8_mip2 (void)
 	{
 	// FIXME: make these locals?
 	// FIXME: use delta rather than both right and left, like ASM?
-		lightleft = r_lightptr[0].c;
-		lightright = r_lightptr[1].c;
+		lightleft = get_light_channel (0);
+		lightright = get_light_channel (1);
 		r_lightptr += r_lightwidth;
-		lightleftstep = (r_lightptr[0].c - lightleft) >> 2;
-		lightrightstep = (r_lightptr[1].c - lightright) >> 2;
+		lightleftstep = (get_light_channel (0) - lightleft) >> 2;
+		lightrightstep = (get_light_channel (1) - lightright) >> 2;
 
 		for (i=0 ; i<4 ; i++)
 		{
@@ -294,8 +330,7 @@ void R_DrawSurfaceBlock8_mip2 (void)
 
 			for (b=3; b>=0; b--)
 			{
-				pix = psource[b];
-				prowdest[b] = apply_lighting (light, pix);
+				surf_apply_lighting ((byte *) &prowdest[b], (byte *) &psource[b], light);
 				light += lightstep;
 			}
 	
@@ -319,7 +354,7 @@ R_DrawSurfaceBlock8_mip3
 void R_DrawSurfaceBlock8_mip3 (void)
 {
 	int				v, i, b, lightstep, lighttemp, light;
-	pixel_t			pix, *psource, *prowdest;
+	pixel_t			*psource, *prowdest;
 
 	psource = pbasesource;
 	prowdest = prowdestbase;
@@ -328,11 +363,11 @@ void R_DrawSurfaceBlock8_mip3 (void)
 	{
 	// FIXME: make these locals?
 	// FIXME: use delta rather than both right and left, like ASM?
-		lightleft = r_lightptr[0].c;
-		lightright = r_lightptr[1].c;
+		lightleft = get_light_channel (0);
+		lightright = get_light_channel (1);
 		r_lightptr += r_lightwidth;
-		lightleftstep = (r_lightptr[0].c - lightleft) >> 1;
-		lightrightstep = (r_lightptr[1].c - lightright) >> 1;
+		lightleftstep = (get_light_channel (0) - lightleft) >> 1;
+		lightrightstep = (get_light_channel (1) - lightright) >> 1;
 
 		for (i=0 ; i<2 ; i++)
 		{
@@ -343,8 +378,7 @@ void R_DrawSurfaceBlock8_mip3 (void)
 
 			for (b=1; b>=0; b--)
 			{
-				pix = psource[b];
-				prowdest[b] = apply_lighting (light, pix);
+				surf_apply_lighting ((byte *) &prowdest[b], (byte *) &psource[b], light);
 				light += lightstep;
 			}
 	

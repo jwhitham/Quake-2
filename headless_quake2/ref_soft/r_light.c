@@ -200,7 +200,7 @@ int RecursiveLightPoint (mnode_t *node, vec3_t start, vec3_t end)
 					maps++)
 			{
 #ifdef COLOR_32
-				vec3_t scale[3];
+				vec3_t scale;
 				int i;
 
 				for (i=0 ; i<3 ; i++) {
