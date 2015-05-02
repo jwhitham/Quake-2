@@ -50,6 +50,18 @@ typedef union pixel_s {
 
 #define TRANSPARENT_COLOR ((uint32_t) 0xffffffffU)
 
+typedef struct blocklight_s {
+	unsigned r, g, b;
+} blocklight_t;
+
+typedef struct dlightadj_s {
+	fixed8_t r, g, b;
+} lightadj_t;
+
+typedef union lightdata_s {
+	byte r, g, b;
+} lightdata_t;
+
 #else
 
 typedef union pixel_s {
@@ -58,19 +70,19 @@ typedef union pixel_s {
 
 #define TRANSPARENT_COLOR ((byte) 0xff)
 
-#endif
-
 typedef struct blocklight_s {
-	unsigned b;
+	unsigned c;
 } blocklight_t;
 
 typedef struct dlightadj_s {
-	fixed8_t b;
+	fixed8_t c;
 } lightadj_t;
 
 typedef union lightdata_s {
-	byte b;
+	byte c;
 } lightdata_t;
+
+#endif
 
 #define MAX_LIGHTMAP_SIZE	1024 // allow some very large lightmaps
 
@@ -887,6 +899,37 @@ void		SWimp_AppActivate( qboolean active );
 
 ====================================================================
 */
+
+static inline unsigned light_bis_channel (unsigned ti)
+{
+	int t = (int)ti;
+	if (t < 0)
+		t = 0;
+	t = (255*256 - t) >> (8 - VID_CBITS);
+
+	if (t < (1 << 6))
+		t = (1 << 6);
+
+	return (unsigned) t;
+}
+
+static inline void blocklight_add_dynamic_channel
+	(unsigned * c, int negativeLight, float dist, float minlight, float addend)
+{
+	if(!negativeLight)
+	{
+		if (dist < minlight)
+			c[0] += addend;
+	}
+	else
+	{
+		if (dist < minlight)
+			c[0] -= addend;
+		if(c[0] < minlight)
+			c[0] = minlight;
+	}
+}
+
 #ifdef COLOR_32
 // 32-BIT COLOR
 static inline pixel_t palette_to_pixel (byte c)
@@ -946,6 +989,29 @@ static inline pixel_t apply_alpha (pixel_t mix33, pixel_t mix66)
 	p.rgb.b = apply_alpha_channel (mix33.rgb.b, mix66.rgb.b);
 	return p;
 }
+
+static inline lightadj_t lightstyle_to_lightadj (lightstyle_t s)
+{
+	lightadj_t l;
+	l.r = s.rgb[0] * 128;
+	l.g = s.rgb[1] * 128;
+	l.b = s.rgb[2] * 128;
+	return l;
+}
+
+static inline int lightadj_eq (lightadj_t l, lightadj_t r)
+{
+	return l.g == r.g && l.b == r.b && l.r == r.r;
+}
+
+static inline void blocklight_add_dynamic
+	(unsigned index, int negativeLight, float dist, float minlight, float addend)
+{
+	blocklight_add_dynamic_channel (&blocklights[index].r, negativeLight, dist, minlight, addend);
+	blocklight_add_dynamic_channel (&blocklights[index].g, negativeLight, dist, minlight, addend);
+	blocklight_add_dynamic_channel (&blocklights[index].b, negativeLight, dist, minlight, addend);
+}
+
 #else
 // 8-BIT COLOR
 static inline pixel_t apply_lighting (int light, pixel_t pix)
@@ -967,47 +1033,23 @@ static inline pixel_t palette_to_pixel (byte c)
 	return p;
 }
 
-#endif
-
-static inline unsigned light_bis_channel (unsigned ti)
-{
-	int t = (int)ti;
-	if (t < 0)
-		t = 0;
-	t = (255*256 - t) >> (8 - VID_CBITS);
-
-	if (t < (1 << 6))
-		t = (1 << 6);
-
-	return (unsigned) t;
-}
-
 static inline lightadj_t lightstyle_to_lightadj (lightstyle_t s)
 {
 	lightadj_t l;
-	l.b = s.white * 128;
+	l.c = s.white * 128;
 	return l;
 }
 
 static inline int lightadj_eq (lightadj_t l, lightadj_t r)
 {
-	return l.b == r.b;
+	return l.c == r.c;
 }
 
 static inline void blocklight_add_dynamic
 	(unsigned index, int negativeLight, float dist, float minlight, float addend)
 {
-	if(!negativeLight)
-	{
-		if (dist < minlight)
-			blocklights[index].b += addend;
-	}
-	else
-	{
-		if (dist < minlight)
-			blocklights[index].b -= addend;
-		if(blocklights[index].b < minlight)
-			blocklights[index].b = minlight;
-	}
+	blocklight_add_dynamic_channel (&blocklights[index].c, negativeLight, dist, minlight, addend);
 }
+
+#endif
 

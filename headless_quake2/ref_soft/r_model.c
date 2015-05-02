@@ -303,16 +303,22 @@ void Mod_LoadLighting (lump_t *l)
 		return;
 	}
 	size = l->filelen/3;
-	loadmodel->lightdata = Hunk_Alloc (size);
+	loadmodel->lightdata = Hunk_Alloc (size * sizeof (lightdata_t));
 	in = (void *)(mod_base + l->fileofs);
 	for (i=0 ; i<size ; i++, in+=3)
 	{
+#ifdef COLOR_32
+		loadmodel->lightdata[i].r = in[0];
+		loadmodel->lightdata[i].g = in[1];
+		loadmodel->lightdata[i].b = in[2];
+#else
 		if (in[0] > in[1] && in[0] > in[2])
-			loadmodel->lightdata[i].b = in[0];
+			loadmodel->lightdata[i].c = in[0];
 		else if (in[1] > in[0] && in[1] > in[2])
-			loadmodel->lightdata[i].b = in[1];
+			loadmodel->lightdata[i].c = in[1];
 		else
-			loadmodel->lightdata[i].b = in[2];
+			loadmodel->lightdata[i].c = in[2];
+#endif
 	}
 }
 

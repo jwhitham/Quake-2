@@ -128,9 +128,7 @@ int RecursiveLightPoint (mnode_t *node, vec3_t start, vec3_t end)
 	int			i;
 	mtexinfo_t	*tex;
 	lightdata_t	*lightmap;
-	float		*scales;
 	int			maps;
-	float		samp;
 	int			r;
 
 	if (node->contents != -1)
@@ -201,9 +199,25 @@ int RecursiveLightPoint (mnode_t *node, vec3_t start, vec3_t end)
 			for (maps = 0 ; maps < MAXLIGHTMAPS && surf->styles[maps] != 255 ;
 					maps++)
 			{
-				samp = (*lightmap).b * /* 0.5 * */ (1.0/255);	// adjust for gl scale
+#ifdef COLOR_32
+				vec3_t scale[3];
+				int i;
+
+				for (i=0 ; i<3 ; i++) {
+					scale[i] = r_newrefdef.lightstyles[surf->styles[maps]].rgb[i];
+				}
+
+				pointcolor[0] += (* lightmap).r * scale[0] * (1.0/255);
+				pointcolor[1] += (* lightmap).g * scale[1] * (1.0/255);
+				pointcolor[2] += (* lightmap).b * scale[2] * (1.0/255);
+
+#else
+				float	samp;
+				float	*scales;
+				samp = (*lightmap).c * /* 0.5 * */ (1.0/255);	// adjust for gl scale
 				scales = r_newrefdef.lightstyles[surf->styles[maps]].rgb;
 				VectorMA (pointcolor, samp, scales, pointcolor);
+#endif
 				lightmap += ((surf->extents[0]>>4)+1) *
 						((surf->extents[1]>>4)+1);
 			}
@@ -372,7 +386,6 @@ void R_BuildLightMap (void)
 	int			smax, tmax;
 	int			i, size;
 	lightdata_t *lightmap;
-	unsigned	scale;
 	int			maps;
 	msurface_t	*surf;
 
@@ -396,11 +409,25 @@ void R_BuildLightMap (void)
 		for (maps = 0 ; maps < MAXLIGHTMAPS && surf->styles[maps] != 255 ;
 			 maps++)
 		{
-			scale = r_drawsurf.dlightadj[maps].b;	// 8.8 fraction		
+#ifdef COLOR_32
+			unsigned rscale, gscale, bscale;
+			rscale = r_drawsurf.dlightadj[maps].r;	// 8.8 fraction		
+			gscale = r_drawsurf.dlightadj[maps].g;
+			bscale = r_drawsurf.dlightadj[maps].b;
 			for (i=0 ; i<size ; i++)
 			{
-				blocklights[i].b += lightmap[i].b * scale;
+				blocklights[i].r += lightmap[i].r * rscale;
+				blocklights[i].g += lightmap[i].g * gscale;
+				blocklights[i].b += lightmap[i].b * bscale;
 			}
+#else
+			unsigned scale;
+			scale = r_drawsurf.dlightadj[maps].c;	// 8.8 fraction		
+			for (i=0 ; i<size ; i++)
+			{
+				blocklights[i].c += lightmap[i].c * scale;
+			}
+#endif
 			lightmap += size;	// skip to next lightmap
 		}
 
@@ -411,7 +438,13 @@ void R_BuildLightMap (void)
 // bound, invert, and shift
 	for (i=0 ; i<size ; i++)
 	{
+#ifdef COLOR_32
+		blocklights[i].r = light_bis_channel (blocklights[i].r);
+		blocklights[i].g = light_bis_channel (blocklights[i].g);
 		blocklights[i].b = light_bis_channel (blocklights[i].b);
+#else
+		blocklights[i].c = light_bis_channel (blocklights[i].c);
+#endif
 	}
 }
 

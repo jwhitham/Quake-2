@@ -181,11 +181,11 @@ void R_DrawSurfaceBlock8_mip0 (void)
 	{
 	// FIXME: make these locals?
 	// FIXME: use delta rather than both right and left, like ASM?
-		lightleft = r_lightptr[0].b;
-		lightright = r_lightptr[1].b;
+		lightleft = r_lightptr[0].c;
+		lightright = r_lightptr[1].c;
 		r_lightptr += r_lightwidth;
-		lightleftstep = (r_lightptr[0].b - lightleft) >> 4;
-		lightrightstep = (r_lightptr[1].b - lightright) >> 4;
+		lightleftstep = (r_lightptr[0].c - lightleft) >> 4;
+		lightrightstep = (r_lightptr[1].c - lightright) >> 4;
 
 		for (i=0 ; i<16 ; i++)
 		{
@@ -230,11 +230,11 @@ void R_DrawSurfaceBlock8_mip1 (void)
 	{
 	// FIXME: make these locals?
 	// FIXME: use delta rather than both right and left, like ASM?
-		lightleft = r_lightptr[0].b;
-		lightright = r_lightptr[1].b;
+		lightleft = r_lightptr[0].c;
+		lightright = r_lightptr[1].c;
 		r_lightptr += r_lightwidth;
-		lightleftstep = (r_lightptr[0].b - lightleft) >> 3;
-		lightrightstep = (r_lightptr[1].b - lightright) >> 3;
+		lightleftstep = (r_lightptr[0].c - lightleft) >> 3;
+		lightrightstep = (r_lightptr[1].c - lightright) >> 3;
 
 		for (i=0 ; i<8 ; i++)
 		{
@@ -279,11 +279,11 @@ void R_DrawSurfaceBlock8_mip2 (void)
 	{
 	// FIXME: make these locals?
 	// FIXME: use delta rather than both right and left, like ASM?
-		lightleft = r_lightptr[0].b;
-		lightright = r_lightptr[1].b;
+		lightleft = r_lightptr[0].c;
+		lightright = r_lightptr[1].c;
 		r_lightptr += r_lightwidth;
-		lightleftstep = (r_lightptr[0].b - lightleft) >> 2;
-		lightrightstep = (r_lightptr[1].b - lightright) >> 2;
+		lightleftstep = (r_lightptr[0].c - lightleft) >> 2;
+		lightrightstep = (r_lightptr[1].c - lightright) >> 2;
 
 		for (i=0 ; i<4 ; i++)
 		{
@@ -328,11 +328,11 @@ void R_DrawSurfaceBlock8_mip3 (void)
 	{
 	// FIXME: make these locals?
 	// FIXME: use delta rather than both right and left, like ASM?
-		lightleft = r_lightptr[0].b;
-		lightright = r_lightptr[1].b;
+		lightleft = r_lightptr[0].c;
+		lightright = r_lightptr[1].c;
 		r_lightptr += r_lightwidth;
-		lightleftstep = (r_lightptr[0].b - lightleft) >> 1;
-		lightrightstep = (r_lightptr[1].b - lightright) >> 1;
+		lightleftstep = (r_lightptr[0].c - lightleft) >> 1;
+		lightrightstep = (r_lightptr[1].c - lightright) >> 1;
 
 		for (i=0 ; i<2 ; i++)
 		{
