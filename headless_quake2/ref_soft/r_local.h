@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-// #define COLOR_32 1
+#define COLOR_32 1
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,8 +58,8 @@ typedef struct dlightadj_s {
 	fixed8_t r, g, b;
 } lightadj_t;
 
-typedef union lightdata_s {
-	byte r, g, b;
+typedef struct lightdata_s {
+	byte b, g, r, padding;
 } lightdata_t;
 
 #else
