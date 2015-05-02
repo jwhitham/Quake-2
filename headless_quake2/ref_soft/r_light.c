@@ -36,40 +36,6 @@ static inline unsigned light_bis_channel (unsigned ti)
 	return (unsigned) t;
 }
 
-static inline void blocklight_add_dynamic_channel
-	(unsigned * c, int negativeLight, float dist, float minlight, float addend)
-{
-	if(!negativeLight)
-	{
-		if (dist < minlight)
-			c[0] += addend;
-	}
-	else
-	{
-		if (dist < minlight)
-			c[0] -= addend;
-		if(c[0] < minlight)
-			c[0] = minlight;
-	}
-}
-
-
-#ifdef COLOR_32
-static inline void blocklight_add_dynamic
-	(unsigned index, int negativeLight, float dist, float minlight, float addend)
-{
-	blocklight_add_dynamic_channel (&blocklights[index].r, negativeLight, dist, minlight, addend);
-	blocklight_add_dynamic_channel (&blocklights[index].g, negativeLight, dist, minlight, addend);
-	blocklight_add_dynamic_channel (&blocklights[index].b, negativeLight, dist, minlight, addend);
-}
-
-#else
-static inline void blocklight_add_dynamic
-	(unsigned index, int negativeLight, float dist, float minlight, float addend)
-{
-	blocklight_add_dynamic_channel (&blocklights[index].c, negativeLight, dist, minlight, addend);
-}
-#endif
 
 /*
 =============================================================================
@@ -404,6 +370,8 @@ void R_AddDynamicLights (void)
 				td = -td;
 			for (s=0 ; s<smax ; s++)
 			{
+				blocklight_t * pfBL;
+
 				sd = local[0] - s*16;
 				if (sd < 0)
 					sd = -sd;
@@ -413,7 +381,40 @@ void R_AddDynamicLights (void)
 					dist = td + (sd>>1);
 //====
 //PGM
-				blocklight_add_dynamic (t * smax + s, negativeLight, dist, minlight, (rad - dist) * 256);
+				pfBL = &blocklights[t * smax + s];
+
+                if(!negativeLight)
+                {
+                    if (dist < minlight) {
+#ifdef COLOR_32
+                        pfBL->r += (rad - dist)*256*dl->color[0];
+                        pfBL->g += (rad - dist)*256*dl->color[1];
+                        pfBL->b += (rad - dist)*256*dl->color[2];
+#else
+                        pfBL->c += (rad - dist)*256;
+#endif
+					}
+                }
+                else
+                {
+                    if (dist < minlight) {
+#ifdef COLOR_32
+                        pfBL->r -= (rad - dist)*256*dl->color[0];
+                        pfBL->g -= (rad - dist)*256*dl->color[1];
+                        pfBL->b -= (rad - dist)*256*dl->color[2];
+#else
+                        pfBL->c -= (rad - dist)*256;
+#endif
+					}
+#ifdef COLOR_32
+                    if(pfBL->r < minlight) pfBL->r = minlight;
+                    if(pfBL->g < minlight) pfBL->g = minlight;
+                    if(pfBL->b < minlight) pfBL->b = minlight;
+#else
+                    if(pfBL->c < minlight) pfBL->c = minlight;
+#endif
+                }
+
 //PGM
 //====
 			}
