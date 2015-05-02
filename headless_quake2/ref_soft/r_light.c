@@ -23,6 +23,53 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 int	r_dlightframecount;
 
+static inline unsigned light_bis_channel (unsigned ti)
+{
+	int t = (int)ti;
+	if (t < 0)
+		t = 0;
+	t = (255*256 - t) >> (8 - VID_CBITS);
+
+	if (t < (1 << 6))
+		t = (1 << 6);
+
+	return (unsigned) t;
+}
+
+static inline void blocklight_add_dynamic_channel
+	(unsigned * c, int negativeLight, float dist, float minlight, float addend)
+{
+	if(!negativeLight)
+	{
+		if (dist < minlight)
+			c[0] += addend;
+	}
+	else
+	{
+		if (dist < minlight)
+			c[0] -= addend;
+		if(c[0] < minlight)
+			c[0] = minlight;
+	}
+}
+
+
+#ifdef COLOR_32
+static inline void blocklight_add_dynamic
+	(unsigned index, int negativeLight, float dist, float minlight, float addend)
+{
+	blocklight_add_dynamic_channel (&blocklights[index].r, negativeLight, dist, minlight, addend);
+	blocklight_add_dynamic_channel (&blocklights[index].g, negativeLight, dist, minlight, addend);
+	blocklight_add_dynamic_channel (&blocklights[index].b, negativeLight, dist, minlight, addend);
+}
+
+#else
+static inline void blocklight_add_dynamic
+	(unsigned index, int negativeLight, float dist, float minlight, float addend)
+{
+	blocklight_add_dynamic_channel (&blocklights[index].c, negativeLight, dist, minlight, addend);
+}
+#endif
 
 /*
 =============================================================================

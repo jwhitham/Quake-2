@@ -56,16 +56,29 @@ qboolean        r_cache_thrash;         // set if surface cache is thrashing
 int         sc_size;
 surfcache_t	*sc_rover, *sc_base;
 
-
 #ifdef COLOR_32
 static inline int get_light_channel (int offset)
 {
-	return r_lightptr[offset].r;
+	return * ((unsigned *) &r_lightptr[offset]);
 }
 
 static inline void surf_apply_lighting (byte * dest, byte * src, int light)
 {
 	(* dest) = apply_lighting_channel (light, (* src));
+}
+
+static lightadj_t lightstyle_to_lightadj (lightstyle_t s)
+{
+	lightadj_t l;
+	l.r = s.rgb[0] * 128 * 3;
+	l.g = s.rgb[1] * 128 * 3;
+	l.b = s.rgb[2] * 128 * 3;
+	return l;
+}
+
+static inline int lightadj_eq (lightadj_t l, lightadj_t r)
+{
+	return l.g == r.g && l.b == r.b && l.r == r.r;
 }
 
 #else
@@ -78,6 +91,19 @@ static inline void surf_apply_lighting (byte * dest, byte * src, int light)
 {
 	(* dest) = ((unsigned char *)vid.colormap)[(light & 0xFF00) + (* src)];
 }
+
+static inline lightadj_t lightstyle_to_lightadj (lightstyle_t s)
+{
+	lightadj_t l;
+	l.c = s.white * 128;
+	return l;
+}
+
+static inline int lightadj_eq (lightadj_t l, lightadj_t r)
+{
+	return l.c == r.c;
+}
+
 #endif
 
 /*
@@ -167,8 +193,6 @@ void R_DrawSurface (void)
 
 	for (u=0 ; u<r_numhblocks; u++)
 	{
-		r_lightptr = blocklights + u;
-
 		prowdestbase = pcolumndest;
 		pbasesource = (basetptr + soffset);
 
@@ -177,15 +201,18 @@ void R_DrawSurface (void)
 			int i;
 			// Do each channel in three separate passes,
 			// moving the pointers by one unit between passes
+			// This does Blue, then Green, then Red
 			for (i = 0; i < 3; i++) {
+				r_lightptr = blocklights + u;
+				r_lightptr = (blocklight_t *) (((byte *) r_lightptr) + (i * 4));
 				(*pblockdrawer)();
 				prowdestbase = (pixel_t *) (((byte *) prowdestbase) + 1);
 				pbasesource = (pixel_t *) (((byte *) pbasesource) + 1);
-				r_lightptr = (blocklight_t *) (((byte *) r_lightptr) + 4);
 			}
 		}
 
 #else
+		r_lightptr = blocklights + u;
 		(*pblockdrawer)();
 #endif
 
